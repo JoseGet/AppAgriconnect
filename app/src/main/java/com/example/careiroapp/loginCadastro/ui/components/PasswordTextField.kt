@@ -12,13 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.OutputTransformation
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
@@ -28,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -38,18 +36,14 @@ import com.example.careiroapp.R
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun LoginTextField(
-    title: String,
-    placeholder: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    maxChar: Int? = null,
+fun PassWordTextField(
     state: TextFieldState,
-    outputTransformation: OutputTransformation? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
 ) {
 
     Column() {
         Text(
-            title,
+            stringResource(R.string.senha),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = montserratRegularFontFamily,
@@ -74,18 +68,14 @@ fun LoginTextField(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                BasicTextField(
+                BasicSecureTextField(
                     modifier = Modifier
                         .padding(start = 16.dp),
                     state = state,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = keyboardType
                     ),
-                    inputTransformation = if (maxChar != null) {
-                        InputTransformation.maxLength(maxChar)
-                    } else null,
-                    outputTransformation = outputTransformation,
-                    lineLimits = TextFieldLineLimits.SingleLine,
+                    textObfuscationMode = TextObfuscationMode.RevealLastTyped,
                     textStyle = LocalTextStyle.current.copy(
                         color = Color.Black,
                         textAlign = TextAlign.Start
@@ -97,7 +87,7 @@ fun LoginTextField(
                         ) {
                             if (state.text.isEmpty()) {
                                 Text(
-                                    text = placeholder,
+                                    text = stringResource(R.string.digite_senha),
                                     style = TextStyle(
                                         fontFamily = montserratRegularFontFamily,
                                         fontSize = 14.sp,
@@ -107,7 +97,7 @@ fun LoginTextField(
                             }
                             innerTextField()
                         }
-                    },
+                    }
                 )
             }
         }
@@ -117,10 +107,8 @@ fun LoginTextField(
 @Composable
 @Preview(showBackground = true)
 
-private fun LoginTextFieldPreview() {
-    LoginTextField(
-        title = "Email",
-        placeholder = "Digite seu email",
+private fun PasswordTextFieldPreview() {
+    PassWordTextField(
         state = rememberTextFieldState()
     )
 }

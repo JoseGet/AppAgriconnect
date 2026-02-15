@@ -14,13 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
-import androidx.compose.foundation.text.input.OutputTransformation
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,18 +32,15 @@ import com.example.careiroapp.R
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun LoginTextField(
-    title: String,
-    placeholder: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    maxChar: Int? = null,
-    state: TextFieldState,
-    outputTransformation: OutputTransformation? = null,
+fun EmailTextField(
+    email: String,
+    onValueChange: (String) -> Unit,
+    hasEmailError: Boolean
 ) {
 
     Column() {
         Text(
-            title,
+            stringResource(R.string.email),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = montserratRegularFontFamily,
@@ -77,27 +68,17 @@ fun LoginTextField(
                 BasicTextField(
                     modifier = Modifier
                         .padding(start = 16.dp),
-                    state = state,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = keyboardType
-                    ),
-                    inputTransformation = if (maxChar != null) {
-                        InputTransformation.maxLength(maxChar)
-                    } else null,
-                    outputTransformation = outputTransformation,
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    textStyle = LocalTextStyle.current.copy(
-                        color = Color.Black,
-                        textAlign = TextAlign.Start
-                    ),
-                    decorator = { innerTextField ->
+                    value = email,
+                    onValueChange = onValueChange,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    decorationBox = { innerTextField ->
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            if (state.text.isEmpty()) {
+                            if (email.isEmpty()) {
                                 Text(
-                                    text = placeholder,
+                                    text = stringResource(R.string.digete_email),
                                     style = TextStyle(
                                         fontFamily = montserratRegularFontFamily,
                                         fontSize = 14.sp,
@@ -107,7 +88,15 @@ fun LoginTextField(
                             }
                             innerTextField()
                         }
-                    },
+                        if (hasEmailError) {
+                            Text(
+                                text = "CPF inválido",
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                            )
+                        }
+                    }
                 )
             }
         }
@@ -116,11 +105,10 @@ fun LoginTextField(
 
 @Composable
 @Preview(showBackground = true)
-
-private fun LoginTextFieldPreview() {
-    LoginTextField(
-        title = "Email",
-        placeholder = "Digite seu email",
-        state = rememberTextFieldState()
+private fun EmailTextFieldPreview() {
+    EmailTextField(
+        email = "",
+        onValueChange = {},
+        hasEmailError = true
     )
 }

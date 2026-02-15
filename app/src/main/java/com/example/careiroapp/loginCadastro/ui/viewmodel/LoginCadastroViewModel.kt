@@ -2,6 +2,7 @@ package com.example.careiroapp.loginCadastro.ui.viewmodel
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
