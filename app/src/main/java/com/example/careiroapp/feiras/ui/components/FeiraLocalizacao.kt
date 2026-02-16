@@ -1,4 +1,4 @@
-package com.example.careiroapp.associacoes.ui.components
+package com.example.careiroapp.feiras.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,20 +16,19 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun AssociacaoSection(
-    title: String,
-    content: String
+fun FeiraLocalizacao(
+    localizacao: String
 ) {
     Column {
         Text(
-            title,
+            stringResource(R.string.localizacao),
             fontSize = 16.sp,
             fontFamily = montserratBoldFontFamily,
             color = colorResource(R.color.dark_gray)
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            content,
+            localizacao,
             fontSize = 14.sp,
             fontFamily = montserratRegularFontFamily,
             color = colorResource(R.color.dark_gray)
@@ -39,9 +38,8 @@ fun AssociacaoSection(
 
 @Composable
 @Preview
-private fun AssociacaoDescriptionPreview() {
-    AssociacaoSection(
-        title = "Titulo",
-        content = stringResource(R.string.default_big_text)
+private fun FeiraLocalizacaoPreview() {
+    FeiraLocalizacao(
+        localizacao = stringResource(R.string.default_big_text)
     )
 }

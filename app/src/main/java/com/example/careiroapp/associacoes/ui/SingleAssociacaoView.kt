@@ -31,12 +31,10 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import com.example.careiroapp.R
-import com.example.careiroapp.associacoes.data.models.AssociacaoProductModel
-import com.example.careiroapp.associacoes.ui.components.AssociacaoDescription
 import com.example.careiroapp.associacoes.ui.components.AssociacaoProductorsRow
 import com.example.careiroapp.associacoes.ui.components.AssociacaoProductsRow
+import com.example.careiroapp.associacoes.ui.components.AssociacaoSection
 import com.example.careiroapp.associacoes.ui.viewmodel.AssociacaoViewModel
-import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.common.components.SingleImage
 import com.example.careiroapp.common.components.buttons.BackButton
 import com.example.careiroapp.common.montserratBoldFontFamily
@@ -112,8 +110,19 @@ fun SingleAssociacaoView(
             )
         }
         Spacer(Modifier.height(16.dp))
-        AssociacaoDescription(
-            description = uiState.selectedAssociacao?.descricao ?: ""
+        AssociacaoSection(
+            title = stringResource(R.string.descricao),
+            content = uiState.selectedAssociacao?.descricao ?: ""
+        )
+        Spacer(Modifier.height(24.dp))
+        AssociacaoSection(
+            title = stringResource(R.string.hora_funcionamento),
+            content = uiState.selectedAssociacao?.dataHora ?: ""
+        )
+        Spacer(Modifier.height(24.dp))
+        AssociacaoSection(
+            title = stringResource(R.string.endereco),
+            content = uiState.selectedAssociacao?.endereco ?: ""
         )
         Spacer(Modifier.height(24.dp))
         uiState.selectedAssociacao?.productorsList?.takeIf { it.isNotEmpty() }?.let { list ->

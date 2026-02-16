@@ -128,6 +128,7 @@ object Mocks {
             nome = "Associação dos Agricultores",
             dataHora = "",
             descricao = "",
+            localizacao = "",
             image = ""
         ),
         FeiraModel(
@@ -135,6 +136,7 @@ object Mocks {
             nome = "Cooperativa de Pescadores",
             dataHora = "",
             descricao = "",
+            localizacao = "",
             image = ""
         ),
         FeiraModel(
@@ -142,6 +144,7 @@ object Mocks {
             image = "",
             nome = "Associação dos Artesãos",
             dataHora = "",
+            localizacao = "",
             descricao = ""
         ),
         FeiraModel(
@@ -149,6 +152,7 @@ object Mocks {
             image = "",
             nome = "Associação Comunitária",
             dataHora = "",
+            localizacao = "",
             descricao = ""
         )
     )

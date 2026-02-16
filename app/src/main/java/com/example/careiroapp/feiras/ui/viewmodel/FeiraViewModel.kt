@@ -42,6 +42,7 @@ class FeiraViewModel @Inject constructor(
                     nome = feira.nome,
                     descricao = feira.descricao,
                     dataHora = feira.dataHora,
+                    localizacao = feira.localizacao,
                     image = feira.image
                 )
             }
