@@ -138,7 +138,7 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun clienteApiSetupProvider(@PublicClient okHttpClient: OkHttpClient): ClienteApiService {
+    fun clienteApiSetupProvider(@AuthenticatedClient okHttpClient: OkHttpClient): ClienteApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

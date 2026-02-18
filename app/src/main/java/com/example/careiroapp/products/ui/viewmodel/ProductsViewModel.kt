@@ -3,17 +3,26 @@ package com.example.careiroapp.products.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.data.dataStore.UserDataStore
+import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
+import com.example.careiroapp.loginCadastro.domain.usecases.AddToFavoritesUseCase
+import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
+import com.example.careiroapp.loginCadastro.domain.usecases.RemoveFromFavoritesUseCase
+import com.example.careiroapp.products.data.models.AddFavoritesReqModel
 import com.example.careiroapp.products.data.models.ProductCardModel
-import com.example.careiroapp.products.domain.usecases.GetProductsUseCase
+import com.example.careiroapp.products.data.models.ProductModel
 import com.example.careiroapp.products.domain.usecases.GetProductByIdUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductVendedorUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaCountUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsCountUseCase
+import com.example.careiroapp.products.domain.usecases.GetProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -26,7 +35,11 @@ class ProductsViewModel @Inject constructor(
     private val getProductsByCategoriaUseCase: GetProductsByCategoriaUseCase,
     private val getProductsCountUseCase: GetProductsCountUseCase,
     private val getProductsByCategoriaCountUseCase: GetProductsByCategoriaCountUseCase,
-    private val getProductVendedorUseCase: GetProductVendedorUseCase
+    private val getProductVendedorUseCase: GetProductVendedorUseCase,
+    private val addToFavoritesUseCase: AddToFavoritesUseCase,
+    private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    userDataStore: UserDataStore
 ) : ViewModel() {
 
     private val TAG = "ProductsViewModel"
@@ -39,6 +52,12 @@ class ProductsViewModel @Inject constructor(
 
     private var isInitializedByNavArg = false
 
+    val userData: StateFlow<UserDataStoreModel> = userDataStore.getUserData()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UserDataStoreModel()
+        )
 
     fun getProducts(isNecessaryLoadMore: Boolean) {
 
@@ -94,7 +113,10 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
-    fun getProductById(id: UUID) {
+    fun getProductById(
+        cpf: String,
+        id: UUID
+    ) {
         viewModelScope.launch {
             try {
                 _productUiState.update {
@@ -103,14 +125,20 @@ class ProductsViewModel @Inject constructor(
                     )
                 }
 
+                val getFavoritesReq = getFavoritesUseCase.invoke(cpf)
                 val selectedItem = getProductByIdUseCase.invoke(id)
                 val productorName = getVendedorName(selectedItem?.fkVendedor)
+                val isFavorite = isItemFavorite(
+                    productId = id,
+                    body = getFavoritesReq.body()
+                )
 
                 _productUiState.update {
                     it.copy(
                         isLoading = false,
                         selectedProduct = selectedItem,
-                        productorName = productorName
+                        productorName = productorName,
+                        isSelectedProductFavorite = isFavorite
                     )
                 }
 
@@ -135,7 +163,8 @@ class ProductsViewModel @Inject constructor(
                 }
 
                 val currentList = productUiState.value.productsCardList
-                val productsList = getProductsByCategoriaUseCase.invoke(nomeCategoria, offset, limit)
+                val productsList =
+                    getProductsByCategoriaUseCase.invoke(nomeCategoria, offset, limit)
 
                 val productsCount = getProductsByCategoriaCount(nomeCategoria)
 
@@ -177,7 +206,8 @@ class ProductsViewModel @Inject constructor(
 
     private suspend fun getProductsCount(): Int? = getProductsCountUseCase.invoke()
 
-    private suspend fun getProductsByCategoriaCount(nomeCategoria: String): Int? = getProductsByCategoriaCountUseCase.invoke(nomeCategoria)
+    private suspend fun getProductsByCategoriaCount(nomeCategoria: String): Int? =
+        getProductsByCategoriaCountUseCase.invoke(nomeCategoria)
 
     fun updateFilterActivate(filterName: String?) {
         _productUiState.update {
@@ -215,7 +245,8 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             _productUiState.update {
                 it.copy(
-                    selectedProduct = null
+                    selectedProduct = null,
+                    isSelectedProductFavorite = null
                 )
             }
         }
@@ -229,7 +260,73 @@ class ProductsViewModel @Inject constructor(
     }
 
     suspend fun getVendedorName(idVendedor: UUID?): String {
-       return getProductVendedorUseCase.invoke(idVendedor)?.nome ?: ""
+        return getProductVendedorUseCase.invoke(idVendedor)?.nome ?: ""
+    }
+
+    fun addProductToFavorites(
+        cpf: String
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val productIdBody = AddFavoritesReqModel(
+                    productId = productUiState.value.selectedProduct?.id
+                )
+
+                val addToFavoritesReq = addToFavoritesUseCase.invoke(
+                    cpf = cpf,
+                    productId = productIdBody
+                )
+
+                if (addToFavoritesReq.isSuccessful) {
+                    _productUiState.update { it.copy(isSelectedProductFavorite = true) }
+                }
+
+            } catch (e: Exception) {
+                e.message?.let { Log.e(TAG, it) }
+            }
+        }
+    }
+
+    fun removeProductFromFavorites(
+        cpf: String
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val productIdBody = AddFavoritesReqModel(
+                    productId = productUiState.value.selectedProduct?.id
+                )
+
+                val removeFromFavoritesReq = removeFromFavoritesUseCase.invoke(
+                    cpf = cpf,
+                    productId = productIdBody
+                )
+
+                if (removeFromFavoritesReq.isSuccessful) {
+                    _productUiState.update { it.copy(isSelectedProductFavorite = false) }
+                }
+
+            } catch (e: Exception) {
+                e.message?.let { Log.e(TAG, it) }
+            }
+        }
+    }
+
+    private fun isItemFavorite(
+        productId: UUID,
+        body: MutableList<ProductModel>?
+    ): Boolean {
+        val favoriteIdList = body?.map { it.id }
+        if (favoriteIdList?.contains(productId) == true) {
+            return true
+        }
+
+        return false
+    }
+
+    companion object {
+        private const val TAG = "ProductsViewModel"
     }
 
 }

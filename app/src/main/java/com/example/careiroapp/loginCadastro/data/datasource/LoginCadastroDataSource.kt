@@ -1,12 +1,14 @@
 package com.example.careiroapp.loginCadastro.data.datasource
 
-import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
-import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
-import com.example.careiroapp.loginCadastro.data.model.LoginResponseModel
 import com.example.careiroapp.data.network.api.AuthApiService
 import com.example.careiroapp.data.network.api.ClienteApiService
 import com.example.careiroapp.data.network.api.RefreshApiTokenService
+import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
+import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
+import com.example.careiroapp.loginCadastro.data.model.LoginResponseModel
 import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
+import com.example.careiroapp.products.data.models.AddFavoritesReqModel
+import com.example.careiroapp.products.data.models.ProductModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -36,6 +38,26 @@ class LoginCadastroDataSource @Inject constructor(
             senha = senha,
             foto_perfil = imagePart
         )
+    }
+
+    suspend fun addToFavorite(
+        cpf: String,
+        productId: AddFavoritesReqModel
+    ): Response<Any> {
+        return clienteApiService.addToFavorites(cpf, productId)
+    }
+
+    suspend fun removeFromFavorites(
+        cpf: String,
+        productId: AddFavoritesReqModel
+    ): Response<Any> {
+        return clienteApiService.removeFromFavorites(cpf, productId)
+    }
+
+    suspend fun getFavorites(
+        cpf: String,
+    ): Response<MutableList<ProductModel>> {
+        return clienteApiService.getFavorites(cpf)
     }
 
     suspend fun login(

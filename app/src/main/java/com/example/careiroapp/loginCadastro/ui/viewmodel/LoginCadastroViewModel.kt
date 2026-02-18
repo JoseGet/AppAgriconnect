@@ -138,6 +138,7 @@ class LoginCadastroViewModel @Inject constructor(
                     jwtDataStore.saveRefreshJwt(loginResponse.body()?.refreshToken ?: "")
                     val userData = loginResponse.body()?.let {
                         UserDataStoreModel(
+                            cpf = it.cliente.cpf,
                             name = it.cliente.nome,
                             email = it.cliente.email,
                             telefone = it.cliente.telefone,

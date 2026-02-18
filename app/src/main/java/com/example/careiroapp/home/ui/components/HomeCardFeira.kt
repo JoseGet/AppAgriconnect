@@ -54,7 +54,7 @@ fun HomeCardFeira(
             .wrapContentHeight()
             .background(color = Color.Transparent),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 6.dp
         ),
         shape = RoundedCornerShape(25.dp),
     ) {
@@ -76,7 +76,7 @@ fun HomeCardFeira(
             Text(
                 titleText,
                 modifier = Modifier
-                    .padding(start = 16.dp),
+                    .padding(horizontal = 16.dp),
                 maxLines = 2,
                 fontSize = 16.sp,
                 fontFamily = montserratBoldFontFamily,
@@ -86,7 +86,7 @@ fun HomeCardFeira(
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
-                    .padding(start = 16.dp),
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -108,7 +108,7 @@ fun HomeCardFeira(
             Spacer(modifier = Modifier.height(4.dp))
             Row(
                 modifier = Modifier
-                    .padding(start = 16.dp),
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -122,6 +122,7 @@ fun HomeCardFeira(
                 Text(
                     dataText,
                     fontSize = 14.sp,
+                    maxLines = 2,
                     color = Color.Black,
                     fontFamily = montserratRegularFontFamily,
                     overflow = TextOverflow.Ellipsis
