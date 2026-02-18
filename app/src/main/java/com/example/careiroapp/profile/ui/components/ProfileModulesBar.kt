@@ -1,42 +1,37 @@
 package com.example.careiroapp.profile.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.TabIndicatorScope
+import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
-import com.example.careiroapp.profile.util.ProfileRoutes
+import com.example.careiroapp.profile.ui.viewmodel.ProfileModules
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileModulesBar() {
+fun ProfileModulesBar(
+    currentModule: ProfileModules,
+    onCLick: (ProfileModules) -> Unit
+) {
 
-    val profileNavController = rememberNavController()
-    val startDestination = ProfileRoutes.Pedidos
-    var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
+    var selectedDestination by rememberSaveable { mutableIntStateOf(currentModule.ordinal) }
 
     PrimaryTabRow(
         containerColor = Color.Transparent,
@@ -53,19 +48,24 @@ fun ProfileModulesBar() {
         },
         divider = {}
     ) {
-        ProfileRoutes.entries.forEachIndexed { index, routes ->
-            Box(
-                modifier = Modifier,
-                contentAlignment = Alignment.Center
+        ProfileModules.entries.forEachIndexed { index, module ->
+            Tab(
+                selected = selectedDestination == index,
+                onClick = {
+                    selectedDestination = index
+                    onCLick(module)
+                },
+                modifier = Modifier.padding(bottom = 8.dp)
             ) {
                 Text(
-                    text = routes.name,
+                    text = module.name,
                     maxLines = 1,
                     style = TextStyle(
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontFamily = if (selectedDestination == index) montserratBoldFontFamily else montserratRegularFontFamily,
                         color = colorResource(R.color.top_bar_title_color)
-                    )
+                    ),
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
         }
@@ -76,5 +76,8 @@ fun ProfileModulesBar() {
 @Composable
 @Preview(showBackground = true)
 private fun ProfileModulesBarPreview() {
-    ProfileModulesBar()
+    ProfileModulesBar(
+        ProfileModules.PEDIDOS,
+        onCLick = {}
+    )
 }

@@ -35,7 +35,7 @@ fun AppDrawer(
     viewModel: ProfileViewModel = hiltViewModel(),
     loginCadastroViewModel: LoginCadastroViewModel = hiltViewModel()
 ) {
-    val userState by viewModel.uiState.collectAsStateWithLifecycle()
+    val userState by viewModel.dataStoreUiState.collectAsStateWithLifecycle()
 
     val noProfileImage = R.drawable.no_profile
     val context = LocalContext.current
