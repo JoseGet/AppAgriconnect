@@ -2,6 +2,7 @@ package com.example.careiroapp.loginCadastro.ui
 
 import android.app.Activity
 import android.os.Build.VERSION.SDK_INT
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -57,8 +58,7 @@ fun LoginView(
     val focusManager = LocalFocusManager.current
 
     BackHandler() {
-        if (uiState.cardState == CardState.CADASTRO)
-        {
+        if (uiState.cardState == CardState.CADASTRO) {
             viewModel.changeCardState(CardState.LOGIN)
         } else {
             (context as? Activity)?.finish()
@@ -121,7 +121,8 @@ fun LoginView(
                             email,
                             senha,
                             goToMainView = {
-                                navController.navigate(NavigationItem.Home.route)
+                                navController.navigate(NavigationItem.Main.route)
+                                Log.i("NAV", "Indo para a Home")
                             }
                         )
                     }
@@ -148,7 +149,10 @@ fun LoginView(
         }
         if (uiState.isLoading) {
             Image(
-                painter = rememberAsyncImagePainter(model = R.drawable.load, imageLoader = imageLoader),
+                painter = rememberAsyncImagePainter(
+                    model = R.drawable.load,
+                    imageLoader = imageLoader
+                ),
                 contentDescription = null
             )
         }

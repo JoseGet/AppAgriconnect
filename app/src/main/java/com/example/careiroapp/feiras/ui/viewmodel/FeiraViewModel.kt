@@ -1,5 +1,6 @@
 package com.example.careiroapp.feiras.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.feiras.data.models.FeiraModel
@@ -27,33 +28,35 @@ class FeiraViewModel @Inject constructor(
 
     fun getFeiras() {
         viewModelScope.launch {
+            try {
+                _feiraUiState.update {
+                    it.copy(
+                        isLoading = true
+                    )
+                }
 
-            _feiraUiState.update {
-                it.copy(
-                    isLoading = true
-                )
+                val feirasListRequest = getFeirasUseCase.invoke()
+
+                if (feirasListRequest.isSuccessful) {
+                    val feirasList = feirasListRequest.body()
+
+                    val feirasCardList: List<FeiraModel>? = feirasList?.map { feira ->
+                        FeiraModel(
+                            id = feira.id,
+                            nome = feira.nome,
+                            descricao = feira.descricao,
+                            dataHora = feira.dataHora,
+                            localizacao = feira.localizacao,
+                            image = feira.image
+                        )
+                    }
+                    _feiraUiState.update { it.copy(feirasCardList = feirasCardList ?: emptyList())}
+                }
+            } catch (e: Exception) {
+                e.message?.let { Log.e(TAG, it) }
+            } finally {
+                _feiraUiState.update { it.copy(isLoading = false) }
             }
-
-            val feirasList = getFeirasUseCase.invoke()
-
-            val feirasCardList: List<FeiraModel>? = feirasList?.map { feira ->
-                FeiraModel(
-                    id = feira.id,
-                    nome = feira.nome,
-                    descricao = feira.descricao,
-                    dataHora = feira.dataHora,
-                    localizacao = feira.localizacao,
-                    image = feira.image
-                )
-            }
-
-            _feiraUiState.update {
-                it.copy(
-                    isLoading = false,
-                    feirasCardList = feirasCardList ?: emptyList()
-                )
-            }
-
         }
     }
     
@@ -86,5 +89,9 @@ class FeiraViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "FeiraViewModel"
     }
 }

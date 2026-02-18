@@ -4,6 +4,7 @@ import com.example.careiroapp.loginCadastro.data.datasource.LoginCadastroDataSou
 import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
 import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
 import com.example.careiroapp.loginCadastro.data.model.LoginResponseModel
+import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -23,4 +24,11 @@ class LoginCadastroRepository @Inject constructor(
     ): Response<LoginResponseModel> {
         return dataSource.login(loginRequestModel)
     }
+
+    suspend fun logout(
+        refreshToken: LogoutRequestModel
+    ): Response<Any>  {
+        return dataSource.logout(refreshToken)
+    }
+
 }

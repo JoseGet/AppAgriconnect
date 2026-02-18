@@ -25,4 +25,6 @@ interface ClienteApiService {
         @Part foto_perfil: MultipartBody.Part?
     ): Response<ClienteDTO>
 
+    @POST("clientes/{cpf}/favoritos")
+
 }

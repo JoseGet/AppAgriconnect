@@ -5,6 +5,8 @@ import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
 import com.example.careiroapp.loginCadastro.data.model.LoginResponseModel
 import com.example.careiroapp.data.network.api.AuthApiService
 import com.example.careiroapp.data.network.api.ClienteApiService
+import com.example.careiroapp.data.network.api.RefreshApiTokenService
+import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 class LoginCadastroDataSource @Inject constructor(
     private val clienteApiService: ClienteApiService,
-    private val authApiService: AuthApiService
+    private val authApiService: AuthApiService,
+    private val refreshApiTokenService: RefreshApiTokenService
 ) {
     suspend fun createCliente(
         cliente: ClienteDTO, imagePart: MultipartBody.Part?
@@ -39,6 +42,12 @@ class LoginCadastroDataSource @Inject constructor(
         loginRequest: LoginRequestModel
     ): Response<LoginResponseModel> {
         return authApiService.login(loginRequest)
+    }
+
+    suspend fun logout(
+        refreshToken: LogoutRequestModel
+    ): Response<Any> {
+        return refreshApiTokenService.logout(refreshToken)
     }
 
 }
