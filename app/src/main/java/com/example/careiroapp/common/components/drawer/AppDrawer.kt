@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
+import com.example.careiroapp.loginCadastro.ui.viewmodel.LoginCadastroViewModel
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 
@@ -30,9 +31,11 @@ fun AppDrawer(
     tabBarNavController: NavController,
     closeDrawerFunction: () -> Unit,
     resetScrollFunction: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel()
+    backToLogin: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel(),
+    loginCadastroViewModel: LoginCadastroViewModel = hiltViewModel()
 ) {
-    val userState by viewModel.uiState.collectAsStateWithLifecycle()
+    val userState by viewModel.dataStoreUiState.collectAsStateWithLifecycle()
 
     val noProfileImage = R.drawable.no_profile
     val context = LocalContext.current
@@ -99,7 +102,11 @@ fun AppDrawer(
                 HorizontalDivider(Modifier.padding(horizontal = 15.dp))
                 DrawerItem(
                     text = stringResource(R.string.sair),
-                    onClick = {}
+                    onClick = {
+                        loginCadastroViewModel.logout(
+                            backToLogin = backToLogin
+                        )
+                    }
                 )
             }
         }
@@ -112,6 +119,7 @@ private fun AppDrawerPreview() {
     AppDrawer(
         tabBarNavController = rememberNavController(),
         closeDrawerFunction = {},
-        resetScrollFunction = {}
+        resetScrollFunction = {},
+        backToLogin = {}
     )
 }

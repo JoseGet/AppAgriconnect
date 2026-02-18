@@ -3,34 +3,34 @@ package com.example.careiroapp.loginCadastro.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,11 +43,9 @@ fun LoginTextField(
     placeholder: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     maxChar: Int? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    value: String,
-    onChange: (String) -> Unit
+    state: TextFieldState,
+    outputTransformation: OutputTransformation? = null,
 ) {
-    val focusRequester = remember { FocusRequester() }
 
     Column() {
         Text(
@@ -79,36 +77,37 @@ fun LoginTextField(
                 BasicTextField(
                     modifier = Modifier
                         .padding(start = 16.dp),
-                    value = value,
+                    state = state,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = keyboardType
                     ),
-                    onValueChange = {newText ->
-                        if (maxChar != null) {
-                            if (newText.length <= maxChar) onChange(newText)
-                        } else {
-                            onChange(newText)
-                        }
-                    },
-                    visualTransformation = visualTransformation,
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
-                    decorationBox = { innerTextField ->
-                        if (value.isEmpty()) {
-                            Text(
-                                placeholder,
-                                modifier = Modifier
-                                    .focusRequester(focusRequester),
-                                style = TextStyle(
-                                    fontFamily = montserratRegularFontFamily,
-                                    fontSize = 14.sp,
-                                    color = colorResource(R.color.search_bar_border_color)
+                    inputTransformation = if (maxChar != null) {
+                        InputTransformation.maxLength(maxChar)
+                    } else null,
+                    outputTransformation = outputTransformation,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    textStyle = LocalTextStyle.current.copy(
+                        color = Color.Black,
+                        textAlign = TextAlign.Start
+                    ),
+                    decorator = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (state.text.isEmpty()) {
+                                Text(
+                                    text = placeholder,
+                                    style = TextStyle(
+                                        fontFamily = montserratRegularFontFamily,
+                                        fontSize = 14.sp,
+                                        color = colorResource(R.color.search_bar_border_color)
+                                    )
                                 )
-                            )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
                     },
-
                 )
             }
         }
@@ -122,7 +121,6 @@ private fun LoginTextFieldPreview() {
     LoginTextField(
         title = "Email",
         placeholder = "Digite seu email",
-        value = "",
-        onChange = {}
+        state = rememberTextFieldState()
     )
 }

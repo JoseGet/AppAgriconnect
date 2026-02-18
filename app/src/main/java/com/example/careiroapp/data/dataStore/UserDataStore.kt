@@ -31,7 +31,7 @@ class UserDataStore @Inject constructor(
     suspend fun saveUserData(newUserData: UserDataStoreModel?) {
         context.dataStore.updateData { userData ->
             userData.copy(
-                token = newUserData?.token ?: "",
+                cpf = newUserData?.cpf ?: "",
                 name = newUserData?.name ?: "",
                 email = newUserData?.email ?: "",
                 telefone = newUserData?.telefone ?: "",

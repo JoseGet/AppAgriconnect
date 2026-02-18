@@ -1,5 +1,6 @@
 package com.example.careiroapp.loginCadastro.ui.components
 
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -30,7 +32,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,23 +40,24 @@ import com.example.careiroapp.R
 import com.example.careiroapp.common.components.buttons.OutlineAppButton
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
+import com.example.careiroapp.loginCadastro.ui.components.formatters.CpfFormatter
+import com.example.careiroapp.loginCadastro.ui.components.formatters.PhoneNumberFormatter
 
 @Composable
 fun CadastroCard(
     onClickFazerLogin: () -> Unit,
     onClickFazerCadastro: (String, String, String, String, String, String) -> Unit
 ) {
-
     val interactionSource = remember { MutableInteractionSource() }
 
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
-    var nome by remember { mutableStateOf("") }
-    var cpf by remember { mutableStateOf("") }
-    var telefone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
+    var nome = rememberTextFieldState("")
+    var cpf = rememberTextFieldState("")
+    var telefone = rememberTextFieldState("")
+    var email = rememberTextFieldState("")
+    var senha = rememberTextFieldState("")
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -112,10 +114,7 @@ fun CadastroCard(
             LoginTextField(
                 title = stringResource(R.string.cadastro_nome),
                 placeholder = stringResource(R.string.cadastro_digite_nome),
-                value = nome,
-                onChange = {
-                    nome = it
-                }
+                state = nome
             )
             Spacer(Modifier.height(24.dp))
             LoginTextField(
@@ -123,10 +122,8 @@ fun CadastroCard(
                 placeholder = stringResource(R.string.cadastro_digite_cpf),
                 keyboardType = KeyboardType.Number,
                 maxChar = 11,
-                value = cpf,
-                onChange = {
-                    cpf = it
-                }
+                state = cpf,
+                outputTransformation = CpfFormatter(),
             )
             Spacer(Modifier.height(24.dp))
             LoginTextField(
@@ -134,30 +131,20 @@ fun CadastroCard(
                 placeholder = stringResource(R.string.cadastro_digite_telefone),
                 keyboardType = KeyboardType.Number,
                 maxChar = 11,
-                value = telefone,
-                onChange = {
-                    telefone = it
-                }
+                outputTransformation = PhoneNumberFormatter(),
+                state = telefone
             )
             Spacer(Modifier.height(24.dp))
             LoginTextField(
                 title = stringResource(R.string.email),
                 placeholder = stringResource(R.string.digete_email),
                 keyboardType = KeyboardType.Email,
-                value = email,
-                onChange = {
-                    email = it
-                }
+                state = email
             )
             Spacer(Modifier.height(24.dp))
-            LoginTextField(
-                title = stringResource(R.string.senha),
-                placeholder = stringResource(R.string.digite_senha),
-                visualTransformation = PasswordVisualTransformation(),
-                value = senha,
-                onChange = {
-                    senha = it
-                }
+            PassWordTextField(
+                state = senha,
+                keyboardType = KeyboardType.Password
             )
             Spacer(Modifier.height(24.dp))
             OutlineAppButton(
@@ -167,11 +154,11 @@ fun CadastroCard(
                 icon = null,
                 onClick = {
                     onClickFazerCadastro(
-                        nome,
-                        cpf,
-                        telefone,
-                        email,
-                        senha,
+                        nome.text.toString(),
+                        cpf.text.toString(),
+                        telefone.text.toString(),
+                        email.text.toString(),
+                        senha.text.toString(),
                         imageUri.toString()
                     )
                 },

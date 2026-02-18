@@ -10,6 +10,9 @@
     <string name="assinaturas">Assinaturas</string>
     <string name="sobre_nos">Sobre nós</string>
     <string name="descricao">Descrição</string>
+    <string name="localizacao">Localização</string>
+    <string name="hora_funcionamento">Horário de Funcionamento</string>
+    <string name="endereco">Endereço</string>
     <string name="voltar">Voltar</string>
     <string name="sair">Sair</string>
 

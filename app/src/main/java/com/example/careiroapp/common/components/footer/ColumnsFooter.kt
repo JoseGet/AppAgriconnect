@@ -55,7 +55,7 @@ fun ColumnsFooter() {
     )
 
     val annotatedText = buildAnnotatedString {
-        withStyle(style = SpanStyle(fontFamily = montserratRegularFontFamily)) {
+        withStyle(style = SpanStyle(fontFamily = montserratRegularFontFamily, color = colorResource(R.color.black))) {
             append(annotatedStringResource(R.string.apoio_content))
         }
         pushStringAnnotation(tag = "URL", annotation = moverseNaWebUrl)

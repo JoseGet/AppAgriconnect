@@ -1,6 +1,5 @@
 package com.example.careiroapp.associacoes.ui.viewmodel
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.associacoes.data.models.AssociacaoModel
@@ -9,7 +8,6 @@ import com.example.careiroapp.associacoes.domain.usecases.GetAssociacaoByIdUseCa
 import com.example.careiroapp.associacoes.domain.usecases.GetAssociacoesUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsByAssociacao
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -21,6 +21,10 @@ data class FeiraModel(
     @Expose
     val descricao: String,
 
+    @SerializedName("localizacao")
+    @Expose
+    val localizacao: String,
+
     @SerializedName("image")
     @Expose
     val image: String

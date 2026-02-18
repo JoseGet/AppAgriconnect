@@ -28,11 +28,7 @@ fun AppNavHost(
     val startDestination by viewModel.startDestination
 
     if (startDestination == null) {
-        Box(
-
-        ) {
-
-        }
+        Box {}
     } else {
         NavHost(
             navController = navController,
