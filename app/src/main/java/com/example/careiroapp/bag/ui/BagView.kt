@@ -52,7 +52,7 @@ fun BagView(
             BagBottomBar(
                 total = total,
                 onCheckout = {
-                    navController.navigate(NavigationItem.Checkout.route)
+                    if (itensNaSacola.isNotEmpty()) navController.navigate(NavigationItem.Checkout.route)
                 }
             )
         },

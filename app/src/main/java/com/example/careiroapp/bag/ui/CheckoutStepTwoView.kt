@@ -1,5 +1,6 @@
 package com.example.careiroapp.bag.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -101,11 +102,15 @@ fun CheckoutStepTwoView(
 
         CheckoutMainButton(
             {
-                onButtonClick(
-                    selectedDateTime?.date ?: "",
-                    selectedDateTime?.time ?: "",
-                    selectedLocation?.label ?: ""
-                )
+                if (!isValid) {
+                    Log.i("","")
+                } else {
+                    onButtonClick(
+                        selectedDateTime?.date ?: "",
+                        selectedDateTime?.time ?: "",
+                        selectedLocation?.label ?: ""
+                    )
+                }
             },
             isValid = isValid
         )

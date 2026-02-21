@@ -31,7 +31,9 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun CardCadastroAssociacao() {
+fun CardCadastroAssociacao(
+    onButtonClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,7 +80,7 @@ fun CardCadastroAssociacao() {
                 AppButton(
                     modifier = Modifier,
                     text = "Cadastrar associação",
-                    onClick = {},
+                    onClick = onButtonClick,
                     icon = painterResource(R.drawable.user_add),
                     containerColor = colorResource(R.color.dark_green)
                 )
@@ -90,5 +92,7 @@ fun CardCadastroAssociacao() {
 @Composable
 @Preview
 fun CardCadastroAssociacaoPreview() {
-    CardCadastroAssociacao()
+    CardCadastroAssociacao(
+        {}
+    )
 }

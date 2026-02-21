@@ -32,6 +32,7 @@ import coil3.request.crossfade
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.buttons.BackButton
 import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
+import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.products.ui.components.BuyProductRow
 import com.example.careiroapp.products.ui.components.FeaturedProducts
 import com.example.careiroapp.products.ui.components.ProductDescription
@@ -138,7 +139,11 @@ fun SingleProductView(
             navController
         )
         Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao()
+        CardCadastroAssociacao(
+            {
+                navController.navigate(NavigationItem.Associacoes.route)
+            }
+        )
     }
 }
 

@@ -201,7 +201,11 @@ fun HomeView(
             Spacer(Modifier.height(24.dp))
             TutorialRow()
             Spacer(Modifier.height(24.dp))
-            CardCadastroAssociacao()
+            CardCadastroAssociacao(
+                {
+                    navController.navigate(NavigationItem.Associacoes.route)
+                }
+            )
         }
     }
 }

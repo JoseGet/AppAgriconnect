@@ -168,7 +168,11 @@ fun ProductsView(
             }
         }
         Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao()
+        CardCadastroAssociacao(
+            {
+                navController.navigate(NavigationItem.Associacoes.route)
+            }
+        )
     }
 }
 
