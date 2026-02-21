@@ -29,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
@@ -53,6 +54,7 @@ fun ProductsView(
 ) {
 
     val productViewUiState by productViewModel.productUiState.collectAsState()
+    val userDataStoreState by productViewModel.userData.collectAsStateWithLifecycle()
     val gridListState = rememberLazyGridState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -144,7 +146,10 @@ fun ProductsView(
                     gridListState = gridListState,
                     list = productViewUiState.productsCardList,
                     onItemClicker = { id ->
-                        productViewModel.getProductById(id)
+                        productViewModel.getProductById(
+                            userDataStoreState.cpf,
+                            id
+                        )
                         navController.navigate(NavigationItem.ProdutoUnico.route)
                         resetScrollFunction()
                     },
@@ -155,12 +160,19 @@ fun ProductsView(
                                 isNecessaryLoadMore = true
                             ) else productViewModel.getProducts(isNecessaryLoadMore = true)
                         }
+                    },
+                    addToBag = { product ->
+                        productViewModel.addProductToBag(product, userDataStoreState.cpf)
                     }
                 )
             }
         }
         Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao()
+        CardCadastroAssociacao(
+            {
+                navController.navigate(NavigationItem.Associacoes.route)
+            }
+        )
     }
 }
 

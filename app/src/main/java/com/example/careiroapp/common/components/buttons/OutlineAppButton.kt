@@ -65,7 +65,7 @@ fun OutlineAppButton(
             if (icon != null) {
                 Icon(
                     painter = icon,
-                    contentDescription = ""
+                    contentDescription = "",
                 )
             }
         }

@@ -10,6 +10,9 @@
     <string name="assinaturas">Assinaturas</string>
     <string name="sobre_nos">Sobre nós</string>
     <string name="descricao">Descrição</string>
+    <string name="localizacao">Localização</string>
+    <string name="hora_funcionamento">Horário de Funcionamento</string>
+    <string name="endereco">Endereço</string>
     <string name="voltar">Voltar</string>
     <string name="sair">Sair</string>
 
@@ -112,6 +115,16 @@ No Agriconnect, a tecnologia é aliada na criação de redes entre agricultores 
     <string name="fazer_cadastro">Fazer Cadastro</string>
     <string name="ja_tem_conta">Já tem uma conta?</string>
     <string name="faca_login">Faça login</string>
+
+    <string name="pagamento">Pagamento</string>
+    <string name="pagamento_description">Escolha uma forma de pagamento</string>
+    <string name="dinheiro">Dinheiro</string>
+    <string name="dinheiro_description">Pagamento feito no momento da retirada</string>
+    <string name="pix">Pix</string>
+    <string name="pix_description">Pagamento feito online, após a conclusão da compra</string>
+    <string name="retirada">Retirada</string>
+    <string name="resumo_compra">Resumo da compra</string>
+    <string name="resumo_compra_description">Revise todas as informações antes de concluir a compra</string>
 
 
 </resources>

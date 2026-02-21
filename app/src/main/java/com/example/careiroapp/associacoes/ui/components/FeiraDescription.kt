@@ -16,19 +16,20 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun AssociacaoDescription(
-    description: String
+fun AssociacaoSection(
+    title: String,
+    content: String
 ) {
     Column {
         Text(
-            stringResource(R.string.descricao),
+            title,
             fontSize = 16.sp,
             fontFamily = montserratBoldFontFamily,
             color = colorResource(R.color.dark_gray)
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            description,
+            content,
             fontSize = 14.sp,
             fontFamily = montserratRegularFontFamily,
             color = colorResource(R.color.dark_gray)
@@ -39,7 +40,8 @@ fun AssociacaoDescription(
 @Composable
 @Preview
 private fun AssociacaoDescriptionPreview() {
-    AssociacaoDescription(
-        description = stringResource(R.string.default_big_text)
+    AssociacaoSection(
+        title = "Titulo",
+        content = stringResource(R.string.default_big_text)
     )
 }

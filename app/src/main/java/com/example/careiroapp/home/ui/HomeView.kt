@@ -1,31 +1,46 @@
 package com.example.careiroapp.home.ui
 
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.ImageLoader
+import coil3.compose.rememberAsyncImagePainter
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.common.components.cards.CardAssinatura
 import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
-import com.example.careiroapp.home.ui.components.CardFeira
+import com.example.careiroapp.home.ui.components.HomeCardFeira
 import com.example.careiroapp.products.ui.components.ProductCard
 import com.example.careiroapp.home.ui.components.CategoriasModule
 import com.example.careiroapp.home.ui.components.TutorialRow
+import com.example.careiroapp.home.ui.viewmodel.HomeViewModel
+import com.example.careiroapp.navigation.NavigationItem
 
 @Composable
 fun HomeView(
@@ -40,6 +55,19 @@ fun HomeView(
 
     val produto2 = R.drawable.peras
     val uriProduto2 = "android.resource://${context.packageName}/$produto2"
+
+    val viewModel = hiltViewModel<HomeViewModel>()
+    val uiState by viewModel.uiState.collectAsState()
+
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (SDK_INT >= 28) {
+                add(AnimatedImageDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
 
     Column() {
         Image(
@@ -96,29 +124,36 @@ fun HomeView(
                 subtitulo = stringResource(R.string.conheca_nossas_feiras_descricao)
             )
             Spacer(Modifier.height(24.dp))
-            Row(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .wrapContentSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CardFeira(
+                if (uiState.isLoading) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = R.drawable.load, imageLoader = imageLoader),
+                        contentDescription = null
+                    )
+                }
+                LazyRow (
                     modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.feira1),
-                    localText = "Careiro, Amazonas",
-                    dataText = "20/09/25",
-                    titleText = "Feira da Matriz",
-                    buttonText = stringResource(R.string.ver_mais)
-                )
-                CardFeira(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.feira2),
-                    localText = "Careiro, Amazonas",
-                    dataText = "20/09/25",
-                    titleText = "Feira da Banana",
-                    buttonText = stringResource(R.string.ver_mais)
-                )
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.feirasList) { item ->
+                        HomeCardFeira(
+                            modifier = Modifier,
+                            image = item.image,
+                            localText = item.localizacao,
+                            dataText = item.dataHora,
+                            titleText = item.nome,
+                            onClick = {
+                                navController.navigate(NavigationItem.Feiras.route)
+                                resetScrollFunction()
+                            }
+                        )
+                    }
+                }
             }
             Spacer(Modifier.height(24.dp))
             ModulesHeader(
@@ -166,7 +201,11 @@ fun HomeView(
             Spacer(Modifier.height(24.dp))
             TutorialRow()
             Spacer(Modifier.height(24.dp))
-            CardCadastroAssociacao()
+            CardCadastroAssociacao(
+                {
+                    navController.navigate(NavigationItem.Associacoes.route)
+                }
+            )
         }
     }
 }

@@ -27,6 +27,7 @@ import com.example.careiroapp.R
 import com.example.careiroapp.common.components.SingleImage
 import com.example.careiroapp.common.components.buttons.BackButton
 import com.example.careiroapp.feiras.ui.components.FeiraDescription
+import com.example.careiroapp.feiras.ui.components.FeiraLocalizacao
 import com.example.careiroapp.feiras.ui.components.FeiraTitle
 import com.example.careiroapp.feiras.ui.viewmodel.FeiraViewModel
 
@@ -87,6 +88,10 @@ fun SingleFeiraView(
         FeiraTitle(
             feiraName = uiState.selectedFeira?.nome ?: "",
             feiraDataHora = uiState.selectedFeira?.dataHora ?: ""
+        )
+        Spacer(Modifier.height(24.dp))
+        FeiraLocalizacao(
+            localizacao = uiState.selectedFeira?.localizacao ?: ""
         )
         Spacer(Modifier.height(24.dp))
         FeiraDescription(

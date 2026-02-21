@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.OutputTransformation
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,8 +49,8 @@ fun LoginCard(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
+    var email = rememberTextFieldState("")
+    var senha = rememberTextFieldState("")
 
     Card(
         modifier = Modifier
@@ -88,20 +91,12 @@ fun LoginCard(
             LoginTextField(
                 title = stringResource(R.string.email),
                 placeholder = stringResource(R.string.digete_email),
-                value = email,
-                onChange = {
-                    email = it
-                }
+                state = email
             )
             Spacer(Modifier.height(24.dp))
-            LoginTextField(
-                title = stringResource(R.string.senha),
-                placeholder = stringResource(R.string.digite_senha),
-                visualTransformation = PasswordVisualTransformation(),
-                value = senha,
-                onChange = {
-                    senha = it
-                }
+            PassWordTextField(
+                state = senha,
+                keyboardType = KeyboardType.Password
             )
             Spacer(Modifier.height(24.dp))
             OutlineAppButton(
@@ -110,7 +105,7 @@ fun LoginCard(
                     .height(48.dp),
                 icon = null,
                 onClick = {
-                    onClickEntrar(email, senha)
+                    onClickEntrar(email.text.toString(), senha.text.toString())
                 },
                 text = stringResource(R.string.entrar),
                 isActivate = false

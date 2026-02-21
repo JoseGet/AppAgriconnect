@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.common.components.drawer.AppDrawer
 import com.example.careiroapp.common.components.footer.AppFooter
 import com.example.careiroapp.common.components.header.AppHeader
+import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.navigation.TapBarNavHost
 import kotlinx.coroutines.launch
 
@@ -51,7 +52,10 @@ fun BaseView(
                         drawerState.close()
                     }
                 },
-                resetScrollFunction = resetScroll
+                resetScrollFunction = resetScroll,
+                backToLogin = {
+                    navController.navigate(NavigationItem.Login.route)
+                }
             )
         },
         gesturesEnabled = true
