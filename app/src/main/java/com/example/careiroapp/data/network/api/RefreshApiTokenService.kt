@@ -9,7 +9,9 @@ import retrofit2.http.POST
 interface RefreshApiTokenService {
 
     @POST("refresh/token")
-    suspend fun refreshToken(): Response<RefreshTokenResponseModel>
+    suspend fun refreshToken(
+        @Body refreshToken: LogoutRequestModel,
+    ): Response<RefreshTokenResponseModel>
 
     @POST("refresh/logout")
     suspend fun logout(

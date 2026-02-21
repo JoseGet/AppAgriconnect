@@ -1,4 +1,4 @@
-package com.example.careiroapp.checkout.ui.components
+package com.example.careiroapp.bag.ui.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +21,7 @@ fun Stepper(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 60.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 

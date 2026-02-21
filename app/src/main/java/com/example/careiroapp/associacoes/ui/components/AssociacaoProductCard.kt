@@ -33,6 +33,7 @@ fun AssociacaoProductCard(
     productName: String,
     productPrice: Float,
     productImage: String,
+    onClick:() -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -42,7 +43,7 @@ fun AssociacaoProductCard(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
+            model = ImageRequest.Builder(context)
                 .data(productImage)
                 .crossfade(true)
                 .build(),
@@ -76,7 +77,7 @@ fun AssociacaoProductCard(
                 text = stringResource(R.string.adicionar),
                 modifier = Modifier
                     .wrapContentWidth(),
-                onClick = {},
+                onClick = onClick,
                 icon = painterResource(R.drawable.bag)
             )
         }
@@ -94,6 +95,7 @@ private fun AssociacaoProductCardPreview() {
     AssociacaoProductCard(
         productImage = uriProduto1,
         productName = "Tomate",
-        productPrice = 4.0f
+        productPrice = 4.0f,
+        onClick = {}
     )
 }

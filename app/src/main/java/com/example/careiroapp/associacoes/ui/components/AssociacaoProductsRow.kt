@@ -14,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import com.example.careiroapp.R
 import com.example.careiroapp.associacoes.data.models.AssociacaoProductModel
 import com.example.careiroapp.common.components.ModulesHeader
+import com.example.careiroapp.products.data.models.ProductModel
 
 @Composable
 fun AssociacaoProductsRow(
     productsList: List<AssociacaoProductModel>,
-    associacaoName: String?
+    associacaoName: String?,
+    onButtonClick: (product: AssociacaoProductModel) -> Unit
 ) {
     Column() {
         ModulesHeader(
@@ -34,13 +36,15 @@ fun AssociacaoProductsRow(
                 AssociacaoProductCard(
                     productImage = item.image,
                     productName = item.nome,
-                    productPrice = item.preco
+                    productPrice = item.preco,
+                    onClick = { onButtonClick(item) }
                 )
                 Spacer(Modifier.height(24.dp))
                 AssociacaoProductCard(
                     productImage = item.image,
                     productName = item.nome,
-                    productPrice = item.preco
+                    productPrice = item.preco,
+                    onClick = { onButtonClick(item) }
                 )
             }
         }

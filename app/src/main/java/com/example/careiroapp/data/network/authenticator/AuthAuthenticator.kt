@@ -2,6 +2,7 @@ package com.example.careiroapp.data.network.authenticator
 
 import com.example.careiroapp.data.dataStore.util.JwtTokenManager
 import com.example.careiroapp.data.network.api.RefreshApiTokenService
+import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -30,7 +31,10 @@ class AuthAuthenticator @Inject constructor(
             }
             val token = if (currentToken != updatedToken) updatedToken else {
                 val newSessionResponse = runBlocking {
-                    refreshApiTokenService.refreshToken()
+                    val req = LogoutRequestModel(
+                        refreshToken = tokenManager.getRefreshJwt() ?: ""
+                    )
+                    refreshApiTokenService.refreshToken(req)
                 }
                 if (newSessionResponse.isSuccessful && newSessionResponse.body() != null) {
                     newSessionResponse.body()?.let { body ->

@@ -21,6 +21,7 @@ import com.example.careiroapp.common.components.buttons.OutlineAppButton
 @Composable
 fun BuyProductRow(
     isProductFavorite: Boolean?,
+    addToBagClick: () -> Unit,
     favoriteButtonClick: () -> Unit
 ) {
 
@@ -34,7 +35,7 @@ fun BuyProductRow(
         OutlineAppButton(
             text = stringResource(R.string.adicionar_a_sacola),
             modifier = Modifier,
-            onClick = {},
+            onClick = addToBagClick,
             icon = painterResource(R.drawable.bag)
         )
         Spacer(modifier = Modifier.width(8.dp))
@@ -55,6 +56,7 @@ fun BuyProductRow(
 private fun BuyProductRowPreview() {
     BuyProductRow(
         false,
+        {},
         {}
     )
 }

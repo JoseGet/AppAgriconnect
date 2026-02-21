@@ -22,23 +22,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.annotation.AnnotationRetention
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AuthenticatedClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TokenRefreshClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class PublicClient
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RetrofitModule {
-
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class AuthenticatedClient
-
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class TokenRefreshClient
-
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class PublicClient
-
     private const val BASE_URL = BuildConfig.BASE_URL
 
     private val logging = HttpLoggingInterceptor()

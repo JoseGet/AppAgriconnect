@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
@@ -47,6 +48,7 @@ fun SingleAssociacaoView(
 ) {
 
     val uiState by associacaoViewModel.associacaoUiState.collectAsState()
+    val userDataStoreState by associacaoViewModel.userData.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     BackHandler() {
@@ -134,7 +136,10 @@ fun SingleAssociacaoView(
         uiState.productsList.takeIf { it.isNotEmpty() }?.let { list ->
             AssociacaoProductsRow(
                 productsList = list,
-                uiState.selectedAssociacao?.nome
+                uiState.selectedAssociacao?.nome,
+                onButtonClick = { product ->
+                    associacaoViewModel.addProductToBag(product, userDataStoreState.cpf)
+                }
             )
         }
     }

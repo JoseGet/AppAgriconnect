@@ -1,4 +1,4 @@
-package com.example.careiroapp.checkout.ui.components
+package com.example.careiroapp.bag.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +25,7 @@ fun SelectableChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val buttonColorBorder = colorResource(R.color.checkout_button_enable)
+    val buttonColorBorder = colorResource(R.color.dark_green)
 
     Box(
         modifier = modifier

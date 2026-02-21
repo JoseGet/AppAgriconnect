@@ -3,7 +3,6 @@ package com.example.careiroapp.data.network.api
 import com.example.careiroapp.associacoes.data.models.AssociacaoProductModel
 import com.example.careiroapp.products.data.models.ProductCountModel
 import com.example.careiroapp.products.data.models.ProductModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

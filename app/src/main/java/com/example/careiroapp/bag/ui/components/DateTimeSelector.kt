@@ -1,4 +1,4 @@
-package com.example.careiroapp.checkout.ui.components
+package com.example.careiroapp.bag.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,8 +16,8 @@ fun DateTimeSelector(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 96.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
 
     ) {
         items(options) { option ->

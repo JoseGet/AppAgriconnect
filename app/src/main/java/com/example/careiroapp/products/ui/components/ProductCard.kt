@@ -46,7 +46,8 @@ fun ProductCard(
     isPromocao: Boolean,
     precoPromocao: Double?,
     haveButton: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onButtonClick: () -> Unit = {}
 ) {
 
     val modifiedPrecoProduto = String.format("%.2f", precoProduto).replace('.', ',');
@@ -130,7 +131,7 @@ fun ProductCard(
                         modifier = Modifier
                             .wrapContentWidth()
                             .padding(horizontal = 16.dp),
-                        onClick = {},
+                        onClick = onButtonClick,
                         icon = painterResource(R.drawable.bag)
                     )
                 }

@@ -4,7 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,18 +20,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.careiroapp.R
+import com.example.careiroapp.common.montserratBoldFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
+fun BagTopBar(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     TopAppBar(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth(),
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
+            IconButton(
+                modifier = Modifier,
+                onClick = onBackClick
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = "Voltar",
@@ -37,17 +47,21 @@ fun TopBar(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
             }
         },
         title = {
-            Row (modifier = Modifier.fillMaxWidth().offset(y = 2.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
                 Image(
                     painterResource(R.drawable.ic_agriconnect),
-                    contentDescription = "agriconnect logo")
-                Row {
-                    Text(stringResource(R.string.your_bag),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                    )
-
-                }
+                    contentDescription = "agriconnect logo",
+                )
+                Text(stringResource(R.string.your_bag),
+                    fontFamily = montserratBoldFontFamily,
+                    fontSize = 16.sp,
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -55,4 +69,10 @@ fun TopBar(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
             titleContentColor = colorResource(R.color.top_bar_title_color)
         )
     )
+}
+
+@Preview
+@Composable
+private fun BagTopBarPreview() {
+    BagTopBar() { }
 }

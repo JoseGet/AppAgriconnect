@@ -1,4 +1,4 @@
-package com.example.careiroapp.checkout.ui.components
+package com.example.careiroapp.bag.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.items

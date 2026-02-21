@@ -130,6 +130,9 @@ fun ProfileView(
                                 precoPromocao = item.precoPromocao,
                                 haveButton = true,
                                 onClick = {},
+                                onButtonClick = {
+                                    viewModel.addProductToBag(item, userState.cpf)
+                                }
                             )
                         }
                     }

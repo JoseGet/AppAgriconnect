@@ -160,6 +160,9 @@ fun ProductsView(
                                 isNecessaryLoadMore = true
                             ) else productViewModel.getProducts(isNecessaryLoadMore = true)
                         }
+                    },
+                    addToBag = { product ->
+                        productViewModel.addProductToBag(product, userDataStoreState.cpf)
                     }
                 )
             }

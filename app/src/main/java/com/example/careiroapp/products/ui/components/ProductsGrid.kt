@@ -16,16 +16,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.careiroapp.products.data.models.ProductCardModel
+import com.example.careiroapp.products.data.models.ProductModel
 import java.util.UUID
 
 @Composable
 fun ProductsGrid(
     modifier: Modifier = Modifier,
     gridListState: LazyGridState,
-    list: List<ProductCardModel>,
+    list: List<ProductModel>,
     onItemClicker: (UUID) -> Unit,
-    loadMore: () -> Unit
+    loadMore: () -> Unit,
+    addToBag: (ProductModel) -> Unit
 ) {
 
     val buffer = 5
@@ -53,14 +54,17 @@ fun ProductsGrid(
                 modifier = Modifier
                     .padding(bottom = 16.dp),
                 image = item.image,
-                nomeProduto = item.nome,
-                precoProduto = item.preco,
+                nomeProduto = item.nomeProduto,
+                precoProduto = item.precoProduto,
                 isPromocao = item.isPromocao,
                 precoPromocao = item.precoPromocao,
                 haveButton = true,
                 onClick = {
                     onItemClicker(item.id)
                 },
+                onButtonClick = {
+                    addToBag(item)
+                }
             )
         }
     }
@@ -74,6 +78,7 @@ private fun AppGridPreview() {
         modifier = Modifier,
         list = emptyList(),
         onItemClicker = {},
-        loadMore = {}
+        loadMore = {},
+        addToBag = {}
     )
 }
