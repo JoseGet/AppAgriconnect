@@ -1,6 +1,7 @@
 package com.example.careiroapp.bag.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,16 +57,18 @@ fun BagBottomBar(
                     // formata para duas casas decimais com separador ponto e prefixo R$
                     String.format(Locale("pt", "BR"), "R$%.2f", total),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+                    fontSize = 20.sp
                 )
             }
 
             Button(
                 modifier = Modifier
                     .height(48.dp)
-                    .wrapContentWidth(),
+                    .wrapContentWidth()
+                    .weight(1f),
                 onClick = onCheckout,
                 shape = RoundedCornerShape(16.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.dark_green),
                     contentColor = colorResource(R.color.light_background),
@@ -76,7 +80,8 @@ fun BagBottomBar(
                     Text(
                         stringResource(R.string.complete_order),
                         fontFamily = montserratBoldFontFamily,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(

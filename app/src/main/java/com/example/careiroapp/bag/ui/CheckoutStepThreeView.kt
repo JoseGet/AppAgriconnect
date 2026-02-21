@@ -1,9 +1,13 @@
 package com.example.careiroapp.bag.ui
 
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,7 +29,8 @@ fun CheckoutStepThreeView(
     Column(
         modifier = Modifier
             .padding(padding)
-            .padding(horizontal = 15.dp, vertical = 24.dp),
+            .padding(horizontal = 15.dp, vertical = 24.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Stepper(3)
