@@ -131,7 +131,7 @@ fun ProfileView(
                                 haveButton = true,
                                 onClick = {},
                                 onButtonClick = {
-                                    viewModel.addProductToBag(item)
+                                    viewModel.addProductToBag(item, userState.cpf)
                                 }
                             )
                         }

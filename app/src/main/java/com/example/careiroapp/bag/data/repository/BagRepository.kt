@@ -9,28 +9,35 @@ import javax.inject.Inject
 class BagRepository @Inject constructor(
     private val cartDao: CartDao
 ) {
-    val allItems: Flow<List<BagItem>> = cartDao.getAllItems()
+    fun getAllItems(idUsuario: String): Flow<List<BagItem>> {
+        return cartDao.getAllItems(idUsuario)
+    }
 
-    suspend fun addToBag(item: BagItem) {
-        if (cartDao.isItemInCart(item.productId)) {
-            incrementQuantity(item.productId)
+    suspend fun addToBag(item: BagItem, idUsuario: String) {
+        if (cartDao.isItemInCart(item.productId, idUsuario)) {
+            incrementQuantity(item.productId, idUsuario)
         } else {
-            cartDao.insertOrUpdate(item)
+            val itemComUsuario = item.copy(userId = idUsuario)
+            cartDao.insertOrUpdate(itemComUsuario)
         }
     }
     suspend fun removeFromBag(item: BagItem) {
         cartDao.deleteItem(item)
     }
 
-    suspend fun incrementQuantity(itemId: UUID) {
-        cartDao.incrementQuantity(itemId)
+    suspend fun incrementQuantity(itemId: UUID, idUsuario: String) {
+        cartDao.incrementQuantity(itemId, idUsuario)
     }
 
-    suspend fun decreaseQuantity(itemId: UUID) {
-        cartDao.decrementQuantity(itemId)
+    suspend fun decreaseQuantity(itemId: UUID, idUsuario: String) {
+        cartDao.decrementQuantity(itemId, idUsuario)
     }
 
-    fun getTotalPrice(): Flow<Double?> {
-        return cartDao.getTotalPrice()
+    suspend fun clearBag(idUsuario: String) {
+        cartDao.clearBag(idUsuario)
+    }
+
+    fun getTotalPrice(idUsuario: String): Flow<Double?> {
+        return cartDao.getTotalPrice(idUsuario)
     }
 }

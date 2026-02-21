@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -37,8 +38,8 @@ fun BagView(
     navController: NavController
 ) {
     val viewModel: BagViewModel = hiltViewModel()
+    val userDataStoreState by viewModel.userDataStoreUiState.collectAsStateWithLifecycle()
     val itensNaSacola by viewModel.cartItems.collectAsStateWithLifecycle()
-
     val total by viewModel.totalPrice.observeAsState(0.0)
 
     Scaffold(
@@ -77,13 +78,13 @@ fun BagView(
                         price = produto.price,
                         amount = produto.quantity,
                         increaseProduct = {
-                            viewModel.addQuantity(produto.productId)
+                            viewModel.addQuantity(produto.productId, cpf = userDataStoreState.cpf)
                         },
                         decreaseProduct = {
                             if (produto.quantity - 1 == 0) {
                                 viewModel.removeProduct(produto)
                             } else {
-                                viewModel.decreaseQuantity(produto.productId)
+                                viewModel.decreaseQuantity(produto.productId, cpf = userDataStoreState.cpf)
                             }
                         },
                     )

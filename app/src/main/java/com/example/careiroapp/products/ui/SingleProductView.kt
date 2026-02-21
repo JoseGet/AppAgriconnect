@@ -118,7 +118,10 @@ fun SingleProductView(
                     }
                 },
                 addToBagClick = {
-                    productViewModel.addProductToBag(productViewUiState.selectedProduct!!)
+                    productViewModel.addProductToBag(
+                        productViewUiState.selectedProduct!!,
+                        userDataStoreState.cpf
+                    )
                 }
             )
         }

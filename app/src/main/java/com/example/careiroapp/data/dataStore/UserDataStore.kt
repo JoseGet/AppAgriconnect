@@ -8,6 +8,8 @@ import com.example.careiroapp.data.dataStore.util.UserDataSerializer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
 
@@ -19,6 +21,12 @@ val Context.dataStore: DataStore<UserDataStoreModel> by dataStore(
 class UserDataStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+
+    val userIdFlow: Flow<String?> = context.dataStore.data
+        .map { userData ->
+            userData.cpf.ifBlank { null }
+        }
+        .distinctUntilChanged()
 
     fun getUserData(): Flow<UserDataStoreModel> = context.dataStore.data.catch { exception ->
         if (exception is IOException) {

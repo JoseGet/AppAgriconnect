@@ -162,7 +162,7 @@ fun ProductsView(
                         }
                     },
                     addToBag = { product ->
-                        productViewModel.addProductToBag(product)
+                        productViewModel.addProductToBag(product, userDataStoreState.cpf)
                     }
                 )
             }

@@ -305,7 +305,7 @@ class ProductsViewModel @Inject constructor(
         return false
     }
 
-    fun addProductToBag(product: ProductModel) {
+    fun addProductToBag(product: ProductModel, cpf: String) {
         viewModelScope.launch {
             try {
                 val bagItem = BagItem(
@@ -313,9 +313,10 @@ class ProductsViewModel @Inject constructor(
                     name = product.nomeProduto,
                     price = product.precoProduto,
                     imageUrl = product.image,
+                    userId = cpf,
                     quantity = 1
                 )
-                bagRepository.addToBag(bagItem)
+                bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }
         }
     }

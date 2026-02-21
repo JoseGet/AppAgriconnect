@@ -28,8 +28,6 @@ class ProfileViewModel @Inject constructor(
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
     var profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
-    init {}
-
     val dataStoreUiState: StateFlow<UserDataStoreModel> = userDataStore.getUserData()
         .stateIn(
             scope = viewModelScope,
@@ -64,17 +62,18 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun addProductToBag(product: ProductModel) {
+    fun addProductToBag(product: ProductModel, cpf: String) {
         viewModelScope.launch {
             try {
                 val bagItem = BagItem(
                     productId = product.id,
+                    userId = cpf,
                     name = product.nomeProduto,
                     price = product.precoProduto,
                     imageUrl = product.image,
                     quantity = 1
                 )
-                bagRepository.addToBag(bagItem)
+                bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }
         }
     }

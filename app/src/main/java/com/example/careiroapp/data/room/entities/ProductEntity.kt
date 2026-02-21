@@ -4,9 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-@Entity(tableName = "sacola")
+@Entity(tableName = "sacola", primaryKeys = ["productId", "userId"])
 data class BagItem(
-    @PrimaryKey val productId: UUID,
+    val productId: UUID,
+    val userId: String,
     val name: String,
     val price: Float,
     val imageUrl: String,
