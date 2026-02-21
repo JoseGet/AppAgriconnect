@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import java.util.UUID
 
 @Entity(tableName = "sacola")
-data class CartItem(
+data class BagItem(
     @PrimaryKey val productId: UUID,
     val name: String,
     val price: Float,

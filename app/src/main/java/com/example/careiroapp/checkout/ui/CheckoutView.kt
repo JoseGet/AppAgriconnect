@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.careiroapp.R
-import com.example.careiroapp.bag.ui.components.TopBar
+import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.checkout.ui.components.BottomBarCheckout
 import com.example.careiroapp.checkout.ui.components.Stepper
 import com.example.careiroapp.navigation.NavigationItem
@@ -54,8 +54,7 @@ fun CheckoutView(
 
     Scaffold(
         topBar = {
-            TopBar(
-                Modifier.height(92.dp),
+            BagTopBar(
                 onBackClick = { navController.popBackStack() }
             )
         },

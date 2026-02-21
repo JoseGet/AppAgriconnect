@@ -3,13 +3,14 @@ package com.example.careiroapp.products.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.data.dataStore.UserDataStore
 import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
+import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.loginCadastro.domain.usecases.AddToFavoritesUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.RemoveFromFavoritesUseCase
 import com.example.careiroapp.products.data.models.AddFavoritesReqModel
-import com.example.careiroapp.products.data.models.ProductCardModel
 import com.example.careiroapp.products.data.models.ProductModel
 import com.example.careiroapp.products.domain.usecases.GetProductByIdUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductVendedorUseCase
@@ -39,6 +40,7 @@ class ProductsViewModel @Inject constructor(
     private val addToFavoritesUseCase: AddToFavoritesUseCase,
     private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val bagRepository: BagRepository,
     userDataStore: UserDataStore
 ) : ViewModel() {
 
@@ -87,18 +89,7 @@ class ProductsViewModel @Inject constructor(
                     return@launch
                 }
 
-                val cardProductsList = productsList?.map { produto ->
-                    ProductCardModel(
-                        id = produto.id,
-                        image = produto.image,
-                        nome = produto.nomeProduto,
-                        preco = produto.precoProduto,
-                        isPromocao = produto.isPromocao,
-                        precoPromocao = produto.precoPromocao
-                    )
-                }
-
-                val newList = currentList + (cardProductsList ?: emptyList())
+                val newList = currentList + (productsList ?: emptyList())
 
                 _productUiState.update {
                     it.copy(
@@ -177,18 +168,7 @@ class ProductsViewModel @Inject constructor(
                     return@launch
                 }
 
-                val cardProductsList = productsList?.map { produto ->
-                    ProductCardModel(
-                        id = produto.id,
-                        image = produto.image,
-                        nome = produto.nomeProduto,
-                        preco = produto.precoProduto,
-                        isPromocao = produto.isPromocao,
-                        precoPromocao = produto.precoPromocao
-                    )
-                }
-
-                val newList = currentList + (cardProductsList ?: emptyList())
+                val newList = currentList + (productsList ?: emptyList())
 
                 _productUiState.update {
                     it.copy(
@@ -323,6 +303,21 @@ class ProductsViewModel @Inject constructor(
         }
 
         return false
+    }
+
+    fun addProductToBag(product: ProductModel) {
+        viewModelScope.launch {
+            try {
+                val bagItem = BagItem(
+                    productId = product.id,
+                    name = product.nomeProduto,
+                    price = product.precoProduto,
+                    imageUrl = product.image,
+                    quantity = 1
+                )
+                bagRepository.addToBag(bagItem)
+            } catch (e: Exception) { }
+        }
     }
 
     companion object {

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -18,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.careiroapp.R
-import com.example.careiroapp.bag.ui.components.TopBar
+import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.checkout.ui.components.BottomBarCheckout
 import com.example.careiroapp.checkout.ui.components.Stepper
 import com.example.careiroapp.checkout.ui.components.*
@@ -51,8 +50,7 @@ fun PickupView(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopBar(
-                Modifier.height(92.dp),
+            BagTopBar(
                 onBackClick = { navController.popBackStack() }
             )
         },

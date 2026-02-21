@@ -2,9 +2,12 @@ package com.example.careiroapp.profile.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.data.dataStore.UserDataStore
 import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
+import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
+import com.example.careiroapp.products.data.models.ProductModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     userDataStore: UserDataStore,
+    private val bagRepository: BagRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase
 ): ViewModel() {
 
@@ -60,7 +64,18 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-
-
-
+    fun addProductToBag(product: ProductModel) {
+        viewModelScope.launch {
+            try {
+                val bagItem = BagItem(
+                    productId = product.id,
+                    name = product.nomeProduto,
+                    price = product.precoProduto,
+                    imageUrl = product.image,
+                    quantity = 1
+                )
+                bagRepository.addToBag(bagItem)
+            } catch (e: Exception) { }
+        }
+    }
 }

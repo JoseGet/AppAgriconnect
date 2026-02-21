@@ -134,7 +134,10 @@ fun SingleAssociacaoView(
         uiState.productsList.takeIf { it.isNotEmpty() }?.let { list ->
             AssociacaoProductsRow(
                 productsList = list,
-                uiState.selectedAssociacao?.nome
+                uiState.selectedAssociacao?.nome,
+                onButtonClick = { product ->
+                    associacaoViewModel.addProductToBag(product)
+                }
             )
         }
     }

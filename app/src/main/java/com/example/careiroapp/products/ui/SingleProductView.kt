@@ -107,7 +107,7 @@ fun SingleProductView(
             promotionProductPrice = productViewUiState.selectedProduct?.precoPromocao
         )
         Spacer(Modifier.height(16.dp))
-        if (productViewUiState.selectedProduct != null) {
+        productViewUiState.selectedProduct?.let {
             BuyProductRow(
                 isProductFavorite = productViewUiState.isSelectedProductFavorite,
                 favoriteButtonClick = {
@@ -116,6 +116,9 @@ fun SingleProductView(
                     } else {
                         productViewModel.removeProductFromFavorites(cpf = userDataStoreState.cpf)
                     }
+                },
+                addToBagClick = {
+                    productViewModel.addProductToBag(productViewUiState.selectedProduct!!)
                 }
             )
         }

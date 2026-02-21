@@ -1,7 +1,11 @@
 package com.example.careiroapp.bag.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,24 +13,24 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.careiroapp.R
-import com.example.careiroapp.bag.ui.components.BottomBar
-import com.example.careiroapp.bag.ui.components.ProductCard
-import com.example.careiroapp.bag.ui.components.TopBar
+import com.example.careiroapp.R.color.search_bar_border_color
+import com.example.careiroapp.bag.ui.components.BagBottomBar
+import com.example.careiroapp.bag.ui.components.BagProductCard
+import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
+import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.navigation.NavigationItem
 @Composable
 fun BagView(
@@ -35,66 +39,72 @@ fun BagView(
     val viewModel: BagViewModel = hiltViewModel()
     val itensNaSacola by viewModel.cartItems.collectAsStateWithLifecycle()
 
-//    val produtos = remember {
-//        mutableStateListOf(
-//            Produto("Banana", 2.0, 8),
-//            Produto("Melancia", 4.0, 3),
-//            Produto("Abacaxi", 23.0, 4)
-//        )
-//    }
-//
-//    fun decreaseProduct(index: Int) {
-//        val produto = produtos[index]
-//        if (produto.amount > 0) {
-//            produtos[index] = produto.copy(amount = produto.amount - 1)
-//        }
-//    }
-//
-//    fun increaseProduct(index: Int) {
-//        val produto = produtos[index]
-//        produtos[index] = produto.copy(amount = produto.amount + 1)
-//    }
-//
-//    val total by remember {
-//        derivedStateOf {
-//            produtos.sumOf { it.unitPrice * it.amount }
-//        }
-//    }
+    val total by viewModel.totalPrice.observeAsState(0.0)
 
     Scaffold(
         topBar = {
-            TopBar(Modifier.height(92.dp), { navController.popBackStack() })
+            BagTopBar(
+                onBackClick = { navController.popBackStack() }
+            )
         },
         bottomBar = {
-            BottomBar(total = 4.0, onCheckout = {navController.navigate(NavigationItem.Checkout.route)})
+            BagBottomBar(
+                total = total,
+                onCheckout = {
+                    navController.navigate(NavigationItem.Checkout.route)
+                }
+            )
         },
         containerColor = colorResource(R.color.light_background)
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(horizontal = 15.dp, vertical = 30.dp),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 24.dp),
         ) {
             Text(
                 stringResource(R.string.order_summary),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontFamily = montserratBoldFontFamily,
+                fontSize = 18.sp,
+                color = colorResource(R.color.dark_green)
             )
-
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 itemsIndexed(itensNaSacola) { index, produto ->
-                    ProductCard(
+                    BagProductCard(
                         name = produto.name,
                         image = produto.imageUrl,
-                        index = index,
                         price = produto.price,
                         amount = produto.quantity,
-                        increaseProduct = {  },
-                        decreaseProduct = {  },
+                        increaseProduct = {
+                            viewModel.addQuantity(produto.productId)
+                        },
+                        decreaseProduct = {
+                            if (produto.quantity - 1 == 0) {
+                                viewModel.removeProduct(produto)
+                            } else {
+                                viewModel.decreaseQuantity(produto.productId)
+                            }
+                        },
                     )
+                    if (index < itensNaSacola.lastIndex) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider()
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+fun HorizontalDivider() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(
+                colorResource(search_bar_border_color)
+            )
+    )
 }
