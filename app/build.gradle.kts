@@ -4,9 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id ("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id ("dagger.hilt.android.plugin")
-    id ("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
 }
 
@@ -78,6 +77,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    ksp(libs.kotlinx.metadata.jvm)
 
     //Coil
     implementation(libs.coil)
@@ -105,7 +105,8 @@ dependencies {
 
     //Hilt
     implementation (libs.hilt.android)
-    kapt (libs.hilt.compiler)
+    ksp (libs.dagger.compiler)
+    ksp (libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     //Serializable
@@ -119,5 +120,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.core)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
 }
