@@ -54,7 +54,7 @@ fun ProductsView(
 ) {
 
     val productViewUiState by productViewModel.productUiState.collectAsState()
-    val userDataStoreState by productViewModel.userData.collectAsStateWithLifecycle()
+    val userData by productViewModel.userData.collectAsStateWithLifecycle(initialValue = null)
     val gridListState = rememberLazyGridState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -147,7 +147,7 @@ fun ProductsView(
                     list = productViewUiState.productsCardList,
                     onItemClicker = { id ->
                         productViewModel.getProductById(
-                            userDataStoreState.cpf,
+                            userData?.cpf ?: "",
                             id
                         )
                         navController.navigate(NavigationItem.ProdutoUnico.route)
@@ -162,7 +162,7 @@ fun ProductsView(
                         }
                     },
                     addToBag = { product ->
-                        productViewModel.addProductToBag(product, userDataStoreState.cpf)
+                        productViewModel.addProductToBag(product, userData?.cpf ?: "")
                     }
                 )
             }

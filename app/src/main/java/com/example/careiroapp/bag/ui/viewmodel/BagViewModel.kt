@@ -5,10 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.bag.data.repository.BagRepository
-import com.example.careiroapp.data.dataStore.UserDataStore
-import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
 import com.example.careiroapp.data.room.entities.BagItem
+import com.example.careiroapp.data.room.entities.UserEntity
+import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,7 @@ import kotlin.collections.emptyList
 @HiltViewModel
 class BagViewModel @Inject constructor(
     private val repository: BagRepository,
-    userDataStore: UserDataStore
+    private val userRepository: UserRepository
 ): ViewModel() {
 
     private val _uiState: MutableStateFlow<BagUiState> = MutableStateFlow(BagUiState())
@@ -35,27 +36,24 @@ class BagViewModel @Inject constructor(
     private val _orderUiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
     var orderUiState: StateFlow<OrderUiState> = _orderUiState.asStateFlow()
 
-    val userDataStoreUiState: StateFlow<UserDataStoreModel> = userDataStore.getUserData()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserDataStoreModel()
-        )
-    val totalPrice: LiveData<Double> = userDataStore.userIdFlow
-        .flatMapLatest { userId ->
-            if (userId.isNullOrBlank()) {
+    val userData: Flow<UserEntity?> = userRepository.getUserData()
+    val totalPrice: LiveData<Double> = userData
+        .flatMapLatest { user ->
+            val cpf = user?.cpf
+            if (cpf.isNullOrBlank()) {
                 flowOf(0.0)
             } else {
-                repository.getTotalPrice(userId).map { it ?: 0.0 }
+                repository.getTotalPrice(cpf).map { it ?: 0.0 }
             }
         }
         .asLiveData()
-    val cartItems: StateFlow<List<BagItem>> = userDataStore.userIdFlow
-        .flatMapLatest { userId ->
-            if (userId == null) {
+    val cartItems: StateFlow<List<BagItem>> = userData
+        .flatMapLatest { user ->
+            val cpf = user?.cpf
+            if (cpf == null) {
                 flowOf(emptyList())
             } else {
-                repository.getAllItems(userId)
+                repository.getAllItems(cpf)
             }
         }
         .stateIn(

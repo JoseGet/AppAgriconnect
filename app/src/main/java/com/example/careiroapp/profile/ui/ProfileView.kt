@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
@@ -43,8 +42,8 @@ import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 fun ProfileView(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val userState by viewModel.dataStoreUiState.collectAsStateWithLifecycle()
     val profileUiState by viewModel.profileUiState.collectAsState()
+    val userData by viewModel.userData.collectAsState(initial = null)
 
     val noProfileImage = R.drawable.no_profile
     val context = LocalContext.current
@@ -73,10 +72,10 @@ fun ProfileView(
         )
         Spacer(Modifier.height(24.dp))
         ProfileDataWidget(
-            nomePerfil = userState.name,
-            emailPerfil = userState.email,
-            telefonePerfil = userState.telefone,
-            fotoPerfil = if (userState.fotoPerfil == "") uriImage else userState.fotoPerfil
+            nomePerfil = userData?.name ?: "",
+            emailPerfil = userData?.email ?: "",
+            telefonePerfil = userData?.telefone ?: "",
+            fotoPerfil = userData?.fotoPerfil?.takeIf { it.isNotBlank() } ?: uriImage
         )
         Spacer(Modifier.height(24.dp))
         ProfileModulesBar(
@@ -93,8 +92,8 @@ fun ProfileView(
 
             ProfileModules.FAVORITOS -> {
 
-                LaunchedEffect(userState.cpf) {
-                    if (profileUiState.favoriteItensList.isEmpty()) viewModel.getFavoritesProducts(userState.cpf)
+                LaunchedEffect(userData?.cpf) {
+                    if (profileUiState.favoriteItensList.isEmpty()) viewModel.getFavoritesProducts(userData?.cpf ?: "")
                 }
 
                 Box(
@@ -131,7 +130,7 @@ fun ProfileView(
                                 haveButton = true,
                                 onClick = {},
                                 onButtonClick = {
-                                    viewModel.addProductToBag(item, userState.cpf)
+                                    viewModel.addProductToBag(item, userData?.cpf ?: "")
                                 }
                             )
                         }

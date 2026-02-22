@@ -7,8 +7,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.data.dataStore.JwtDataStore
-import com.example.careiroapp.data.dataStore.UserDataStore
-import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
+import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
 import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
 import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
@@ -16,6 +15,7 @@ import com.example.careiroapp.loginCadastro.domain.usecases.LoginUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.LogoutUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.RegisterUseCase
 import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +32,8 @@ class LoginCadastroViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val loginUseCase: LoginUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val userDataStore: UserDataStore,
-    private val jwtDataStore: JwtDataStore
+    private val jwtDataStore: JwtDataStore,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginCadastroUiState())
     var uiState: StateFlow<LoginCadastroUiState> = _uiState.asStateFlow()
@@ -136,16 +136,16 @@ class LoginCadastroViewModel @Inject constructor(
 
                     jwtDataStore.saveAccessJwt(loginResponse.body()?.token ?: "")
                     jwtDataStore.saveRefreshJwt(loginResponse.body()?.refreshToken ?: "")
-                    val userData = loginResponse.body()?.let {
-                        UserDataStoreModel(
+                    loginResponse.body()?.let {
+                        val userData = UserEntity(
                             cpf = it.cliente.cpf,
                             name = it.cliente.nome,
                             email = it.cliente.email,
                             telefone = it.cliente.telefone,
                             fotoPerfil = it.cliente.fotoPerfil ?: ""
                         )
+                        userRepository.saveUserData(userData)
                     }
-                    userDataStore.saveUserData(userData)
                     goToMainView()
                 }
             } catch (e: Exception) {
@@ -171,6 +171,7 @@ class LoginCadastroViewModel @Inject constructor(
 
                 if (logout.isSuccessful) {
                     jwtDataStore.clearAllTokens()
+                    userRepository.eraseUserData()
                     backToLogin()
                 }
 

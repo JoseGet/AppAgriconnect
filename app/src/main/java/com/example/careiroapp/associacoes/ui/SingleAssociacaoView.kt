@@ -48,7 +48,7 @@ fun SingleAssociacaoView(
 ) {
 
     val uiState by associacaoViewModel.associacaoUiState.collectAsState()
-    val userDataStoreState by associacaoViewModel.userData.collectAsStateWithLifecycle()
+    val userData by associacaoViewModel.userData.collectAsStateWithLifecycle(initialValue = null)
     val context = LocalContext.current
 
     BackHandler() {
@@ -138,7 +138,7 @@ fun SingleAssociacaoView(
                 productsList = list,
                 uiState.selectedAssociacao?.nome,
                 onButtonClick = { product ->
-                    associacaoViewModel.addProductToBag(product, userDataStoreState.cpf)
+                    associacaoViewModel.addProductToBag(product, userData?.cpf ?: "")
                 }
             )
         }
