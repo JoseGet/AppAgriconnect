@@ -49,7 +49,7 @@ fun SingleProductView(
 
     val context = LocalContext.current
     val productViewUiState by productViewModel.productUiState.collectAsState()
-    val userDataStoreState by productViewModel.userData.collectAsStateWithLifecycle()
+    val userData by productViewModel.userData.collectAsStateWithLifecycle(initialValue = null)
 
     val imageLoader = ImageLoader.Builder(context)
         .components {
@@ -113,15 +113,15 @@ fun SingleProductView(
                 isProductFavorite = productViewUiState.isSelectedProductFavorite,
                 favoriteButtonClick = {
                     if (productViewUiState.isSelectedProductFavorite == false) {
-                        productViewModel.addProductToFavorites(cpf = userDataStoreState.cpf)
+                        productViewModel.addProductToFavorites(cpf = userData?.cpf ?: "")
                     } else {
-                        productViewModel.removeProductFromFavorites(cpf = userDataStoreState.cpf)
+                        productViewModel.removeProductFromFavorites(cpf = userData?.cpf ?: "")
                     }
                 },
                 addToBagClick = {
                     productViewModel.addProductToBag(
                         productViewUiState.selectedProduct!!,
-                        userDataStoreState.cpf
+                        userData?.cpf ?: ""
                     )
                 }
             )

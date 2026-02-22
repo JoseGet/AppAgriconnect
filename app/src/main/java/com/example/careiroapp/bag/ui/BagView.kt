@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.careiroapp.R
@@ -38,7 +36,7 @@ fun BagView(
     navController: NavController
 ) {
     val viewModel: BagViewModel = hiltViewModel()
-    val userDataStoreState by viewModel.userDataStoreUiState.collectAsStateWithLifecycle()
+    val userData by viewModel.userData.collectAsStateWithLifecycle(initialValue = null)
     val itensNaSacola by viewModel.cartItems.collectAsStateWithLifecycle()
     val total by viewModel.totalPrice.observeAsState(0.0)
 
@@ -78,13 +76,13 @@ fun BagView(
                         price = produto.price,
                         amount = produto.quantity,
                         increaseProduct = {
-                            viewModel.addQuantity(produto.productId, cpf = userDataStoreState.cpf)
+                            viewModel.addQuantity(produto.productId, cpf = userData?.cpf ?: "")
                         },
                         decreaseProduct = {
                             if (produto.quantity - 1 == 0) {
                                 viewModel.removeProduct(produto)
                             } else {
-                                viewModel.decreaseQuantity(produto.productId, cpf = userDataStoreState.cpf)
+                                viewModel.decreaseQuantity(produto.productId, cpf = userData?.cpf ?: "")
                             }
                         },
                     )

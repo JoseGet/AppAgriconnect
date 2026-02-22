@@ -4,9 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.bag.data.repository.BagRepository
-import com.example.careiroapp.data.dataStore.UserDataStore
-import com.example.careiroapp.data.dataStore.model.UserDataStoreModel
 import com.example.careiroapp.data.room.entities.BagItem
+import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.loginCadastro.domain.usecases.AddToFavoritesUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.RemoveFromFavoritesUseCase
@@ -18,12 +17,12 @@ import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaCou
 import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsCountUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsUseCase
+import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -41,7 +40,7 @@ class ProductsViewModel @Inject constructor(
     private val removeFromFavoritesUseCase: RemoveFromFavoritesUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val bagRepository: BagRepository,
-    userDataStore: UserDataStore
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val TAG = "ProductsViewModel"
@@ -54,12 +53,7 @@ class ProductsViewModel @Inject constructor(
 
     private var isInitializedByNavArg = false
 
-    val userData: StateFlow<UserDataStoreModel> = userDataStore.getUserData()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UserDataStoreModel()
-        )
+    val userData: Flow<UserEntity?> = userRepository.getUserData()
 
     fun getProducts(isNecessaryLoadMore: Boolean) {
 

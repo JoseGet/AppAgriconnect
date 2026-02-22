@@ -35,7 +35,7 @@ fun AppDrawer(
     viewModel: ProfileViewModel = hiltViewModel(),
     loginCadastroViewModel: LoginCadastroViewModel = hiltViewModel()
 ) {
-    val userState by viewModel.dataStoreUiState.collectAsStateWithLifecycle()
+    val userState by viewModel.userData.collectAsStateWithLifecycle(initialValue = null)
 
     val noProfileImage = R.drawable.no_profile
     val context = LocalContext.current
@@ -47,8 +47,8 @@ fun AppDrawer(
     ) {
         Column {
             DrawerItemProfile(
-                name = userState.name,
-                image = if (userState.fotoPerfil == "") uriImage else userState.fotoPerfil,
+                name = userState?.name ?: "",
+                image = userState?.fotoPerfil?.takeIf { it.isNotBlank() } ?: uriImage,
                 onClick = {
                     closeDrawerFunction()
                     tabBarNavController.navigate(NavigationItem.Profile.route)
