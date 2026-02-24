@@ -50,6 +50,8 @@ Outras boas práticas:
 - **Logging** -> Implementação de registros de eventos para monitoramento do comportamento do sistema e facilitação do debug em tempo de execução.
 - **Retrofit** -> Cliente HTTP do tipo type-safe para Android, utilizado para consumir APIs e realizar a comunicação com o servidor de forma eficiente.
 - **Navigation Compose** -> Biblioteca para gerenciamento de navegação entre telas de forma robusta e integrada ao Jetpack Compose.
+- **Room DB** -> Biblioteca oficial do Android que atua como uma camada de abstração sobre o SQLite, facilitando a criação e o gerenciamento de bancos de dados locais dentro de aplicações Android.
+- **Data Store** -> DataStore é uma solução de armazenamento de dados que permite armazenar pares de chave-valor ou objetos tipados com buffers de protocolo.
 
 ## Estruturas de Pastas
 
