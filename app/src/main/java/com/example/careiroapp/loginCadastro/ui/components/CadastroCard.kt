@@ -32,6 +32,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -100,7 +101,8 @@ fun CadastroCard(
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontFamily = montserratRegularFontFamily,
-                    color = colorResource(R.color.dark_gray)
+                    color = colorResource(R.color.dark_gray),
+                    textAlign = TextAlign.Center
                 )
             )
             Spacer(Modifier.height(24.dp))

@@ -38,6 +38,9 @@ class LoginCadastroViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginCadastroUiState())
     var uiState: StateFlow<LoginCadastroUiState> = _uiState.asStateFlow()
 
+    private val _loginErrorUiEvent = MutableStateFlow(LoginErrorUiEvents.None())
+    var loginErrorUiEvent: StateFlow<LoginErrorUiEvents> = _loginErrorUiEvent.asStateFlow()
+
     private val _startDestination = mutableStateOf<String?>(null)
     val startDestination = _startDestination
 
@@ -78,25 +81,35 @@ class LoginCadastroViewModel @Inject constructor(
         uriImage: String?
     ) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            try {
+                _uiState.update { it.copy(isLoading = true) }
 
-            val clienteDTO = ClienteDTO(
-                nome,
-                cpf,
-                telefone,
-                email,
-                senha,
-                ""
-            )
+                if (cpf.length != 11) {
+                    _uiState.update { it.copy(
+                        isLoading = false,
 
-            val imagePart = if (uriImage != null) prepararImagemPart(context, uriImage) else null
-            val response = registerUseCase.invoke(clienteDTO, imagePart)
+                    ) }
+                    return@launch
+                }
 
-            _uiState.update { it.copy(isLoading = false) }
+                val clienteDTO = ClienteDTO(
+                    nome,
+                    cpf,
+                    telefone,
+                    email,
+                    senha,
+                    ""
+                )
 
-            if (response.isSuccessful) {
-                changeCardState(CardState.LOGIN)
-            }
+                val imagePart = if (uriImage != null) prepararImagemPart(context, uriImage) else null
+                val response = registerUseCase.invoke(clienteDTO, imagePart)
+
+                _uiState.update { it.copy(isLoading = false) }
+
+                if (response.isSuccessful) {
+                    changeCardState(CardState.LOGIN)
+                }
+            } catch (e: Exception) {}
         }
     }
 
@@ -148,6 +161,11 @@ class LoginCadastroViewModel @Inject constructor(
                     }
                     goToMainView()
                 }
+
+                if (loginResponse.code() == 400) {
+
+                }
+
             } catch (e: Exception) {
                 e.message?.let { Log.e(TAG, it) }
             } finally {

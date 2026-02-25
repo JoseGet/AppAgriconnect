@@ -8,19 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,7 @@ import com.example.careiroapp.R
 fun TopBar(
     leftIconOnClick: () -> Unit,
     rightIconAction: () -> Unit,
+    bagItemsCount: Int
 ) {
     Row(
         modifier = Modifier
@@ -61,7 +63,7 @@ fun TopBar(
                 painter = painterResource(R.drawable.logo)
             )
             Text(
-                stringResource(R.string.agriconnect).toString().uppercase(),
+                stringResource(R.string.agriconnect).uppercase(),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
@@ -69,17 +71,28 @@ fun TopBar(
                 )
             )
         }
-        IconButton(
+        BadgedBox (
             modifier = Modifier
-                .padding(end = 24.dp)
-                .size(24.dp),
-            onClick = rightIconAction
+                .padding(end = 24.dp),
+            badge = {
+                if (bagItemsCount > 0) {
+                    Badge(
+                        containerColor = colorResource(R.color.dark_green)
+                    )
+                }
+            }
         ) {
-            Icon(
-                painter = painterResource(R.drawable.bag),
-                contentDescription = "Sacola",
-                tint = colorResource(R.color.dark_green)
-            )
+            IconButton(
+                modifier = Modifier
+                    .size(24.dp),
+                onClick = rightIconAction
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.bag),
+                    contentDescription = "Sacola",
+                    tint = colorResource(R.color.dark_green)
+                )
+            }
         }
     }
 }
@@ -90,6 +103,7 @@ fun TopBarPreview(
 ) {
     TopBar(
         leftIconOnClick = {},
-        rightIconAction = {}
+        rightIconAction = {},
+        bagItemsCount = 0
     );
 }
