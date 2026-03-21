@@ -121,7 +121,9 @@ fun LoginView(
                             email,
                             senha,
                             goToMainView = {
-                                navController.navigate(NavigationItem.Main.route)
+                                navController.navigate(NavigationItem.Main.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
                                 Log.i("NAV", "Indo para a Home")
                             }
                         )
