@@ -29,7 +29,8 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 fun OrderCard(
     orderId: Int,
     orderTotalValue: Float,
-    orderStatus: String
+    orderStatus: String,
+    onClick: () -> Unit
 ) {
 
     val orderDefaultImage = R.drawable.order_image_default
@@ -68,7 +69,7 @@ fun OrderCard(
                 contentAlignment = Alignment.Center
             ) {
                 OutlineAppButton(
-                    onClick = {},
+                    onClick = onClick,
                     isActivate = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -87,6 +88,7 @@ private fun OrderCardPreview() {
     OrderCard(
         orderId = 1,
         orderStatus = "Pedido concluido",
-        orderTotalValue = 23.0f
+        orderTotalValue = 23.0f,
+        onClick = {}
     )
 }

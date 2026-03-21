@@ -47,7 +47,7 @@ fun CheckoutView(
             CheckoutStep.ONE -> {
                 CheckoutStepOneView(
                     innerPadding,
-                    payerData = orderUiState.payerData,
+                    payerData = orderUiState.order.payerData,
                     onButtonClick = {email, name, telefone ->
                         viewModel.savePayerData(
                             email,

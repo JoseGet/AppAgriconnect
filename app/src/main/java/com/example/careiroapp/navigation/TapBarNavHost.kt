@@ -17,6 +17,7 @@ import com.example.careiroapp.home.ui.HomeView
 import com.example.careiroapp.products.ui.ProductsView
 import com.example.careiroapp.products.ui.SingleProductView
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
+import com.example.careiroapp.profile.ui.OrderView
 import com.example.careiroapp.profile.ui.ProfileView
 
 @Composable
@@ -132,7 +133,18 @@ fun TapBarNavHost(
         composable(
             NavigationItem.Profile.route
         ) {
-            ProfileView()
+            ProfileView(
+                navController = navController,
+                resetScrollFunction = resetScrollFunction
+            )
+        }
+
+        composable(
+            NavigationItem.Pedido.route
+        ) {
+            OrderView(
+                navController,
+            )
         }
 
         composable(
