@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ fun SelectableChip(
 
     Box(
         modifier = modifier
+            .wrapContentSize()
             .clip(RoundedCornerShape(24.dp))
             .background(if (selected) buttonColorBorder else Color.White)
             .border(

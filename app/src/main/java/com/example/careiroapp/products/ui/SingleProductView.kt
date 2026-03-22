@@ -142,6 +142,7 @@ fun SingleProductView(
         CardCadastroAssociacao(
             {
                 navController.navigate(NavigationItem.Associacoes.route)
+                resetScrollFunction()
             }
         )
     }

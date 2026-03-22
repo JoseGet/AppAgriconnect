@@ -22,6 +22,7 @@ fun AppHeader(
     leftIconAction: () -> Unit,
     appNavController: NavController,
     tabBarNavController: NavController,
+    bagItemsCount: Int,
     resetScrollFunction: () -> Unit
 ) {
     Column (
@@ -33,7 +34,8 @@ fun AppHeader(
     ) {
         TopBar(
             leftIconOnClick = leftIconAction,
-            rightIconAction = { appNavController.navigate(NavigationItem.Sacola.route) }
+            rightIconAction = { appNavController.navigate(NavigationItem.Sacola.route) },
+            bagItemsCount = bagItemsCount
         )
         AppSearchBar()
         Spacer(Modifier.height(16.dp))
@@ -51,6 +53,7 @@ fun AppHeaderPreview() {
         leftIconAction = {},
         appNavController = rememberNavController(),
         tabBarNavController = rememberNavController(),
+        bagItemsCount = 0,
         resetScrollFunction = {}
     );
 }

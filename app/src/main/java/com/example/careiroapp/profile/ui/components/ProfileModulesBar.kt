@@ -61,7 +61,8 @@ fun ProfileModulesBar(
                     text = module.name,
                     maxLines = 1,
                     style = TextStyle(
-                        fontSize = 18.sp,
+                        fontSize = 14.sp,
+                        letterSpacing = 1.sp,
                         fontFamily = if (selectedDestination == index) montserratBoldFontFamily else montserratRegularFontFamily,
                         color = colorResource(R.color.top_bar_title_color)
                     ),

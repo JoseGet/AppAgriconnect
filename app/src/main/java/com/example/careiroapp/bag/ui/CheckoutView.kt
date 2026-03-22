@@ -13,6 +13,7 @@ import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutStep
+import com.example.careiroapp.navigation.NavigationItem
 
 @Composable
 fun CheckoutView(
@@ -30,12 +31,19 @@ fun CheckoutView(
         topBar = {
             BagTopBar(
                 onBackClick = {
-                    if (bagUiState.checkoutStep == CheckoutStep.ONE) {
-                        navController.popBackStack()
-                    } else if (bagUiState.checkoutStep == CheckoutStep.TWO) {
-                        viewModel.changeCheckoutStep(CheckoutStep.ONE)
-                    } else if (bagUiState.checkoutStep == CheckoutStep.THREE) {
-                        viewModel.changeCheckoutStep(CheckoutStep.TWO)
+                    when (bagUiState.checkoutStep) {
+                        CheckoutStep.ONE -> {
+                            navController.popBackStack()
+                        }
+                        CheckoutStep.TWO -> {
+                            viewModel.changeCheckoutStep(CheckoutStep.ONE)
+                        }
+                        CheckoutStep.THREE -> {
+                            viewModel.changeCheckoutStep(CheckoutStep.TWO)
+                        }
+                        CheckoutStep.FINAL -> {
+                            navController.navigate(NavigationItem.Main.route)
+                        }
                     }
                 }
             )
@@ -47,7 +55,7 @@ fun CheckoutView(
             CheckoutStep.ONE -> {
                 CheckoutStepOneView(
                     innerPadding,
-                    payerData = orderUiState.payerData,
+                    payerData = orderUiState.order.payerData,
                     onButtonClick = {email, name, telefone ->
                         viewModel.savePayerData(
                             email,
@@ -74,12 +82,17 @@ fun CheckoutView(
                     innerPadding,
                     orderData = orderUiState.order,
                     productsList = bagItems,
-                    totalValue = totalPrice
+                    totalValue = totalPrice,
+                    onButtonClick = {
+                        viewModel.changeCheckoutStep(CheckoutStep.FINAL)
+                    }
                 )
             }
 
             CheckoutStep.FINAL -> {
-
+                CheckoutFinalStepView(
+                    innerPadding,
+                )
             }
         }
     }

@@ -19,6 +19,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -43,6 +45,7 @@ import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.loginCadastro.ui.components.CadastroCard
 import com.example.careiroapp.loginCadastro.ui.components.LoginCard
+import com.example.careiroapp.loginCadastro.ui.components.UiEventsHandler
 import com.example.careiroapp.loginCadastro.ui.viewmodel.CardState
 import com.example.careiroapp.loginCadastro.ui.viewmodel.LoginCadastroViewModel
 import com.example.careiroapp.navigation.NavigationItem
@@ -53,9 +56,12 @@ fun LoginView(
 ) {
     val viewModel: LoginCadastroViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val uiEvent by viewModel.uiEvent.collectAsState()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
+
+    val openAlertDialog = remember { mutableStateOf(false) }
 
     BackHandler() {
         if (uiState.cardState == CardState.CADASTRO) {
@@ -81,6 +87,15 @@ fun LoginView(
             .zIndex(1f),
         contentAlignment = Alignment.Center
     ) {
+
+        UiEventsHandler(
+            uiEvent = uiEvent,
+            openAlertDialog = openAlertDialog,
+            resetUiEventFunction = {
+                viewModel.resetUiEvent()
+            }
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -121,7 +136,9 @@ fun LoginView(
                             email,
                             senha,
                             goToMainView = {
-                                navController.navigate(NavigationItem.Main.route)
+                                navController.navigate(NavigationItem.Main.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
                                 Log.i("NAV", "Indo para a Home")
                             }
                         )

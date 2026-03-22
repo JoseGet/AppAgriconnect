@@ -11,13 +11,11 @@ import androidx.navigation.compose.composable
 import com.example.careiroapp.BaseView
 import com.example.careiroapp.bag.ui.BagView
 import com.example.careiroapp.bag.ui.CheckoutView
-import com.example.careiroapp.bag.ui.CheckoutStepTwoView
 import com.example.careiroapp.loginCadastro.ui.LoginView
 import com.example.careiroapp.loginCadastro.ui.viewmodel.LoginCadastroViewModel
 import com.example.careiroapp.navigation.NavigationItem.Checkout
 import com.example.careiroapp.navigation.NavigationItem.Login
 import com.example.careiroapp.navigation.NavigationItem.Main
-import com.example.careiroapp.navigation.NavigationItem.Pickup
 import com.example.careiroapp.navigation.NavigationItem.Sacola
 
 @Composable

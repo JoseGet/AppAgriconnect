@@ -54,12 +54,12 @@ fun SummarySection(
             Spacer(modifier = Modifier.height(8.dp))
             SummaryProductsHeader()
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn(
+            Column (
                 modifier = Modifier
-                    .height(56.dp),
+                    .wrapContentHeight(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(list) { product ->
+                for (product in list) {
                     SummaryProductCard(
                         image = product.imageUrl,
                         name = product.name,

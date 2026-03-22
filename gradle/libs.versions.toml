@@ -29,6 +29,8 @@ retrofit = "3.0.0"
 foundation = "1.10.3"
 roomRuntime = "2.8.4"
 runtimeLivedata = "1.10.3"
+simpleCpfValidator = "{version}"
+simpleCpfValidatorVersion = "2.8.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -76,6 +78,8 @@ protolite-well-known-types = { group = "com.google.firebase", name = "protolite-
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+simple-cpf-validator = { module = "br.com.colman.simplecpfvalidator:simple-cpf-validator", version.ref = "simpleCpfValidator" }
+simple-cpf-validator-v280 = { module = "br.com.colman.simplecpfvalidator:simple-cpf-validator", version.ref = "simpleCpfValidatorVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

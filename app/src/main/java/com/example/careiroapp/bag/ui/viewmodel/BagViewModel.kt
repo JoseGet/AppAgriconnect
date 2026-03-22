@@ -106,7 +106,9 @@ class BagViewModel @Inject constructor(
 
         viewModelScope.launch {
             _orderUiState.update { it.copy(
-                payerData = payerData
+                order = OrderModel(
+                    payerData = payerData
+                )
             ) }
         }
     }

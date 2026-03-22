@@ -14,6 +14,8 @@ enum class Screen {
     PICKUP,
     PROFILE,
     SOBRE_NOS,
+
+    PEDIDO,
     LOGIN
 }
 
@@ -31,6 +33,8 @@ sealed class NavigationItem(val route: String) {
     object SobreNos: NavigationItem(route = Screen.SOBRE_NOS.name)
     object FeiraUnica: NavigationItem(route = Screen.FEIRA_UNICA.name)
     object AssociacaoUnica: NavigationItem(route = Screen.ASSOCIACAO_UNICA.name)
+
+    object Pedido: NavigationItem(route = Screen.PEDIDO.name)
 
     object Login: NavigationItem(route = Screen.LOGIN.name)
 }
