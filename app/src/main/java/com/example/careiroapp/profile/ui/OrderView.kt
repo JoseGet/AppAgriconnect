@@ -46,6 +46,7 @@ fun OrderView(
             fontSize = 18.sp,
             color = colorResource(R.color.dark_green)
         )
+        Spacer(Modifier.height(4.dp))
         SummaryProductsHeader()
         Spacer(modifier = Modifier.height(16.dp))
         Column (

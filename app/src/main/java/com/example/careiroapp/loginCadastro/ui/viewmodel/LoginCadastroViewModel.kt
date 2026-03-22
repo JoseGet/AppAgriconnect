@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import br.com.colman.simplecpfvalidator.isCpf
 import com.example.careiroapp.data.dataStore.JwtDataStore
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
@@ -38,8 +39,8 @@ class LoginCadastroViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginCadastroUiState())
     var uiState: StateFlow<LoginCadastroUiState> = _uiState.asStateFlow()
 
-    private val _loginErrorUiEvent = MutableStateFlow(LoginErrorUiEvents.None())
-    var loginErrorUiEvent: StateFlow<LoginErrorUiEvents> = _loginErrorUiEvent.asStateFlow()
+    private val _uiEvent = MutableStateFlow<LoginCadastroUiEvents>(LoginCadastroUiEvents.None())
+    var uiEvent: StateFlow<LoginCadastroUiEvents> = _uiEvent.asStateFlow()
 
     private val _startDestination = mutableStateOf<String?>(null)
     val startDestination = _startDestination
@@ -80,17 +81,12 @@ class LoginCadastroViewModel @Inject constructor(
         senha: String,
         uriImage: String?
     ) {
+
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
-
-                if (cpf.length != 11) {
-                    _uiState.update { it.copy(
-                        isLoading = false,
-
-                    ) }
-                    return@launch
-                }
 
                 val clienteDTO = ClienteDTO(
                     nome,
@@ -101,15 +97,60 @@ class LoginCadastroViewModel @Inject constructor(
                     ""
                 )
 
+                if (nome.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+                    _uiEvent.update {
+                        LoginCadastroUiEvents.InvalidInput()
+                    }
+                    return@launch
+                }
+
+                if (!cpf.isCpf()) {
+                    _uiEvent.update {
+                        LoginCadastroUiEvents.InvalidCpf()
+                    }
+                    return@launch
+                }
+
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    _uiEvent.update {
+                        LoginCadastroUiEvents.InvalidEmail()
+                    }
+                    return@launch
+                }
+
                 val imagePart = if (uriImage != null) prepararImagemPart(context, uriImage) else null
                 val response = registerUseCase.invoke(clienteDTO, imagePart)
 
-                _uiState.update { it.copy(isLoading = false) }
-
                 if (response.isSuccessful) {
+                    _uiEvent.update { LoginCadastroUiEvents.RegisterSuccess() }
                     changeCardState(CardState.LOGIN)
+                } else {
+                    when (response.code()) {
+                        409 -> {
+                            val errorMsg = response
+                                .errorBody()?.string() ?: ""
+
+                            Log.d("CADASTRO", "Error body: $errorMsg")
+
+                            if (errorMsg.contains("CPF", ignoreCase = true)) {
+                                _uiEvent.update { LoginCadastroUiEvents.CpfAlreadyExist() }
+                            } else if (errorMsg.contains("Email", ignoreCase = true)) {
+                                _uiEvent.update { LoginCadastroUiEvents.EmailAlreadyExist() }
+                            }
+                        }
+                        else -> {
+                            _uiEvent.update {
+                                LoginCadastroUiEvents.ServerError()
+                            }
+                        }
+                    }
                 }
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+                e.message?.let { Log.e(TAG, it) }
+                _uiEvent.update { LoginCadastroUiEvents.NetworkError() }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
@@ -135,6 +176,9 @@ class LoginCadastroViewModel @Inject constructor(
         senha: String,
         goToMainView: () -> Unit
     ) {
+
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
@@ -146,7 +190,6 @@ class LoginCadastroViewModel @Inject constructor(
             try {
                 val loginResponse = loginUseCase.invoke(loginRequest)
                 if (loginResponse.isSuccessful) {
-
                     jwtDataStore.saveAccessJwt(loginResponse.body()?.token ?: "")
                     jwtDataStore.saveRefreshJwt(loginResponse.body()?.refreshToken ?: "")
                     loginResponse.body()?.let {
@@ -160,15 +203,30 @@ class LoginCadastroViewModel @Inject constructor(
                         userRepository.saveUserData(userData)
                     }
                     goToMainView()
+                } else {
+                    when (loginResponse.code()) {
+                        400 -> {
+                            _uiEvent.update {
+                                LoginCadastroUiEvents.InvalidInput()
+                            }
+                        }
+                        401 -> {
+                            _uiEvent.update {
+                                LoginCadastroUiEvents.InvalidCredentials()
+                            }
+                        }
+                        else -> {
+                            _uiEvent.update {
+                                LoginCadastroUiEvents.ServerError()
+                            }
+                        }
+                    }
+
                 }
-
-                if (loginResponse.code() == 400) {
-
-                }
-
             } catch (e: Exception) {
                 e.message?.let { Log.e(TAG, it) }
-            } finally {
+                _uiEvent.update { LoginCadastroUiEvents.NetworkError() }
+            }finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
@@ -197,6 +255,14 @@ class LoginCadastroViewModel @Inject constructor(
                 e.message?.let { Log.e(TAG, it) }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun resetUiEvent() {
+        viewModelScope.launch {
+            _uiEvent.update {
+                LoginCadastroUiEvents.None()
             }
         }
     }

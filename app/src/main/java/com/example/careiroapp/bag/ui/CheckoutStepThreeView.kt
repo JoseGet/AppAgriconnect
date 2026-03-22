@@ -22,7 +22,8 @@ fun CheckoutStepThreeView(
     padding: PaddingValues,
     orderData: OrderModel,
     productsList: List<BagItem>,
-    totalValue: Double
+    totalValue: Double,
+    onButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -43,7 +44,7 @@ fun CheckoutStepThreeView(
             total = totalValue.toFloat()
         )
         CheckoutMainButton(
-            onButtonClick = {}
+            onButtonClick = onButtonClick
         )
     }
 }
