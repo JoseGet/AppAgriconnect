@@ -133,4 +133,7 @@ dependencies {
     //QR code
     implementation(libs.core)
 
+    //Lottie Animation
+    implementation(libs.lottie.compose)
+
 }

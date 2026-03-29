@@ -22,7 +22,9 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun PaymentSection() {
+fun PaymentSection(
+    updatePaymentTypeFunction: (PaymentType) -> Unit = {}
+) {
 
     var selectedPayment by rememberSaveable { mutableStateOf<PaymentType?>(null) }
 
@@ -48,6 +50,7 @@ fun PaymentSection() {
                 isSelected = selectedPayment == PaymentType.DINHEIRO,
                 onSelect = {
                     selectedPayment = PaymentType.DINHEIRO
+                    updatePaymentTypeFunction(selectedPayment!!)
                 }
             )
             PaymentRadioButton(
@@ -56,6 +59,7 @@ fun PaymentSection() {
                 isSelected = selectedPayment == PaymentType.PIX,
                 onSelect = {
                     selectedPayment = PaymentType.PIX
+                    updatePaymentTypeFunction(selectedPayment!!)
                 }
             )
         }

@@ -1,8 +1,5 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
-import android.graphics.Bitmap
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -14,8 +11,6 @@ import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -92,15 +87,17 @@ class BagViewModel @Inject constructor(
                     retiradaHora = orderUiState.value.order.time
                 )
 
-                val response = pedidoRepository.createPedido(pedido).isSuccessful
+                val response = pedidoRepository.createPedido(pedido)
 
-                if (response) {
+                if (response.isSuccessful) {
                     _uiState.update { it.copy(isLoading = false) }
+                    _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
+                        totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
+                        pixPayload = response.body()?.pixPayload
+                    ))}
                     changeCheckoutStep(CheckoutStep.FINAL)
                 }
-            } catch (e: Exception) {
-
-            }
+            } catch (e: Exception) { }
         }
     }
 
@@ -143,6 +140,18 @@ class BagViewModel @Inject constructor(
         }
     }
 
+    fun updatePaymentType(
+        paymentType: PaymentType
+    ) {
+        _orderUiState.update {
+            it.copy(
+                order = it.order.copy(
+                    paymentType = paymentType
+                )
+            )
+        }
+    }
+
     fun savePayerData(
         email: String,
         name: String,
@@ -157,7 +166,7 @@ class BagViewModel @Inject constructor(
 
         _orderUiState.update {
             it.copy(
-                order = OrderModel(
+                order = it.order.copy(
                     payerData = payerData
                 )
             )
@@ -169,19 +178,15 @@ class BagViewModel @Inject constructor(
         time: String,
         local: String
     ) {
-
-        val order = OrderModel(
-            date = date,
-            time = time,
-            address = local
-        )
-
         _orderUiState.update {
             it.copy(
-                order = order
+                order = it.order.copy(
+                    date = date,
+                    time = time,
+                    address = local
+                )
             )
         }
-
     }
 
     fun resetOrderState() {
