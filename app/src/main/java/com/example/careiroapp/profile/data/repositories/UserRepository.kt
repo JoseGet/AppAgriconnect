@@ -9,7 +9,7 @@ class UserRepository @Inject constructor(
     private val userDao: UserDao
 ) {
 
-    fun getUserData(): Flow<UserEntity> {
+    fun getUserData(): Flow<UserEntity?> {
         return userDao.getUser()
     }
 

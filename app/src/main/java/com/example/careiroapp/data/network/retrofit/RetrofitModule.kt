@@ -5,6 +5,7 @@ import com.example.careiroapp.data.network.api.AssociacaoApiService
 import com.example.careiroapp.data.network.api.AuthApiService
 import com.example.careiroapp.data.network.api.ClienteApiService
 import com.example.careiroapp.data.network.api.FeiraApiService
+import com.example.careiroapp.data.network.api.PedidoApiService
 import com.example.careiroapp.data.network.api.ProdutoApiService
 import com.example.careiroapp.data.network.api.RefreshApiTokenService
 import com.example.careiroapp.data.network.api.VendedorApiService
@@ -134,6 +135,17 @@ object RetrofitModule {
             .client(okHttpClient)
             .build()
             .create(AssociacaoApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun pedidoApiServiceProvider(@AuthenticatedClient okHttpClient: OkHttpClient): PedidoApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(PedidoApiService::class.java)
     }
 
     @Provides

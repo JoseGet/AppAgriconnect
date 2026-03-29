@@ -45,9 +45,9 @@ fun PaymentSection() {
             PaymentRadioButton(
                 title = stringResource(R.string.dinheiro),
                 description = stringResource(R.string.dinheiro_description),
-                isSelected = selectedPayment == PaymentType.CASH,
+                isSelected = selectedPayment == PaymentType.DINHEIRO,
                 onSelect = {
-                    selectedPayment = PaymentType.CASH
+                    selectedPayment = PaymentType.DINHEIRO
                 }
             )
             PaymentRadioButton(

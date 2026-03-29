@@ -308,7 +308,7 @@ class ProductsViewModel @Inject constructor(
                     price = product.precoProduto,
                     imageUrl = product.image,
                     userId = cpf,
-                    quantity = 1
+                    quantity = 1,
                 )
                 bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }

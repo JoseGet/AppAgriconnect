@@ -1,13 +1,21 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
+import android.graphics.Bitmap
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.bag.data.models.PedidoBody
+import com.example.careiroapp.bag.data.models.PedidoProdutoModel
 import com.example.careiroapp.bag.data.repository.BagRepository
+import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +30,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.collections.emptyList
 
 @HiltViewModel
 class BagViewModel @Inject constructor(
     private val repository: BagRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val pedidoRepository: PedidoRepository
 ): ViewModel() {
 
     private val _uiState: MutableStateFlow<BagUiState> = MutableStateFlow(BagUiState())
@@ -61,6 +69,49 @@ class BagViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun createPedido() {
+
+        val produtos = bagItemsConverter(cartItems.value)
+
+        viewModelScope.launch {
+
+            _uiState.update {
+                it.copy(
+                    isLoading = true
+                )
+            }
+
+            try {
+                val pedido = PedidoBody(
+                    valorTotal = totalPrice.value?.toFloat() ?: 0f,
+                    produtos = produtos,
+                    paymentType = orderUiState.value.order.paymentType,
+                    retiradaLocal = orderUiState.value.order.address,
+                    retiradaData = orderUiState.value.order.date,
+                    retiradaHora = orderUiState.value.order.time
+                )
+
+                val response = pedidoRepository.createPedido(pedido).isSuccessful
+
+                if (response) {
+                    _uiState.update { it.copy(isLoading = false) }
+                    changeCheckoutStep(CheckoutStep.FINAL)
+                }
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    private fun bagItemsConverter(bagItems: List<BagItem>): List<PedidoProdutoModel> {
+        return bagItems.map { item ->
+            PedidoProdutoModel(
+                idProduto = item.productId,
+                quantidade = item.quantity
+            )
+        }
+    }
 
     fun addQuantity(productId: UUID, cpf: String) {
         viewModelScope.launch {
@@ -104,12 +155,12 @@ class BagViewModel @Inject constructor(
             telefone = telefone
         )
 
-        viewModelScope.launch {
-            _orderUiState.update { it.copy(
+        _orderUiState.update {
+            it.copy(
                 order = OrderModel(
                     payerData = payerData
                 )
-            ) }
+            )
         }
     }
 
@@ -125,11 +176,18 @@ class BagViewModel @Inject constructor(
             address = local
         )
 
-        viewModelScope.launch {
-            _orderUiState.update { it.copy(
+        _orderUiState.update {
+            it.copy(
                 order = order
-            ) }
+            )
         }
+
+    }
+
+    fun resetOrderState() {
+        _orderUiState.update { it.copy(
+            order = OrderModel()
+        ) }
     }
 
 }

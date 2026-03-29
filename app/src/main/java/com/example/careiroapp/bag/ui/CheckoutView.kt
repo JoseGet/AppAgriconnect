@@ -84,7 +84,7 @@ fun CheckoutView(
                     productsList = bagItems,
                     totalValue = totalPrice,
                     onButtonClick = {
-                        viewModel.changeCheckoutStep(CheckoutStep.FINAL)
+                        viewModel.createPedido()
                     }
                 )
             }
@@ -92,6 +92,7 @@ fun CheckoutView(
             CheckoutStep.FINAL -> {
                 CheckoutFinalStepView(
                     innerPadding,
+                    "google.com"
                 )
             }
         }

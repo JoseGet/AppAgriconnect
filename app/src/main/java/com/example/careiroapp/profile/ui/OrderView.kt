@@ -41,7 +41,7 @@ fun OrderView(
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "Pedido #${order?.orderId}",
+            "Pedido #1}",
             fontFamily = montserratBoldFontFamily,
             fontSize = 18.sp,
             color = colorResource(R.color.dark_green)
@@ -73,8 +73,6 @@ fun OrderView(
 private fun OrderViewPreview() {
     OrderView(
         navController = rememberNavController(),
-        OrderModel(
-            1
-        )
+        OrderModel()
     )
 }

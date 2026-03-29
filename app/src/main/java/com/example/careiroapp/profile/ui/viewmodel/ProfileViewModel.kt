@@ -27,7 +27,7 @@ class ProfileViewModel @Inject constructor(
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
     var profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
-    val userData: Flow<UserEntity> = userRepository.getUserData()
+    val userData: Flow<UserEntity?> = userRepository.getUserData()
     fun setCurrentModule(newModule: ProfileModules) {
         _profileUiState.update { it.copy(currentProfileModule = newModule) }
     }
@@ -64,7 +64,7 @@ class ProfileViewModel @Inject constructor(
                     name = product.nomeProduto,
                     price = product.precoProduto,
                     imageUrl = product.image,
-                    quantity = 1
+                    quantity = 1,
                 )
                 bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }
