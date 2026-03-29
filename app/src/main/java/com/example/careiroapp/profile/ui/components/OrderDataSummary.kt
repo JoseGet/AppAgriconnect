@@ -26,7 +26,12 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
 @Composable
-fun OrderDataSummary() {
+fun OrderDataSummary(
+    local: String,
+    date: String,
+    time: String,
+    paymentType: String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,11 +51,11 @@ fun OrderDataSummary() {
                 fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CollectSectionRow(painter = painterResource(R.drawable.map_marker), "")
+            CollectSectionRow(painter = painterResource(R.drawable.map_marker), local)
             Spacer(modifier = Modifier.height(8.dp))
-            CollectSectionRow(painter = painterResource(R.drawable.clock),"")
+            CollectSectionRow(painter = painterResource(R.drawable.clock),time)
             Spacer(modifier = Modifier.height(8.dp))
-            CollectSectionRow(painter = painterResource(R.drawable.calendar),"")
+            CollectSectionRow(painter = painterResource(R.drawable.calendar),date)
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 "Pagamento",
@@ -59,7 +64,7 @@ fun OrderDataSummary() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Dinheiro",
+                paymentType,
                 fontFamily = montserratRegularFontFamily,
                 fontSize = 16.sp
             )
@@ -88,5 +93,10 @@ fun OrderDataSummary() {
 @Preview
 @Composable
 private fun OrderDataSummaryPreview() {
-    OrderDataSummary()
+    OrderDataSummary(
+        local = "Local",
+        date = "Data",
+        time = "Hora",
+        paymentType = "Pagamento"
+    )
 }

@@ -130,4 +130,10 @@ dependencies {
     //CPF validator
     implementation(libs.simple.cpf.validator.v280)
 
+    //QR code
+    implementation(libs.core)
+
+    //Lottie Animation
+    implementation(libs.lottie.compose)
+
 }

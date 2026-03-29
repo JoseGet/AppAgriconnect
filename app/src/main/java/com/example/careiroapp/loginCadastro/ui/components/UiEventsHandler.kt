@@ -22,8 +22,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Credenciais inválidas",
                     dialogText = "O e-mail ou senha informados estão incorretos. Tente novamente.",
@@ -40,8 +40,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Problema de conexão",
                     dialogText = "Verifique sua internet e tente novamente.",
@@ -58,8 +58,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Algo deu errado",
                     dialogText = "Estamos com problemas para realizar o login. Tente novamente em instantes.",
@@ -76,8 +76,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Informações inválidas",
                     dialogText = "Verifique se todos os campos foram preenchidos corretamente.",
@@ -94,8 +94,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Email já cadastrado",
                     dialogText = "Este email já está em uso. Faça login ou utilize outro email para continuar.",
@@ -112,8 +112,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "CPF já cadastrado",
                     dialogText = "Este CPF já está vinculado a uma conta. Tente fazer login ou utilize outro CPF.",
@@ -130,8 +130,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "CPF inválido",
                     dialogText = "O CPF informado é inválido. Verifique os dados e tente novamente.",
@@ -148,8 +148,8 @@ fun UiEventsHandler(
                         openAlertDialog.value = false
                     },
                     onConfirmation = {
-                        openAlertDialog.value = false
                         resetUiEventFunction()
+                        openAlertDialog.value = false
                     },
                     dialogTitle = "Email inválido",
                     dialogText = "O Email informado é inválido. Verifique os dados e tente novamente.",
