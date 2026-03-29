@@ -19,6 +19,7 @@ import com.example.careiroapp.products.ui.SingleProductView
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
 import com.example.careiroapp.profile.ui.OrderView
 import com.example.careiroapp.profile.ui.ProfileView
+import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun TapBarNavHost(
@@ -142,8 +143,16 @@ fun TapBarNavHost(
         composable(
             NavigationItem.Pedido.route
         ) {
+            val viewModel: ProfileViewModel =
+                if (navController.previousBackStackEntry != null) hiltViewModel(
+                    navController.previousBackStackEntry!!
+                ) else hiltViewModel()
             OrderView(
                 navController,
+                viewModel.profileUiState.value.selectedPedido,
+                clearSelectedOrder = {
+                    viewModel.clearSelectedOrder()
+                }
             )
         }
 

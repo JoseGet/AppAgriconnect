@@ -1,8 +1,11 @@
 package com.example.careiroapp.profile.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.bag.data.models.Pedidos
 import com.example.careiroapp.bag.data.repository.BagRepository
+import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
@@ -21,7 +24,8 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val bagRepository: BagRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val pedidoRepository: PedidoRepository
 ): ViewModel() {
 
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
@@ -35,6 +39,8 @@ class ProfileViewModel @Inject constructor(
     fun getFavoritesProducts(
         cpf: String
     ) {
+        if (_profileUiState.value.isLoading) return
+        
         viewModelScope.launch {
             try {
                 _profileUiState.update { it.copy(isLoading = true) }
@@ -44,14 +50,56 @@ class ProfileViewModel @Inject constructor(
                 if (favoriteRes.isSuccessful) {
                     val favoriteList = favoriteRes.body()
                     _profileUiState.update { it.copy(
-                        favoriteItensList = favoriteList?.toList() ?: emptyList(),
-                        isLoading = false
+                        favoriteItensList = favoriteList?.toList() ?: emptyList()
                     ) }
                 }
 
             } catch (e: Exception) {
-
+                Log.e("ProfileVM", "Error loading favorites", e)
+            } finally {
+                _profileUiState.update { it.copy(isLoading = false) }
             }
+        }
+    }
+
+    fun getPedidos() {
+        if (_profileUiState.value.isLoading) return
+
+        viewModelScope.launch {
+            try {
+                _profileUiState.update { it.copy(isLoading = true) }
+
+                val pedidos = pedidoRepository.getPedidos()
+
+                if (pedidos.isSuccessful) {
+                    val pedidosList = pedidos.body()
+                    _profileUiState.update {
+                        it.copy(
+                        pedidosList = pedidosList?.toList() ?: emptyList()
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileVM", "Error loading pedidos", e)
+            } finally {
+                _profileUiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun updateSelectedPedido(pedido: Pedidos) {
+        _profileUiState.update {
+            it.copy(
+                selectedPedido = pedido
+            )
+        }
+    }
+
+    fun clearSelectedOrder() {
+        _profileUiState.update {
+            it.copy(
+                selectedPedido = null
+            )
         }
     }
 

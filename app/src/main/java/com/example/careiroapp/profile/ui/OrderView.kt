@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
+import com.example.careiroapp.bag.data.models.Pedidos
+import com.example.careiroapp.bag.ui.components.SummaryProductCard
 import com.example.careiroapp.bag.ui.components.SummaryProductsHeader
 import com.example.careiroapp.bag.ui.viewmodel.OrderModel
 import com.example.careiroapp.common.components.buttons.BackButton
@@ -26,7 +28,8 @@ import com.example.careiroapp.profile.ui.components.OrderDataSummary
 @Composable
 fun OrderView(
     navController: NavHostController,
-    order: OrderModel? = null
+    order: Pedidos? = null,
+    clearSelectedOrder: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -37,11 +40,12 @@ fun OrderView(
         BackButton(
             onClick = {
                 navController.popBackStack()
+                clearSelectedOrder()
             }
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "Pedido #1}",
+            "Pedido #${order?.id}",
             fontFamily = montserratBoldFontFamily,
             fontSize = 18.sp,
             color = colorResource(R.color.dark_green)
@@ -54,17 +58,22 @@ fun OrderView(
                 .wrapContentHeight(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-//            for (product in listOf<ProductModel>()) {
-//                SummaryProductCard(
-//                    image = product.imageUrl,
-//                    name = product.name,
-//                    qntd = product.quantity,
-//                    price = product.price
-//                )
-//            }
+            for (product in order?.itens ?: emptyList()) {
+                SummaryProductCard(
+                    image = product.produto?.image ?: "",
+                    name = product.produto?.nome ?: "",
+                    qntd = product.quantidade ?: 0,
+                    price = product.produto?.preco?.toFloat() ?: 0f
+                )
+            }
         }
         Spacer(modifier = Modifier.height(24.dp))
-        OrderDataSummary()
+        OrderDataSummary(
+            local = order?.retiradaLocal ?: "",
+            date = order?.retiradaData ?: "",
+            time = order?.retiradaHora ?: "",
+            paymentType = order?.paymentType?.name ?: ""
+        )
     }
 }
 
@@ -73,6 +82,5 @@ fun OrderView(
 private fun OrderViewPreview() {
     OrderView(
         navController = rememberNavController(),
-        OrderModel()
     )
 }

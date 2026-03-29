@@ -16,7 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -96,6 +96,11 @@ fun ProfileView(
         when (profileUiState.currentProfileModule) {
 
             ProfileModules.PEDIDOS -> {
+
+                LaunchedEffect(Unit) {
+                    if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
+                }
+
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
@@ -117,12 +122,13 @@ fun ProfileView(
                             .fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        items(2) { item ->
+                        items(profileUiState.pedidosList){ pedido ->
                             OrderCard(
-                                orderId = 1,
-                                orderTotalValue = 35.0f,
-                                orderStatus = "Retirada",
+                                orderId = pedido.id,
+                                orderTotalValue = pedido.valorTotal.toFloat(),
+                                orderStatus = pedido.status ?: "",
                                 onClick = {
+                                    viewModel.updateSelectedPedido(pedido)
                                     navController.navigate(NavigationItem.Pedido.route)
                                     resetScrollFunction()
                                 }
@@ -135,7 +141,11 @@ fun ProfileView(
             ProfileModules.FAVORITOS -> {
 
                 LaunchedEffect(userData?.cpf) {
-                    if (profileUiState.favoriteItensList.isEmpty()) viewModel.getFavoritesProducts(userData?.cpf ?: "")
+                    if (profileUiState.favoriteItensList.isEmpty()) {
+                        userData?.cpf?.let { cpf ->
+                            viewModel.getFavoritesProducts(cpf)
+                        }
+                    }
                 }
 
                 Box(
