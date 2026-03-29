@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,13 +28,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
+import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.products.ui.components.ProductCard
+import com.example.careiroapp.profile.ui.components.OrderCard
 import com.example.careiroapp.profile.ui.components.ProfileDataWidget
 import com.example.careiroapp.profile.ui.components.ProfileModulesBar
 import com.example.careiroapp.profile.ui.viewmodel.ProfileModules
@@ -40,7 +46,9 @@ import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileView(
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    navController: NavHostController,
+    resetScrollFunction: () -> Unit
 ) {
     val profileUiState by viewModel.profileUiState.collectAsState()
     val userData by viewModel.userData.collectAsState(initial = null)
@@ -86,14 +94,58 @@ fun ProfileView(
         )
         Spacer(Modifier.height(24.dp))
         when (profileUiState.currentProfileModule) {
+
             ProfileModules.PEDIDOS -> {
 
+                LaunchedEffect(Unit) {
+                    if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
+                }
+
+                Box(
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .height(500.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (profileUiState.isLoading) {
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = R.drawable.load,
+                                imageLoader = imageLoader
+                            ),
+                            contentDescription = null
+                        )
+                    }
+                    LazyColumn (
+                        modifier = Modifier
+                            .padding(vertical = 10.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        items(profileUiState.pedidosList){ pedido ->
+                            OrderCard(
+                                orderId = pedido.id,
+                                orderTotalValue = pedido.valorTotal.toFloat(),
+                                orderStatus = pedido.status ?: "",
+                                onClick = {
+                                    viewModel.updateSelectedPedido(pedido)
+                                    navController.navigate(NavigationItem.Pedido.route)
+                                    resetScrollFunction()
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
             ProfileModules.FAVORITOS -> {
 
                 LaunchedEffect(userData?.cpf) {
-                    if (profileUiState.favoriteItensList.isEmpty()) viewModel.getFavoritesProducts(userData?.cpf ?: "")
+                    if (profileUiState.favoriteItensList.isEmpty()) {
+                        userData?.cpf?.let { cpf ->
+                            viewModel.getFavoritesProducts(cpf)
+                        }
+                    }
                 }
 
                 Box(
@@ -148,5 +200,5 @@ fun ProfileView(
 @Composable
 @Preview(showBackground = true)
 private fun ProfileViewPreview() {
-    ProfileView()
+    //ProfileView()
 }

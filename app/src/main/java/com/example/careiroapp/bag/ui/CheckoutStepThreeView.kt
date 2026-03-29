@@ -1,7 +1,5 @@
 package com.example.careiroapp.bag.ui
 
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +15,7 @@ import com.example.careiroapp.bag.ui.components.PaymentSection
 import com.example.careiroapp.bag.ui.components.Stepper
 import com.example.careiroapp.bag.ui.components.SummarySection
 import com.example.careiroapp.bag.ui.viewmodel.OrderModel
+import com.example.careiroapp.bag.ui.viewmodel.PaymentType
 import com.example.careiroapp.data.room.entities.BagItem
 
 @Composable
@@ -24,7 +23,9 @@ fun CheckoutStepThreeView(
     padding: PaddingValues,
     orderData: OrderModel,
     productsList: List<BagItem>,
-    totalValue: Double
+    totalValue: Double,
+    updatePaymentType: (PaymentType) -> Unit,
+    onButtonClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -34,7 +35,9 @@ fun CheckoutStepThreeView(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Stepper(3)
-        PaymentSection()
+        PaymentSection(
+            updatePaymentTypeFunction = updatePaymentType
+        )
         CollectSection(
             orderData.address,
             orderData.time,
@@ -45,7 +48,7 @@ fun CheckoutStepThreeView(
             total = totalValue.toFloat()
         )
         CheckoutMainButton(
-            onButtonClick = {}
+            onButtonClick = onButtonClick
         )
     }
 }

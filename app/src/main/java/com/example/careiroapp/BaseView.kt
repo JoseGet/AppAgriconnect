@@ -13,18 +13,26 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
 import com.example.careiroapp.common.components.drawer.AppDrawer
 import com.example.careiroapp.common.components.footer.AppFooter
 import com.example.careiroapp.common.components.header.AppHeader
+import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.navigation.TapBarNavHost
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,6 +43,9 @@ fun BaseView(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val tabBarNavController = rememberNavController()
+
+    val bagViewModel: BagViewModel = hiltViewModel()
+    val bagItems: List<BagItem> by bagViewModel.cartItems.collectAsStateWithLifecycle()
 
     val resetScroll: () -> Unit = {
         scope.launch {
@@ -70,6 +81,7 @@ fun BaseView(
                     },
                     navController,
                     tabBarNavController = tabBarNavController,
+                    bagItemsCount = bagItems.size,
                     resetScroll
                 )
             },

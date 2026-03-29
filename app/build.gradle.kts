@@ -127,4 +127,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
 
+    //CPF validator
+    implementation(libs.simple.cpf.validator.v280)
+
+    //QR code
+    implementation(libs.core)
+
+    //Lottie Animation
+    implementation(libs.lottie.compose)
+
 }

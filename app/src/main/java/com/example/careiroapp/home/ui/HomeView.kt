@@ -204,6 +204,7 @@ fun HomeView(
             CardCadastroAssociacao(
                 {
                     navController.navigate(NavigationItem.Associacoes.route)
+                    resetScrollFunction()
                 }
             )
         }

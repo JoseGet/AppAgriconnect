@@ -47,12 +47,14 @@ fun DateTimeChip(
                 text = date,
                 color = if (selected) Color.White else green,
                 fontFamily = montserratBoldFontFamily,
+                maxLines = 1,
                 fontSize = 14.sp
             )
             Text(
                 text = time,
                 color = if (selected) Color.White else green,
                 fontFamily = montserratRegularFontFamily,
+                maxLines = 1,
                 fontSize = 14.sp
             )
         }

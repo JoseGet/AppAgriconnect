@@ -4,8 +4,6 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -20,12 +18,15 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,9 +38,7 @@ import com.example.careiroapp.common.montserratRegularFontFamily
 @Composable
 fun ColumnsFooter() {
 
-    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val interactionSource = remember { MutableInteractionSource() }
     val moverseNaWebUrl : String = "https://moverse.ceweb.br"
 
     val tituloTextStyle = TextStyle(
@@ -58,12 +57,22 @@ fun ColumnsFooter() {
         withStyle(style = SpanStyle(fontFamily = montserratRegularFontFamily, color = colorResource(R.color.black))) {
             append(annotatedStringResource(R.string.apoio_content))
         }
-        pushStringAnnotation(tag = "URL", annotation = moverseNaWebUrl)
-        withStyle(style = SpanStyle(
-            color = colorResource(R.color.dark_green),
-            fontFamily = montserratRegularFontFamily,
-            textDecoration = TextDecoration.Underline
-        )) {
+
+        withLink(
+            link = LinkAnnotation.Url(
+                url = moverseNaWebUrl,
+                styles = TextLinkStyles(
+                    style = SpanStyle(
+                        color = colorResource(R.color.dark_green),
+                        fontFamily = montserratRegularFontFamily,
+                        textDecoration = TextDecoration.Underline
+                    )
+                ),
+                linkInteractionListener = {
+                    uriHandler.openUri(moverseNaWebUrl)
+                }
+            )
+        ) {
             append(moverseNaWebUrl)
         }
     }
@@ -81,13 +90,6 @@ fun ColumnsFooter() {
         Spacer(Modifier.height(4.dp))
         Text(
             annotatedText,
-            modifier = Modifier
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                ) {
-                    uriHandler.openUri(moverseNaWebUrl)
-                },
             textAlign = TextAlign.Start
         )
     }

@@ -1,14 +1,14 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
+import com.example.careiroapp.products.data.models.ProductModel
+
 data class OrderUiState(
     val isLoading: Boolean = false,
     val order: OrderModel = OrderModel(),
-    val payerData: PayerData = PayerData(),
-    val paymentType: PaymentType? = null,
 )
 enum class PaymentType{
     PIX,
-    CASH
+    DINHEIRO
 }
 
 data class PayerData(
@@ -20,5 +20,10 @@ data class PayerData(
 data class OrderModel (
     val date: String = "",
     val time: String = "",
-    val address: String = ""
+    val address: String = "",
+    val paymentType: PaymentType? = null,
+    val payerData: PayerData = PayerData(),
+    val items: List<ProductModel> = emptyList(),
+    val totalValue: Float = 0f,
+    val pixPayload: String? = null
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -52,7 +53,9 @@ fun AppSearchBar() {
         ) {
 
             BasicTextField(
-                modifier = Modifier.padding(start = 16.dp),
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .weight(1f),
                 value = text,
                 onValueChange = {
                     text = it
@@ -60,13 +63,18 @@ fun AppSearchBar() {
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(color = Color.Black),
                 decorationBox = { innerTextField ->
-                    if (text.isEmpty()) {
-                        Text(
-                            "O que voce procura?",
-                            color = Color.Gray
-                        )
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (text.isEmpty()) {
+                            Text(
+                                "O que você procura?",
+                                color = Color.Gray
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 },
             )
 
@@ -85,4 +93,3 @@ fun AppSearchBar() {
 fun AppSearchBarPreview() {
     AppSearchBar()
 }
-

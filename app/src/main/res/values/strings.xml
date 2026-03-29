@@ -125,6 +125,7 @@ No Agriconnect, a tecnologia é aliada na criação de redes entre agricultores 
     <string name="retirada">Retirada</string>
     <string name="resumo_compra">Resumo da compra</string>
     <string name="resumo_compra_description">Revise todas as informações antes de concluir a compra</string>
+    <string name="ver_detalhes">Ver detalhes</string>
 
 
 </resources>
