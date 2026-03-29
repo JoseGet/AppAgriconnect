@@ -79,15 +79,6 @@ fun CheckoutView(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (bagUiState.isLoading) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.load,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = null
-                )
-            }
             when(bagUiState.checkoutStep) {
 
                 CheckoutStep.ONE -> {
@@ -142,6 +133,15 @@ fun CheckoutView(
                         pixPayload = orderUiState.order.pixPayload ?: ""
                     )
                 }
+            }
+            if (bagUiState.isLoading) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = R.drawable.load,
+                        imageLoader = imageLoader
+                    ),
+                    contentDescription = null
+                )
             }
         }
     }

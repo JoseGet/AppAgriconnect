@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -69,6 +70,8 @@ class BagViewModel @Inject constructor(
 
         val produtos = bagItemsConverter(cartItems.value)
 
+        if (_uiState.value.isLoading) return
+
         viewModelScope.launch {
 
             _uiState.update {
@@ -95,6 +98,11 @@ class BagViewModel @Inject constructor(
                         totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
                         pixPayload = response.body()?.pixPayload
                     ))}
+
+                    userData.firstOrNull()?.cpf?.let { cpf ->
+                        repository.clearBag(cpf)
+                    }
+
                     changeCheckoutStep(CheckoutStep.FINAL)
                 }
             } catch (e: Exception) { }
