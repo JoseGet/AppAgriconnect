@@ -37,7 +37,6 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.products.ui.components.FeaturedProducts
@@ -91,10 +90,6 @@ fun ProductsView(
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
-        FeaturedProducts(
-            navController
-        )
-        Spacer(Modifier.height(24.dp))
         ModulesHeader(
             titulo = stringResource(R.string.confira_nossos_produtos),
             subtitulo = null
@@ -167,12 +162,6 @@ fun ProductsView(
                 )
             }
         }
-        Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao(
-            {
-                navController.navigate(NavigationItem.Associacoes.route)
-            }
-        )
     }
 }
 

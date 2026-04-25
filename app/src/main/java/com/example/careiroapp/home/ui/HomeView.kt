@@ -34,7 +34,6 @@ import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.common.components.cards.CardAssinatura
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
 import com.example.careiroapp.home.ui.components.HomeCardFeira
 import com.example.careiroapp.products.ui.components.ProductCard
 import com.example.careiroapp.home.ui.components.CategoriasModule
@@ -200,13 +199,6 @@ fun HomeView(
             )
             Spacer(Modifier.height(24.dp))
             TutorialRow()
-            Spacer(Modifier.height(24.dp))
-            CardCadastroAssociacao(
-                {
-                    navController.navigate(NavigationItem.Associacoes.route)
-                    resetScrollFunction()
-                }
-            )
         }
     }
 }
