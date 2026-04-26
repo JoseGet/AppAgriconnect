@@ -13,11 +13,11 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -31,8 +31,6 @@ import com.example.careiroapp.common.components.header.AppHeader
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.navigation.TapBarNavHost
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -86,6 +84,9 @@ fun BaseView(
                 )
             },
             content = { innerPadding ->
+                val scrollTopOffsetPx = with(LocalDensity.current) {
+                    innerPadding.calculateTopPadding().toPx()
+                }
                 Column(
                     modifier = Modifier
                         .padding(innerPadding)
@@ -95,10 +96,15 @@ fun BaseView(
                 ) {
                     TapBarNavHost(
                         navController = tabBarNavController,
-                        resetScrollFunction = resetScroll
+                        resetScrollFunction = resetScroll,
+                        scrollState = scrollState,
+                        scrollTopOffsetPx = scrollTopOffsetPx
                     )
                     Spacer(Modifier.height(20.dp))
-                    AppFooter()
+                    AppFooter(
+                        navController = tabBarNavController,
+                        resetScrollFunction = resetScroll
+                    )
                 }
             }
         )

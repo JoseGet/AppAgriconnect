@@ -48,7 +48,8 @@ fun OrderDataSummary(
             Text(
                 "Retirada",
                 fontFamily = montserratBoldFontFamily,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = colorResource(R.color.black)
             )
             Spacer(modifier = Modifier.height(8.dp))
             CollectSectionRow(painter = painterResource(R.drawable.map_marker), local)
@@ -60,16 +61,15 @@ fun OrderDataSummary(
             Text(
                 "Pagamento",
                 fontFamily = montserratBoldFontFamily,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = colorResource(R.color.black)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 paymentType,
                 fontFamily = montserratRegularFontFamily,
-                fontSize = 16.sp
-            )
-            Text(
-                ""
+                fontSize = 16.sp,
+                color = colorResource(R.color.black)
             )
             Row(
                 modifier = Modifier

@@ -4,6 +4,7 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -12,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.colorResource
@@ -31,12 +31,18 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
+import com.example.careiroapp.navigation.NavigationItem
 
 @Composable
-fun ColumnsFooter() {
+fun ColumnsFooter(
+    navController: NavController,
+    resetScrollFunction: () -> Unit
+) {
 
     val uriHandler = LocalUriHandler.current
     val moverseNaWebUrl : String = "https://moverse.ceweb.br"
@@ -51,6 +57,10 @@ fun ColumnsFooter() {
         fontFamily = montserratRegularFontFamily,
         fontSize = 14.sp,
         color = Color.Black
+    )
+
+    val subtituloClickableStyle = subtituloTextStyle.copy(
+        textDecoration = TextDecoration.Underline
     )
 
     val annotatedText = buildAnnotatedString {
@@ -80,11 +90,32 @@ fun ColumnsFooter() {
     Column() {
         Text(stringResource(R.string.o_agriconnect), style = tituloTextStyle)
         Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.o_que_e), style = subtituloTextStyle)
+        Text(
+            stringResource(R.string.o_que_e),
+            style = subtituloClickableStyle,
+            modifier = Modifier.clickable {
+                resetScrollFunction()
+                navController.navigate("${NavigationItem.SobreNos.route}?section=0")
+            }
+        )
         Spacer(Modifier.height(4.dp))
-        Text(stringResource(R.string.quem_faz_parte), style = subtituloTextStyle)
+        Text(
+            stringResource(R.string.quem_faz_parte),
+            style = subtituloClickableStyle,
+            modifier = Modifier.clickable {
+                resetScrollFunction()
+                navController.navigate("${NavigationItem.SobreNos.route}?section=1")
+            }
+        )
         Spacer(Modifier.height(4.dp))
-        Text(stringResource(R.string.como_participar), style = subtituloTextStyle)
+        Text(
+            stringResource(R.string.como_participar),
+            style = subtituloClickableStyle,
+            modifier = Modifier.clickable {
+                resetScrollFunction()
+                navController.navigate("${NavigationItem.SobreNos.route}?section=2")
+            }
+        )
         Spacer(Modifier.height(24.dp))
         Text(stringResource(R.string.apoio), style = tituloTextStyle)
         Spacer(Modifier.height(4.dp))
@@ -126,5 +157,8 @@ fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
 @Composable
 @Preview(showBackground = true)
 private fun ColumnsFooterPreview() {
-    ColumnsFooter()
+    ColumnsFooter(
+        navController = rememberNavController(),
+        resetScrollFunction = {}
+    )
 }

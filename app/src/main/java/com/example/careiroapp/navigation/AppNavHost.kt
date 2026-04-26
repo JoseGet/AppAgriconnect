@@ -1,5 +1,7 @@
 package com.example.careiroapp.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -18,6 +20,7 @@ import com.example.careiroapp.navigation.NavigationItem.Login
 import com.example.careiroapp.navigation.NavigationItem.Main
 import com.example.careiroapp.navigation.NavigationItem.Sacola
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController,

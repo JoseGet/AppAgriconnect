@@ -37,16 +37,19 @@ fun SummaryProductsHeader() {
             Text(
                 "Item",
                 fontFamily = montserratBoldFontFamily,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                color = colorResource(R.color.black)
             )
             Text(
                 "Qtd.",
                 fontFamily = montserratBoldFontFamily,
-                modifier = Modifier.padding(end = 46.dp)
+                modifier = Modifier.padding(end = 46.dp),
+                color = colorResource(R.color.black)
             )
             Text(
                 "Total",
                 fontFamily = montserratBoldFontFamily,
+                color = colorResource(R.color.black)
             )
         }
     }

@@ -133,7 +133,6 @@ fun SingleProductView(
         ProductDescription(
             productDescription = productViewUiState.selectedProduct?.descricao ?: ""
         )
-        Spacer(Modifier.height(24.dp))
     }
 }
 

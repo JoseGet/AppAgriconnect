@@ -45,19 +45,5 @@ fun Stepper(
             activeColor = activeColor,
             inactiveColor = inactiveColor
         )
-
-        StepLine(
-            isActive = currentStep >= 3,
-            activeColor = activeColor,
-            inactiveColor = inactiveColor,
-            modifier = Modifier.weight(1f)
-        )
-
-        StepCircle(
-            number = 3,
-            isActive = currentStep >= 3,
-            activeColor = activeColor,
-            inactiveColor = inactiveColor
-        )
     }
 }

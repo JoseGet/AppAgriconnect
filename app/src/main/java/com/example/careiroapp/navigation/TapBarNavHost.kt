@@ -1,11 +1,14 @@
 package com.example.careiroapp.navigation
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.careiroapp.AboutUsView
 import com.example.careiroapp.associacoes.ui.AssociacoesView
 import com.example.careiroapp.associacoes.ui.SingleAssociacaoView
@@ -25,7 +28,9 @@ import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 fun TapBarNavHost(
     navController: NavHostController,
     startDestination: String = NavigationItem.Home.route,
-    resetScrollFunction: () -> Unit
+    resetScrollFunction: () -> Unit,
+    scrollState: ScrollState,
+    scrollTopOffsetPx: Float
 ) {
 
     NavHost(
@@ -157,9 +162,20 @@ fun TapBarNavHost(
         }
 
         composable(
-            NavigationItem.SobreNos.route
-        ) {
-            AboutUsView()
+            "${NavigationItem.SobreNos.route}?section={section}",
+            arguments = listOf(
+                navArgument("section") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val section = backStackEntry.arguments?.getInt("section") ?: -1
+            AboutUsView(
+                targetSection = section,
+                scrollState = scrollState,
+                scrollTopOffsetPx = scrollTopOffsetPx
+            )
         }
     }
 
