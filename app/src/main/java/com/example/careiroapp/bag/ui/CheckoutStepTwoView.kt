@@ -30,7 +30,8 @@ fun CheckoutStepTwoView(
     Column(
         modifier = Modifier
             .padding(padding)
-            .padding(horizontal = 15.dp, vertical = 24.dp)
+            .padding(top = 24.dp)
+            .padding(horizontal = 15.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

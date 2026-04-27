@@ -2,6 +2,7 @@ package com.example.careiroapp.data.network.authenticator
 
 import com.example.careiroapp.data.dataStore.util.JwtTokenManager
 import com.example.careiroapp.data.network.api.RefreshApiTokenService
+import com.example.careiroapp.data.session.SessionManager
 import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -44,7 +45,11 @@ class AuthAuthenticator @Inject constructor(
                         }
                         body.accessToken
                     }
-                } else null
+                } else {
+                    runBlocking { tokenManager.clearAllTokens() }
+                    SessionManager.onSessionExpired()
+                    null
+                }
             }
             return if (token != null) response.request.newBuilder()
                 .header(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import br.com.colman.simplecpfvalidator.isCpf
 import com.example.careiroapp.data.dataStore.JwtDataStore
 import com.example.careiroapp.data.room.entities.UserEntity
+import com.example.careiroapp.data.session.SessionManager
 import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
 import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
 import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
@@ -21,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -47,6 +49,15 @@ class LoginCadastroViewModel @Inject constructor(
 
     init {
         checkAuthStatus()
+        observeSessionExpiry()
+    }
+
+    private fun observeSessionExpiry() {
+        viewModelScope.launch {
+            SessionManager.sessionExpired.collectLatest {
+                _uiEvent.update { LoginCadastroUiEvents.SessionExpired() }
+            }
+        }
     }
 
     private fun checkAuthStatus() {

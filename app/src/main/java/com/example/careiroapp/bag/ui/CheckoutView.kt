@@ -65,6 +65,7 @@ fun CheckoutView(
                         }
                         CheckoutStep.TWO -> {
                             viewModel.changeCheckoutStep(CheckoutStep.ONE)
+                            viewModel.resetPaymentMode()
                         }
                         CheckoutStep.FINAL -> {
                             navController.navigate(NavigationItem.Main.route)

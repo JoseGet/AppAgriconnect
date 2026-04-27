@@ -85,11 +85,11 @@ fun AppDrawer(
                         resetScrollFunction()
                     }
                 )
-                HorizontalDivider(Modifier.padding(horizontal = 15.dp))
-                DrawerItem(
-                    text = stringResource(R.string.assinaturas),
-                    onClick = {}
-                )
+//                HorizontalDivider(Modifier.padding(horizontal = 15.dp))
+//                DrawerItem(
+//                    text = stringResource(R.string.assinaturas),
+//                    onClick = {}
+//                )
                 HorizontalDivider(Modifier.padding(horizontal = 15.dp))
                 DrawerItem(
                     text = stringResource(R.string.sobre_nos),
