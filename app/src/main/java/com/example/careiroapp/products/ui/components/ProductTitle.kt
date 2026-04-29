@@ -23,11 +23,14 @@ import com.example.careiroapp.common.montserratBoldFontFamily
 
 @Composable
 fun ProductTitle(
-    productName: String, productPrice: Float, promotionProductPrice: Double?
+    productName: String,
+    productPrice: Float,
+    promotionProductPrice: Double?,
+    unity: String
 ) {
     Column() {
         Text(
-            "$productName - 1kg",
+            "$productName - $unity",
             fontFamily = montserratBoldFontFamily,
             fontSize = 18.sp,
             color = colorResource(R.color.dark_gray)
@@ -66,6 +69,9 @@ fun ProductTitle(
 @Preview
 private fun ProductTitlePreview() {
     ProductTitle(
-        "Abobora", 8.50f, promotionProductPrice = null
+        "Abobora",
+        8.50f,
+        promotionProductPrice = null,
+        unity = "kg"
     )
 }

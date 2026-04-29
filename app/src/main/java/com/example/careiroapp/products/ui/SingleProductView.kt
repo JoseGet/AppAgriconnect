@@ -104,7 +104,8 @@ fun SingleProductView(
         ProductTitle(
             productName = productViewUiState.selectedProduct?.nomeProduto ?: "",
             productPrice = productViewUiState.selectedProduct?.precoProduto ?: 0.0f,
-            promotionProductPrice = productViewUiState.selectedProduct?.precoPromocao
+            promotionProductPrice = productViewUiState.selectedProduct?.precoPromocao,
+            unity = productViewUiState.selectedProduct?.unidadeMedida ?: ""
         )
         Spacer(Modifier.height(16.dp))
         productViewUiState.selectedProduct?.let {

@@ -165,34 +165,34 @@ fun HomeView(
                 resetScrollFunction
             )
             Spacer(Modifier.height(24.dp))
-            ModulesHeader(
-                titulo = stringResource(R.string.assinaturas_titulo),
-                subtitulo = stringResource(R.string.assinaturas_descricao)
-            )
-            Spacer(Modifier.height(24.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                CardAssinatura(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.macas),
-                    nomeAssinatura = "Assinatura",
-                    precoAssinatura = 10.0f,
-                    haveButton = false
-                )
-                CardAssinatura(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.macas),
-                    nomeAssinatura = "Assinatura",
-                    precoAssinatura = 10.0f,
-                    haveButton = false
-                )
-            }
-            Spacer(Modifier.height(24.dp))
+//            ModulesHeader(
+//                titulo = stringResource(R.string.assinaturas_titulo),
+//                subtitulo = stringResource(R.string.assinaturas_descricao)
+//            )
+//            Spacer(Modifier.height(24.dp))
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                CardAssinatura(
+//                    modifier = Modifier
+//                        .weight(1f),
+//                    image = painterResource(R.drawable.macas),
+//                    nomeAssinatura = "Assinatura",
+//                    precoAssinatura = 10.0f,
+//                    haveButton = false
+//                )
+//                CardAssinatura(
+//                    modifier = Modifier
+//                        .weight(1f),
+//                    image = painterResource(R.drawable.macas),
+//                    nomeAssinatura = "Assinatura",
+//                    precoAssinatura = 10.0f,
+//                    haveButton = false
+//                )
+//            }
+//            Spacer(Modifier.height(24.dp))
             ModulesHeader(
                 titulo = stringResource(R.string.como_funciona_titulo),
                 subtitulo = stringResource(R.string.como_funciona_descricao)
