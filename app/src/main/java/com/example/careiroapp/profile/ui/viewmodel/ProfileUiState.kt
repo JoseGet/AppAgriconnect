@@ -14,5 +14,5 @@ data class ProfileUiState(
 enum class ProfileModules {
     PEDIDOS,
     FAVORITOS,
-    ASSINATURAS
+    //ASSINATURAS
 }

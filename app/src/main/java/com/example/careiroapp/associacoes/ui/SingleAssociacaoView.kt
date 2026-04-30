@@ -126,14 +126,14 @@ fun SingleAssociacaoView(
             title = stringResource(R.string.endereco),
             content = uiState.selectedAssociacao?.endereco ?: ""
         )
-        Spacer(Modifier.height(24.dp))
         uiState.selectedAssociacao?.productorsList?.takeIf { it.isNotEmpty() }?.let { list ->
+            Spacer(Modifier.height(24.dp))
             AssociacaoProductorsRow(
                 productorsList = list
             )
         }
-        Spacer(Modifier.height(24.dp))
         uiState.productsList.takeIf { it.isNotEmpty() }?.let { list ->
+            Spacer(Modifier.height(24.dp))
             AssociacaoProductsRow(
                 productsList = list,
                 uiState.selectedAssociacao?.nome,

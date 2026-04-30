@@ -190,9 +190,9 @@ fun ProfileView(
                 }
             }
 
-            ProfileModules.ASSINATURAS -> {
-
-            }
+//            ProfileModules.ASSINATURAS -> {
+//
+//            }
         }
     }
 }

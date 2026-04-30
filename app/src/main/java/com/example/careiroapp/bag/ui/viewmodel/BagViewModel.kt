@@ -160,27 +160,6 @@ class BagViewModel @Inject constructor(
         }
     }
 
-    fun savePayerData(
-        email: String,
-        name: String,
-        telefone: String,
-    ) {
-
-        val payerData = PayerData(
-            email = email,
-            name = name,
-            telefone = telefone
-        )
-
-        _orderUiState.update {
-            it.copy(
-                order = it.order.copy(
-                    payerData = payerData
-                )
-            )
-        }
-    }
-
     fun saveOrderDateLocal(
         date: String,
         time: String,
@@ -192,6 +171,16 @@ class BagViewModel @Inject constructor(
                     date = date,
                     time = time,
                     address = local
+                )
+            )
+        }
+    }
+
+    fun resetPaymentMode() {
+        _orderUiState.update {
+            it.copy(
+                order = it.order.copy(
+                    paymentType = null
                 )
             )
         }

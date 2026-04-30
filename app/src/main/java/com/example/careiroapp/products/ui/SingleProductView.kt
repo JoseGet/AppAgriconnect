@@ -31,7 +31,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.buttons.BackButton
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.products.ui.components.BuyProductRow
 import com.example.careiroapp.products.ui.components.FeaturedProducts
@@ -105,7 +104,8 @@ fun SingleProductView(
         ProductTitle(
             productName = productViewUiState.selectedProduct?.nomeProduto ?: "",
             productPrice = productViewUiState.selectedProduct?.precoProduto ?: 0.0f,
-            promotionProductPrice = productViewUiState.selectedProduct?.precoPromocao
+            promotionProductPrice = productViewUiState.selectedProduct?.precoPromocao,
+            unity = productViewUiState.selectedProduct?.unidadeMedida ?: ""
         )
         Spacer(Modifier.height(16.dp))
         productViewUiState.selectedProduct?.let {
@@ -133,17 +133,6 @@ fun SingleProductView(
         Spacer(Modifier.height(16.dp))
         ProductDescription(
             productDescription = productViewUiState.selectedProduct?.descricao ?: ""
-        )
-        Spacer(Modifier.height(24.dp))
-        FeaturedProducts(
-            navController
-        )
-        Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao(
-            {
-                navController.navigate(NavigationItem.Associacoes.route)
-                resetScrollFunction()
-            }
         )
     }
 }

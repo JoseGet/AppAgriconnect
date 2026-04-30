@@ -8,6 +8,5 @@ data class BagUiState(
 enum class CheckoutStep() {
     ONE,
     TWO,
-    THREE,
     FINAL
 }

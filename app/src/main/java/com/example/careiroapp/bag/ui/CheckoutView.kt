@@ -1,8 +1,10 @@
 package com.example.careiroapp.bag.ui
 
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
@@ -28,6 +32,7 @@ import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutStep
 import com.example.careiroapp.navigation.NavigationItem
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CheckoutView(
     navController: NavController
@@ -60,9 +65,7 @@ fun CheckoutView(
                         }
                         CheckoutStep.TWO -> {
                             viewModel.changeCheckoutStep(CheckoutStep.ONE)
-                        }
-                        CheckoutStep.THREE -> {
-                            viewModel.changeCheckoutStep(CheckoutStep.TWO)
+                            viewModel.resetPaymentMode()
                         }
                         CheckoutStep.FINAL -> {
                             navController.navigate(NavigationItem.Main.route)
@@ -77,43 +80,27 @@ fun CheckoutView(
         Box(
             modifier = Modifier
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             when(bagUiState.checkoutStep) {
 
                 CheckoutStep.ONE -> {
-                    CheckoutStepOneView(
+                     CheckoutStepOneView(
                         innerPadding,
-                        payerData = orderUiState.order.payerData,
-                        onButtonClick = {email, name, telefone ->
-                            viewModel.savePayerData(
-                                email,
-                                name,
-                                telefone
-                            )
+                        onButtonClick = {date,time, local ->
+                            viewModel.saveOrderDateLocal(date, time, local = local)
                             viewModel.changeCheckoutStep(CheckoutStep.TWO)
                         }
                     )
                 }
 
                 CheckoutStep.TWO -> {
-                    CheckoutStepTwoView(
-                        innerPadding,
-                        onButtonClick = {date,time, local ->
-                            viewModel.saveOrderDateLocal(date, time, local = local)
-                            viewModel.changeCheckoutStep(CheckoutStep.THREE)
-                        }
-                    )
-                }
-
-                CheckoutStep.THREE -> {
-                    CheckoutStepThreeView(
+                    CheckoutStepTwoView (
                         innerPadding,
                         orderData = orderUiState.order,
                         productsList = bagItems,
                         totalValue = totalPrice,
                         onButtonClick = {
-
                             if (orderUiState.order.paymentType == null) {
                                 Toast.makeText(context, "Selecione uma forma de pagamento", Toast.LENGTH_SHORT).show()
                             } else {
@@ -136,6 +123,7 @@ fun CheckoutView(
             }
             if (bagUiState.isLoading) {
                 Image(
+                    modifier = Modifier.align(Alignment.Center),
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.load,
                         imageLoader = imageLoader
@@ -145,4 +133,13 @@ fun CheckoutView(
             }
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+@Preview
+private fun CheckoutViewPreview() {
+    CheckoutView(
+        navController = rememberNavController()
+    )
 }
