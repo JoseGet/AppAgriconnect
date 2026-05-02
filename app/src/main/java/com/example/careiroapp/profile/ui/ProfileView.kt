@@ -17,10 +17,14 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -101,6 +105,19 @@ fun ProfileView(
                     if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
                 }
 
+                val pedidosListState = rememberLazyListState()
+                val shouldLoadMore = remember {
+                    derivedStateOf {
+                        val lastVisible = pedidosListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                        val total = pedidosListState.layoutInfo.totalItemsCount
+                        total > 0 && lastVisible >= total - 2
+                    }
+                }
+
+                LaunchedEffect(shouldLoadMore.value) {
+                    if (shouldLoadMore.value) viewModel.loadMorePedidos()
+                }
+
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
@@ -116,13 +133,14 @@ fun ProfileView(
                             contentDescription = null
                         )
                     }
-                    LazyColumn (
+                    LazyColumn(
+                        state = pedidosListState,
                         modifier = Modifier
                             .padding(vertical = 10.dp)
                             .fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(24.dp)
                     ) {
-                        items(profileUiState.pedidosList){ pedido ->
+                        items(profileUiState.pedidosList) { pedido ->
                             OrderCard(
                                 orderId = pedido.id,
                                 orderTotalValue = pedido.valorTotal.toFloat(),
@@ -133,6 +151,18 @@ fun ProfileView(
                                     resetScrollFunction()
                                 }
                             )
+                        }
+                        if (profileUiState.isLoadingMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
                         }
                     }
                 }

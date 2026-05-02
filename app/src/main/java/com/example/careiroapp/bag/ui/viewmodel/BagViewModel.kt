@@ -47,6 +47,9 @@ class BagViewModel @Inject constructor(
     private val _orderUiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
     var orderUiState: StateFlow<OrderUiState> = _orderUiState.asStateFlow()
 
+    private val _checkoutUiEvent: MutableStateFlow<CheckoutUiEvent> = MutableStateFlow(CheckoutUiEvent.None())
+    var checkoutUiEvent: StateFlow<CheckoutUiEvent> = _checkoutUiEvent.asStateFlow()
+
     val userData: Flow<UserEntity?> = userRepository.getUserData()
     val totalPrice: LiveData<Double> = userData
         .flatMapLatest { user ->

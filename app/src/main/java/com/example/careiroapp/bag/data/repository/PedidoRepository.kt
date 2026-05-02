@@ -19,8 +19,8 @@ class PedidoRepository @Inject constructor(
         )
     }
 
-    suspend fun getPedidos(): Response<List<Pedidos>> {
-        return pedidoApiService.getPedidos()
+    suspend fun getPedidos(page: Int, limit: Int): Response<List<Pedidos>> {
+        return pedidoApiService.getPedidos(page = page, limit = limit)
     }
 
 }

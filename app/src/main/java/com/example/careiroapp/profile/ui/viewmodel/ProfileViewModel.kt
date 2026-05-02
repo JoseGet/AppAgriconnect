@@ -32,6 +32,7 @@ class ProfileViewModel @Inject constructor(
     var profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
+
     fun setCurrentModule(newModule: ProfileModules) {
         _profileUiState.update { it.copy(currentProfileModule = newModule) }
     }
@@ -40,7 +41,7 @@ class ProfileViewModel @Inject constructor(
         cpf: String
     ) {
         if (_profileUiState.value.isLoading) return
-        
+
         viewModelScope.launch {
             try {
                 _profileUiState.update { it.copy(isLoading = true) }
@@ -67,15 +68,16 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                _profileUiState.update { it.copy(isLoading = true) }
+                _profileUiState.update { it.copy(isLoading = true, pedidosPage = 1, hasMorePedidos = true) }
 
-                val pedidos = pedidoRepository.getPedidos()
+                val pedidos = pedidoRepository.getPedidos(page = 1, limit = PEDIDOS_PAGE_SIZE)
 
                 if (pedidos.isSuccessful) {
-                    val pedidosList = pedidos.body()
+                    val pedidosList = pedidos.body() ?: emptyList()
                     _profileUiState.update {
                         it.copy(
-                        pedidosList = pedidosList?.toList() ?: emptyList()
+                            pedidosList = pedidosList,
+                            hasMorePedidos = pedidosList.size >= PEDIDOS_PAGE_SIZE
                         )
                     }
                 }
@@ -83,6 +85,35 @@ class ProfileViewModel @Inject constructor(
                 Log.e("ProfileVM", "Error loading pedidos", e)
             } finally {
                 _profileUiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun loadMorePedidos() {
+        val state = _profileUiState.value
+        if (state.isLoadingMore || !state.hasMorePedidos) return
+
+        viewModelScope.launch {
+            try {
+                _profileUiState.update { it.copy(isLoadingMore = true) }
+
+                val nextPage = state.pedidosPage + 1
+                val pedidos = pedidoRepository.getPedidos(page = nextPage, limit = PEDIDOS_PAGE_SIZE)
+
+                if (pedidos.isSuccessful) {
+                    val newPedidos = pedidos.body() ?: emptyList()
+                    _profileUiState.update {
+                        it.copy(
+                            pedidosList = it.pedidosList + newPedidos,
+                            pedidosPage = nextPage,
+                            hasMorePedidos = newPedidos.size >= PEDIDOS_PAGE_SIZE
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileVM", "Error loading more pedidos", e)
+            } finally {
+                _profileUiState.update { it.copy(isLoadingMore = false) }
             }
         }
     }
@@ -117,5 +148,9 @@ class ProfileViewModel @Inject constructor(
                 bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }
         }
+    }
+
+    companion object {
+        private const val PEDIDOS_PAGE_SIZE = 10
     }
 }

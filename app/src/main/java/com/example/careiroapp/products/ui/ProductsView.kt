@@ -149,12 +149,13 @@ fun ProductsView(
                         resetScrollFunction()
                     },
                     loadMore = {
-                        productViewModel.loadMoreProducts {
-                            if (productViewUiState.filterNameActivate != null) productViewModel.getProductsByCategoria(
-                                productViewUiState.filterNameActivate ?: "",
+                        if (productViewUiState.filterNameActivate != null)
+                            productViewModel.getProductsByCategoria(
+                                productViewUiState.filterNameActivate,
                                 isNecessaryLoadMore = true
-                            ) else productViewModel.getProducts(isNecessaryLoadMore = true)
-                        }
+                            )
+                        else
+                            productViewModel.getProducts(isNecessaryLoadMore = true)
                     },
                     addToBag = { product ->
                         productViewModel.addProductToBag(product, userData?.cpf ?: "")
