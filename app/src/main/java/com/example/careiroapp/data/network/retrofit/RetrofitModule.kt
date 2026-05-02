@@ -1,6 +1,7 @@
 package com.example.careiroapp.data.network.retrofit
 
 import com.example.careiroapp.BuildConfig
+import com.example.careiroapp.data.network.api.AbacatePayApiService
 import com.example.careiroapp.data.network.api.AssociacaoApiService
 import com.example.careiroapp.data.network.api.AuthApiService
 import com.example.careiroapp.data.network.api.ClienteApiService
@@ -168,6 +169,17 @@ object RetrofitModule {
             .client(okHttpClient)
             .build()
             .create(AuthApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun abacatePayApiSetupProvider(@PublicClient okHttpClient: OkHttpClient): AbacatePayApiService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(AbacatePayApiService::class.java)
     }
 
     @Provides

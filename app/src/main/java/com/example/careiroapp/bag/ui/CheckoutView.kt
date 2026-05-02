@@ -116,8 +116,7 @@ fun CheckoutView(
                 CheckoutStep.FINAL -> {
                     CheckoutFinalStepView(
                         innerPadding,
-                        orderData = orderUiState.order,
-                        pixPayload = orderUiState.order.pixPayload ?: ""
+                        orderData = orderUiState.order
                     )
                 }
             }
