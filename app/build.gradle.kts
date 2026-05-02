@@ -1,4 +1,5 @@
-import com.android.build.api.variant.BuildConfigField
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,6 +13,10 @@ plugins {
 android {
     namespace = "com.example.careiroapp"
     compileSdk = 35
+
+    val file = rootProject.file("local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(file))
 
     defaultConfig {
         applicationId = "com.joseGet.careiroapp"

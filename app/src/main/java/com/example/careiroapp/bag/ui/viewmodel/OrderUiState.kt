@@ -18,5 +18,6 @@ data class OrderModel (
     val paymentType: PaymentType? = null,
     val items: List<ProductModel> = emptyList(),
     val totalValue: Float = 0f,
-    val pixPayload: String? = null
+    val pixPayload: String? = null,
+    val pixQrCode: String? = null
 )

@@ -1,16 +1,22 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.careiroapp.bag.data.models.Customer
+import com.example.careiroapp.bag.data.models.PaymentDataRequest
 import com.example.careiroapp.bag.data.models.PedidoBody
 import com.example.careiroapp.bag.data.models.PedidoProdutoModel
+import com.example.careiroapp.bag.data.models.PixPaymentRequestBody
 import com.example.careiroapp.bag.data.repository.BagRepository
+import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +37,8 @@ import javax.inject.Inject
 class BagViewModel @Inject constructor(
     private val repository: BagRepository,
     private val userRepository: UserRepository,
-    private val pedidoRepository: PedidoRepository
+    private val pedidoRepository: PedidoRepository,
+    private val paymentRepository: PaymentRepository
 ): ViewModel() {
 
     private val _uiState: MutableStateFlow<BagUiState> = MutableStateFlow(BagUiState())
@@ -81,29 +88,92 @@ class BagViewModel @Inject constructor(
             }
 
             try {
-                val pedido = PedidoBody(
-                    valorTotal = totalPrice.value?.toFloat() ?: 0f,
-                    produtos = produtos,
-                    paymentType = orderUiState.value.order.paymentType,
-                    retiradaLocal = orderUiState.value.order.address,
-                    retiradaData = orderUiState.value.order.date,
-                    retiradaHora = orderUiState.value.order.time
-                )
+                when (orderUiState.value.order.paymentType) {
+                    PaymentType.PIX -> {
 
-                val response = pedidoRepository.createPedido(pedido)
+                        val user = userData.firstOrNull()
 
-                if (response.isSuccessful) {
-                    _uiState.update { it.copy(isLoading = false) }
-                    _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
-                        totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
-                        pixPayload = response.body()?.pixPayload
-                    ))}
+                        val currentTotal = totalPrice.value ?: 0.0
 
-                    userData.firstOrNull()?.cpf?.let { cpf ->
-                        repository.clearBag(cpf)
+                        val pixPaymentBody = PixPaymentRequestBody(
+                            method = "PIX",
+                            data = PaymentDataRequest(
+                                amount = (currentTotal * 100).toInt(), //Para a Api do AbacatePay o valor precisa estar em centavos,
+                                expiresIn = 3600,
+                                description = "Cobrança PIX no checkout transparente",
+                                customer = Customer(
+                                    name = user?.name ?: "",
+                                    email = user?.email ?: "",
+                                    taxId = user?.cpf ?: "",
+                                    cellphone = user?.telefone ?: ""
+                                ),
+                            ),
+                        )
+
+                        val gson = Gson()
+                        val jsonString = gson.toJson(pixPaymentBody)
+
+                        Log.i("ZEGET", jsonString)
+
+                        val paymentResponse = paymentRepository.createPixPayment(pixPaymentBody)
+
+                        if (paymentResponse.isSuccessful) {
+                            val pedido = PedidoBody(
+                                valorTotal = totalPrice.value?.toFloat() ?: 0f,
+                                produtos = produtos,
+                                paymentType = orderUiState.value.order.paymentType,
+                                retiradaLocal = orderUiState.value.order.address,
+                                retiradaData = orderUiState.value.order.date,
+                                retiradaHora = orderUiState.value.order.time
+                            )
+
+                            val response = pedidoRepository.createPedido(pedido)
+
+                            if (response.isSuccessful) {
+                                _uiState.update { it.copy(isLoading = false) }
+                                _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
+                                    totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
+                                    pixPayload = paymentResponse.body()?.data?.brCode,
+                                    pixQrCode = paymentResponse.body()?.data?.brCodeBase64
+                                ))}
+
+                                userData.firstOrNull()?.cpf?.let { cpf ->
+                                    repository.clearBag(cpf)
+                                }
+
+                                changeCheckoutStep(CheckoutStep.FINAL)
+                            }
+                        } else {
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
+
                     }
+                    PaymentType.DINHEIRO -> {
+                        val pedido = PedidoBody(
+                            valorTotal = totalPrice.value?.toFloat() ?: 0f,
+                            produtos = produtos,
+                            paymentType = orderUiState.value.order.paymentType,
+                            retiradaLocal = orderUiState.value.order.address,
+                            retiradaData = orderUiState.value.order.date,
+                            retiradaHora = orderUiState.value.order.time
+                        )
 
-                    changeCheckoutStep(CheckoutStep.FINAL)
+                        val response = pedidoRepository.createPedido(pedido)
+
+                        if (response.isSuccessful) {
+                            _uiState.update { it.copy(isLoading = false) }
+                            _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
+                                totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
+                            ))}
+
+                            userData.firstOrNull()?.cpf?.let { cpf ->
+                                repository.clearBag(cpf)
+                            }
+
+                            changeCheckoutStep(CheckoutStep.FINAL)
+                        }
+                    }
+                    else -> {}
                 }
             } catch (e: Exception) { }
         }
