@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "63985064440",
+    "project_id": "agriconnect-10a10",
+    "storage_bucket": "agriconnect-10a10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63985064440:android:ea5c80f059d64f7a7e5e0d",
+        "android_client_info": {
+          "package_name": "com.joseGet.careiroapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmBGkUTybEzACvnCeW-nk-rLedy-xzBEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
