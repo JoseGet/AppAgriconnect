@@ -1,5 +1,6 @@
 [versions]
 abacatepayKotlinSdk = "0.0.5"
+accompanistPermissions = "0.37.3"
 agp = "8.10.1"
 coilCompose = "3.3.0"
 converterGson = "3.0.0"
@@ -34,8 +35,10 @@ roomRuntime = "2.8.4"
 runtimeLivedata = "1.10.3"
 simpleCpfValidator = "{version}"
 simpleCpfValidatorVersion = "2.8.0"
+firebaseMessagingKtx = "25.0.1"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastorePreferences" }
@@ -85,6 +88,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 androidx-compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 simple-cpf-validator = { module = "br.com.colman.simplecpfvalidator:simple-cpf-validator", version.ref = "simpleCpfValidator" }
 simple-cpf-validator-v280 = { module = "br.com.colman.simplecpfvalidator:simple-cpf-validator", version.ref = "simpleCpfValidatorVersion" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

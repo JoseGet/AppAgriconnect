@@ -8,6 +8,7 @@ plugins {
     id("com.google.devtools.ksp")
     id ("dagger.hilt.android.plugin")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -76,6 +77,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.accompanist.permissions)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -140,5 +142,12 @@ dependencies {
 
     //Lottie Animation
     implementation(libs.lottie.compose)
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    //Firebase Messaging
+    implementation("com.google.firebase:firebase-messaging")
 
 }
