@@ -34,6 +34,7 @@ import java.util.Locale
 fun BagBottomBar(
     modifier: Modifier = Modifier,
     total: Double,
+    isEnable: Boolean,
     onCheckout: () -> Unit = {}
 ) {
     BottomAppBar(
@@ -72,7 +73,8 @@ fun BagBottomBar(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.dark_green),
                     contentColor = colorResource(R.color.light_background),
-                )
+                ),
+                enabled = isEnable
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -98,6 +100,16 @@ fun BagBottomBar(
 @Composable
 private fun BagBottomBarPreview() {
     BagBottomBar(
-        total = 0.0
+        total = 0.0,
+        isEnable = true
+    ) {  }
+}
+
+@Preview
+@Composable
+private fun BagBottomBarDisablePreview() {
+    BagBottomBar(
+        total = 0.0,
+        isEnable = false
     ) {  }
 }

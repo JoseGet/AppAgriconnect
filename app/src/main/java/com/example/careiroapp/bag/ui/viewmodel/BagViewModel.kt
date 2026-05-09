@@ -1,6 +1,8 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -13,6 +15,9 @@ import com.example.careiroapp.bag.data.models.PixPaymentRequestBody
 import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
+import com.example.careiroapp.consts.EventCodes
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
@@ -30,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 import java.util.UUID
 import javax.inject.Inject
 
@@ -51,6 +57,21 @@ class BagViewModel @Inject constructor(
     var checkoutUiEvent: StateFlow<CheckoutUiEvent> = _checkoutUiEvent.asStateFlow()
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
+
+    val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
+
+    init {
+        viewModelScope.launch {
+            NotificationEvents.events.collect { event ->
+                when(event) {
+                    is Events.PaymentPixConfirmed -> {
+                        pixPaymentDone.value = true
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
     val totalPrice: LiveData<Double> = userData
         .flatMapLatest { user ->
             val cpf = user?.cpf
@@ -261,8 +282,9 @@ class BagViewModel @Inject constructor(
 
     fun resetOrderState() {
         _orderUiState.update { it.copy(
-            order = OrderModel()
+            order = OrderModel(),
         ) }
+        pixPaymentDone.value = false
     }
 
 }

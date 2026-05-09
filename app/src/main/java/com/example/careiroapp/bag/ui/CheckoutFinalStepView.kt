@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +43,8 @@ import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.viewmodel.OrderModel
 import com.example.careiroapp.bag.ui.viewmodel.PaymentType
 import com.example.careiroapp.common.components.buttons.AppButton
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 import com.google.zxing.BarcodeFormat
@@ -51,12 +55,14 @@ import kotlin.io.encoding.Base64
 fun CheckoutFinalStepView(
     padding: PaddingValues,
     orderData: OrderModel,
+    isPaymentPixDone: Boolean
 ) {
 
     val qrColor = colorResource(R.color.black).toArgb()
     val bgColor = colorResource(R.color.light_background).toArgb()
 
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.wallet_animation))
+    val walletAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.wallet_animation))
+    val successPayment by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.checkmark_animation))
 
     val clipboardManager = LocalClipboardManager.current
 
@@ -77,73 +83,127 @@ fun CheckoutFinalStepView(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            "Pedido feito!",
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontFamily = montserratBoldFontFamily,
-                color = colorResource(R.color.dark_green)
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
         when (orderData.paymentType) {
             PaymentType.PIX -> {
-                Text(
-                    "Faça o pagamento PIX para confirmar o pedido:",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontFamily = montserratRegularFontFamily,
-                        color = colorResource(R.color.dark_green)
-                    )
-                )
-                Spacer(modifier = Modifier.height(19.dp))
-                Image(
-                    painter = rememberAsyncImagePainter(orderData.pixQrCode),
-                    contentDescription = null,
-                    modifier = Modifier.size(300.dp)
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                AppButton(
-                    text = "Copiar codigo PIX",
-                    modifier = Modifier,
-                    onClick = {
-                        val clipData = ClipData.newPlainText("plain text", orderData.pixPayload)
-                        val clipEntry = ClipEntry(clipData)
-                        clipboardManager.setClip(clipEntry)
-                    },
-                    icon = painterResource(R.drawable.copy),
-                    containerColor = colorResource(R.color.dark_green)
-                )
+                if (!isPaymentPixDone) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Pedido feito!",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontFamily = montserratBoldFontFamily,
+                                color = colorResource(R.color.dark_green)
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Faça o pagamento PIX para confirmar o pedido:",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = montserratRegularFontFamily,
+                                color = colorResource(R.color.dark_green)
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(19.dp))
+                        Image(
+                            painter = rememberAsyncImagePainter(orderData.pixQrCode),
+                            contentDescription = null,
+                            modifier = Modifier.size(300.dp)
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        AppButton(
+                            text = "Copiar codigo PIX",
+                            modifier = Modifier,
+                            onClick = {
+                                val clipData = ClipData.newPlainText("plain text", orderData.pixPayload)
+                                val clipEntry = ClipEntry(clipData)
+                                clipboardManager.setClip(clipEntry)
+                            },
+                            icon = painterResource(R.drawable.copy),
+                            containerColor = colorResource(R.color.dark_green)
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        LottieAnimation(
+                            successPayment
+                        )
+                        Text(
+                            stringResource(R.string.payment_pix_done_title),
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontFamily = montserratBoldFontFamily,
+                                color = colorResource(R.color.dark_green)
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.payment_pix_done_description),
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = montserratRegularFontFamily,
+                                color = colorResource(R.color.dark_gray),
+                                textAlign = TextAlign.Center
+                            )
+                        )
+                    }
+                }
             }
             PaymentType.DINHEIRO -> {
-                Text(
-                    "Seu pedido foi registrado com sucesso. Por favor, prepare o valor em dinheiro e pague diretamente na retirada.",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontFamily = montserratRegularFontFamily,
-                        textAlign = TextAlign.Center,
-                        color = colorResource(R.color.dark_green)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        "Pedido feito!",
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontFamily = montserratBoldFontFamily,
+                            color = colorResource(R.color.dark_green)
+                        )
                     )
-                )
-                LottieAnimation(composition)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "Valor a pagar em dinheiro:",
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontFamily = montserratRegularFontFamily,
-                        color = colorResource(R.color.dark_gray)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Seu pedido foi registrado com sucesso. Por favor, prepare o valor em dinheiro e pague diretamente na retirada.",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontFamily = montserratRegularFontFamily,
+                            textAlign = TextAlign.Center,
+                            color = colorResource(R.color.dark_green)
+                        )
                     )
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "R$ ${orderData.totalValue}",
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontFamily = montserratBoldFontFamily,
-                        color = colorResource(R.color.dark_green)
+                    LottieAnimation(walletAnimation)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Valor a pagar em dinheiro:",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontFamily = montserratRegularFontFamily,
+                            color = colorResource(R.color.dark_gray)
+                        )
                     )
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "R$ ${orderData.totalValue}",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontFamily = montserratBoldFontFamily,
+                            color = colorResource(R.color.dark_green)
+                        )
+                    )
+                }
             }
 
             else -> {}
@@ -190,6 +250,22 @@ private fun CheckoutFinalStepViewPixPreview() {
     CheckoutFinalStepView(
         padding = PaddingValues(),
         orderData = order,
+        isPaymentPixDone = false
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CheckoutFinalStepViewPixDonePreview() {
+
+    val order = OrderModel(
+        paymentType = PaymentType.PIX
+    )
+
+    CheckoutFinalStepView(
+        padding = PaddingValues(),
+        orderData = order,
+        isPaymentPixDone = true
     )
 }
 
@@ -204,5 +280,6 @@ private fun CheckoutFinalStepViewDinheiroPreview() {
     CheckoutFinalStepView(
         padding = PaddingValues(),
         orderData = order,
+        isPaymentPixDone = false
     )
 }

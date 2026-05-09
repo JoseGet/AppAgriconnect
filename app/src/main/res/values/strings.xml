@@ -127,5 +127,11 @@ No Agriconnect, a tecnologia é aliada na criação de redes entre agricultores 
     <string name="resumo_compra_description">Revise todas as informações antes de concluir a compra</string>
     <string name="ver_detalhes">Ver detalhes</string>
 
+    <string name="empty_bag_title">Sua sacola está vazia</string>
+    <string name="empty_bag_description">Adicione produtos à sua sacola para vê-los aqui.</string>
+
+    <string name="payment_pix_done_title">Pedido confirmado!</string>
+    <string name="payment_pix_done_description">Confira o as informações e o resumo do seu pedido em ”Meus pedidos”</string>
+
 
 </resources>
