@@ -11,6 +11,12 @@ enum class PaymentType{
     DINHEIRO
 }
 
+enum class OrderState{
+    PENDENTE,
+    CONFIRMADO,
+    EXPIRADO
+}
+
 data class OrderModel (
     val date: String = "",
     val time: String = "",

@@ -31,7 +31,11 @@ data class PaymentDataRequest(
 
     @SerializedName("customer")
     @Expose
-    val customer: Customer
+    val customer: Customer,
+
+    @SerializedName("metadata")
+    @Expose
+    val metadata: Metadata
 )
 
 data class Customer(
@@ -51,4 +55,10 @@ data class Customer(
     @SerializedName("cellphone")
     @Expose
     val cellphone: String
+)
+
+data class Metadata(
+    @SerializedName("pedidoId")
+    @Expose
+    val pedidoId: Int
 )

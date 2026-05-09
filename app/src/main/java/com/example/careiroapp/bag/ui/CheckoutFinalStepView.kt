@@ -40,6 +40,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
+import com.example.careiroapp.bag.ui.components.FinalStepButtonsRow
 import com.example.careiroapp.bag.ui.viewmodel.OrderModel
 import com.example.careiroapp.bag.ui.viewmodel.PaymentType
 import com.example.careiroapp.common.components.buttons.AppButton
@@ -55,7 +56,9 @@ import kotlin.io.encoding.Base64
 fun CheckoutFinalStepView(
     padding: PaddingValues,
     orderData: OrderModel,
-    isPaymentPixDone: Boolean
+    isPaymentPixDone: Boolean,
+    onClickLeftButton: () -> Unit,
+    onClickRightButton: () -> Unit
 ) {
 
     val qrColor = colorResource(R.color.black).toArgb()
@@ -132,29 +135,38 @@ fun CheckoutFinalStepView(
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        LottieAnimation(
-                            successPayment
-                        )
-                        Text(
-                            stringResource(R.string.payment_pix_done_title),
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontFamily = montserratBoldFontFamily,
-                                color = colorResource(R.color.dark_green)
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            LottieAnimation(
+                                successPayment
                             )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            stringResource(R.string.payment_pix_done_description),
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                fontFamily = montserratRegularFontFamily,
-                                color = colorResource(R.color.dark_gray),
-                                textAlign = TextAlign.Center
+                            Text(
+                                stringResource(R.string.payment_pix_done_title),
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    fontFamily = montserratBoldFontFamily,
+                                    color = colorResource(R.color.dark_green)
+                                )
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                stringResource(R.string.payment_pix_done_description),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontFamily = montserratRegularFontFamily,
+                                    color = colorResource(R.color.dark_gray),
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                        }
+                        FinalStepButtonsRow(
+                            onClickLeftButton = onClickLeftButton,
+                            onClickRightButton = onClickRightButton
                         )
                     }
                 }
@@ -163,45 +175,54 @@ fun CheckoutFinalStepView(
                 Column(
                     modifier = Modifier
                         .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        "Pedido feito!",
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontFamily = montserratBoldFontFamily,
-                            color = colorResource(R.color.dark_green)
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Pedido feito!",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontFamily = montserratBoldFontFamily,
+                                color = colorResource(R.color.dark_green)
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Seu pedido foi registrado com sucesso. Por favor, prepare o valor em dinheiro e pague diretamente na retirada.",
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontFamily = montserratRegularFontFamily,
-                            textAlign = TextAlign.Center,
-                            color = colorResource(R.color.dark_green)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Seu pedido foi registrado com sucesso. Por favor, prepare o valor em dinheiro e pague diretamente na retirada.",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = montserratRegularFontFamily,
+                                textAlign = TextAlign.Center,
+                                color = colorResource(R.color.dark_green)
+                            )
                         )
-                    )
-                    LottieAnimation(walletAnimation)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Valor a pagar em dinheiro:",
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontFamily = montserratRegularFontFamily,
-                            color = colorResource(R.color.dark_gray)
+                        LottieAnimation(walletAnimation)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            "Valor a pagar em dinheiro:",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = montserratRegularFontFamily,
+                                color = colorResource(R.color.dark_gray)
+                            )
                         )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "R$ ${orderData.totalValue}",
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontFamily = montserratBoldFontFamily,
-                            color = colorResource(R.color.dark_green)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "R$ ${orderData.totalValue}",
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontFamily = montserratBoldFontFamily,
+                                color = colorResource(R.color.dark_green)
+                            )
                         )
+                    }
+                    FinalStepButtonsRow(
+                        onClickLeftButton = onClickLeftButton,
+                        onClickRightButton = onClickRightButton
                     )
                 }
             }
@@ -250,7 +271,9 @@ private fun CheckoutFinalStepViewPixPreview() {
     CheckoutFinalStepView(
         padding = PaddingValues(),
         orderData = order,
-        isPaymentPixDone = false
+        isPaymentPixDone = false,
+        onClickLeftButton = {},
+        onClickRightButton = {},
     )
 }
 
@@ -265,7 +288,9 @@ private fun CheckoutFinalStepViewPixDonePreview() {
     CheckoutFinalStepView(
         padding = PaddingValues(),
         orderData = order,
-        isPaymentPixDone = true
+        isPaymentPixDone = true,
+        onClickLeftButton = {},
+        onClickRightButton = {},
     )
 }
 
@@ -280,6 +305,8 @@ private fun CheckoutFinalStepViewDinheiroPreview() {
     CheckoutFinalStepView(
         padding = PaddingValues(),
         orderData = order,
-        isPaymentPixDone = false
+        isPaymentPixDone = false,
+        onClickLeftButton = {},
+        onClickRightButton = {},
     )
 }

@@ -75,7 +75,11 @@ fun CheckoutView(
                             viewModel.resetPaymentMode()
                         }
                         CheckoutStep.FINAL -> {
-                            navController.navigate(NavigationItem.Main.route)
+                            navController.navigate(NavigationItem.Main.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
                             viewModel.resetOrderState()
                         }
                     }
@@ -124,7 +128,23 @@ fun CheckoutView(
                     CheckoutFinalStepView(
                         innerPadding,
                         orderData = orderUiState.order,
-                        isPaymentPixDone = viewModel.pixPaymentDone.value
+                        isPaymentPixDone = viewModel.pixPaymentDone.value,
+                        onClickLeftButton = {
+                            navController.navigate(NavigationItem.Main.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                            viewModel.resetOrderState()
+                        },
+                        onClickRightButton = {
+                            navController.navigate(NavigationItem.Profile.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                            viewModel.resetOrderState()
+                        }
                     )
                 }
             }
