@@ -1,11 +1,16 @@
 package com.example.careiroapp.navigation
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.careiroapp.AboutUsView
 import com.example.careiroapp.associacoes.ui.AssociacoesView
 import com.example.careiroapp.associacoes.ui.SingleAssociacaoView
@@ -18,6 +23,7 @@ import com.example.careiroapp.products.ui.ProductsView
 import com.example.careiroapp.products.ui.SingleProductView
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
 import com.example.careiroapp.profile.ui.OrderView
+import com.example.careiroapp.profile.ui.PixStatusView
 import com.example.careiroapp.profile.ui.ProfileView
 import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 
@@ -25,7 +31,9 @@ import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 fun TapBarNavHost(
     navController: NavHostController,
     startDestination: String = NavigationItem.Home.route,
-    resetScrollFunction: () -> Unit
+    resetScrollFunction: () -> Unit,
+    scrollState: ScrollState,
+    scrollTopOffsetPx: Float
 ) {
 
     NavHost(
@@ -152,14 +160,45 @@ fun TapBarNavHost(
                 viewModel.profileUiState.value.selectedPedido,
                 clearSelectedOrder = {
                     viewModel.clearSelectedOrder()
+                },
+                onPixPaymentClick = {
+                    navController.navigate(NavigationItem.PixStatus.route)
                 }
             )
         }
 
         composable(
-            NavigationItem.SobreNos.route
+            NavigationItem.PixStatus.route
         ) {
-            AboutUsView()
+            val viewModel: ProfileViewModel = hiltViewModel(
+                navController.getBackStackEntry(NavigationItem.Profile.route)
+            )
+            val uiState by viewModel.profileUiState.collectAsStateWithLifecycle()
+            LaunchedEffect(Unit) {
+                viewModel.getPixStatus(uiState.selectedPedido?.pixPaymentId ?: "")
+            }
+            PixStatusView(
+                navController = navController,
+                pixStatus = uiState.pixStatus,
+                isPixPaymentDone = viewModel.pixPaymentDone.value
+            )
+        }
+
+        composable(
+            "${NavigationItem.SobreNos.route}?section={section}",
+            arguments = listOf(
+                navArgument("section") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val section = backStackEntry.arguments?.getInt("section") ?: -1
+            AboutUsView(
+                targetSection = section,
+                scrollState = scrollState,
+                scrollTopOffsetPx = scrollTopOffsetPx
+            )
         }
     }
 

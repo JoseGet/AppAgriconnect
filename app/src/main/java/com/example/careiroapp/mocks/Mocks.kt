@@ -162,6 +162,7 @@ object Mocks {
         nomeProduto = "Shampoo Revitalizante",
         descricao = "Shampoo indicado para cabelos secos, promove hidratação intensa.",
         image = "https://picsum.photos/200/300?random=1",
+        unidadeMedida = "kg",
         disponivel = true,
         precoProduto = 29.90f,
         isPromocao = true,

@@ -27,7 +27,6 @@ import com.example.careiroapp.R
 import com.example.careiroapp.associacoes.ui.components.AssociacoesGrid
 import com.example.careiroapp.associacoes.ui.viewmodel.AssociacaoViewModel
 import com.example.careiroapp.common.components.ModulesHeader
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
 import com.example.careiroapp.navigation.NavigationItem
 
 @Composable
@@ -88,12 +87,6 @@ fun AssociacoesView(
                 )
             }
         }
-        Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao(
-            {
-                navController.navigate(NavigationItem.Associacoes.route)
-            }
-        )
     }
 }
 

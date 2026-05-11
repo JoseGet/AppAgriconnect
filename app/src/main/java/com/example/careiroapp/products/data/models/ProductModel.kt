@@ -40,5 +40,9 @@ data class ProductModel(
 
     @SerializedName("fk_vendedor")
     @Expose
-    val fkVendedor: UUID
+    val fkVendedor: UUID,
+
+    @SerializedName("unidade_medida")
+    @Expose
+    val unidadeMedida: String
 )

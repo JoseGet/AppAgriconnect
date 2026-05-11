@@ -56,44 +56,41 @@ class ProductsViewModel @Inject constructor(
     val userData: Flow<UserEntity?> = userRepository.getUserData()
 
     fun getProducts(isNecessaryLoadMore: Boolean) {
+        val state = _productUiState.value
 
-        if (_productUiState.value.productsCardList.isNotEmpty() && !isNecessaryLoadMore) {
-            return
-        }
+        if (state.productsCardList.isNotEmpty() && !isNecessaryLoadMore) return
+        if (isNecessaryLoadMore && (state.isLoadingMore || state.endOfListReached)) return
+
+        if (isNecessaryLoadMore) offset += limit
 
         viewModelScope.launch {
             try {
                 _productUiState.update {
                     it.copy(
-                        isLoading = true
+                        isLoading = !isNecessaryLoadMore,
+                        isLoadingMore = isNecessaryLoadMore
                     )
                 }
 
-                val currentList = productUiState.value.productsCardList
                 val productsList = getProductsUseCase.invoke(offset, limit)
-
                 val productsCount = getProductsCount()
 
                 if (productsList?.isEmpty() == true) {
-                    _productUiState.update {
-                        it.copy(
-                            endOfListReached = true
-                        )
-                    }
+                    _productUiState.update { it.copy(endOfListReached = true) }
                     return@launch
                 }
 
-                val newList = currentList + (productsList ?: emptyList())
-
                 _productUiState.update {
                     it.copy(
-                        isLoading = false,
-                        productsCardList = newList,
+                        productsCardList = if (isNecessaryLoadMore) it.productsCardList + (productsList ?: emptyList())
+                                          else productsList ?: emptyList(),
                         productsCount = productsCount
                     )
                 }
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
+            } finally {
+                _productUiState.update { it.copy(isLoading = false, isLoadingMore = false) }
             }
         }
     }
@@ -134,46 +131,41 @@ class ProductsViewModel @Inject constructor(
     }
 
     fun getProductsByCategoria(nomeCategoria: String?, isNecessaryLoadMore: Boolean) {
+        if (nomeCategoria == null) return
 
-        if (nomeCategoria == null) {
-            return
-        }
+        val state = _productUiState.value
+        if (isNecessaryLoadMore && (state.isLoadingMore || state.endOfListReached)) return
+
+        if (isNecessaryLoadMore) offset += limit
 
         viewModelScope.launch {
             try {
                 _productUiState.update {
                     it.copy(
-                        isLoading = true
+                        isLoading = !isNecessaryLoadMore,
+                        isLoadingMore = isNecessaryLoadMore
                     )
                 }
 
-                val currentList = productUiState.value.productsCardList
-                val productsList =
-                    getProductsByCategoriaUseCase.invoke(nomeCategoria, offset, limit)
-
+                val productsList = getProductsByCategoriaUseCase.invoke(nomeCategoria, offset, limit)
                 val productsCount = getProductsByCategoriaCount(nomeCategoria)
 
                 if (productsList?.isEmpty() == true) {
-                    _productUiState.update {
-                        it.copy(
-                            endOfListReached = true
-                        )
-                    }
+                    _productUiState.update { it.copy(endOfListReached = true) }
                     return@launch
                 }
 
-                val newList = currentList + (productsList ?: emptyList())
-
                 _productUiState.update {
                     it.copy(
-                        isLoading = false,
-                        productsCardList = newList,
+                        productsCardList = if (isNecessaryLoadMore) it.productsCardList + (productsList ?: emptyList())
+                                          else productsList ?: emptyList(),
                         productsCount = productsCount
                     )
                 }
-
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
+            } finally {
+                _productUiState.update { it.copy(isLoading = false, isLoadingMore = false) }
             }
         }
     }
@@ -191,16 +183,12 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreProducts(function: () -> Unit) {
-        offset = offset + limit
-        function()
-    }
-
     fun resetListState() {
         offset = 0
         _productUiState.update {
             it.copy(
-                endOfListReached = false
+                endOfListReached = false,
+                isLoadingMore = false
             )
         }
     }

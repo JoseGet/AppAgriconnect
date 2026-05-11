@@ -27,7 +27,6 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
 import com.example.careiroapp.feiras.ui.components.FeirasGrid
 import com.example.careiroapp.feiras.ui.viewmodel.FeiraViewModel
 import com.example.careiroapp.navigation.NavigationItem
@@ -87,12 +86,6 @@ fun FeirasView(
                 )
             }
         }
-        Spacer(Modifier.height(24.dp))
-        CardCadastroAssociacao(
-            {
-                navController.navigate(NavigationItem.Associacoes.route)
-            }
-        )
     }
 }
 

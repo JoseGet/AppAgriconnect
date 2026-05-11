@@ -22,6 +22,10 @@ data class Pedidos(
     @Expose
     val itens: List<ItemPedido>,
 
+    @SerializedName("pix_payment_id")
+    @Expose
+    val pixPaymentId: String,
+
     @SerializedName("payment_type")
     @Expose
     val paymentType: PaymentType?,

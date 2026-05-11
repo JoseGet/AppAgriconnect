@@ -11,19 +11,19 @@ enum class PaymentType{
     DINHEIRO
 }
 
-data class PayerData(
-    val email: String = "",
-    val name: String = "",
-    val telefone: String = ""
-)
+enum class OrderState{
+    PENDENTE,
+    CONFIRMADO,
+    EXPIRADO
+}
 
 data class OrderModel (
     val date: String = "",
     val time: String = "",
     val address: String = "",
     val paymentType: PaymentType? = null,
-    val payerData: PayerData = PayerData(),
     val items: List<ProductModel> = emptyList(),
     val totalValue: Float = 0f,
-    val pixPayload: String? = null
+    val pixPayload: String? = null,
+    val pixQrCode: String? = null
 )

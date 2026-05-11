@@ -168,6 +168,8 @@ fun UiEventsHandler(
             resetUiEventFunction()
         }
 
+        is LoginCadastroUiEvents.SessionExpired -> {}
+
         is LoginCadastroUiEvents.None -> {}
     }
 }

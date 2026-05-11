@@ -7,6 +7,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface PedidoApiService {
 
@@ -16,6 +17,9 @@ interface PedidoApiService {
     ): Response<CreatePedidoResponse>
 
     @GET("pedido/")
-    suspend fun getPedidos(): Response<List<Pedidos>>
+    suspend fun getPedidos(
+        @Query("page") page: Int,
+        @Query("limit") limit: Int
+    ): Response<List<Pedidos>>
 
 }

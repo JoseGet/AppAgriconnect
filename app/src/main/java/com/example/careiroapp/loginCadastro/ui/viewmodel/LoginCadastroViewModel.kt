@@ -2,13 +2,16 @@ package com.example.careiroapp.loginCadastro.ui.viewmodel
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.colman.simplecpfvalidator.isCpf
+import com.example.careiroapp.R
 import com.example.careiroapp.data.dataStore.JwtDataStore
 import com.example.careiroapp.data.room.entities.UserEntity
+import com.example.careiroapp.data.session.SessionManager
 import com.example.careiroapp.loginCadastro.data.dto.ClienteDTO
 import com.example.careiroapp.loginCadastro.data.model.LoginRequestModel
 import com.example.careiroapp.loginCadastro.data.model.LogoutRequestModel
@@ -17,10 +20,13 @@ import com.example.careiroapp.loginCadastro.domain.usecases.LogoutUseCase
 import com.example.careiroapp.loginCadastro.domain.usecases.RegisterUseCase
 import com.example.careiroapp.navigation.NavigationItem
 import com.example.careiroapp.profile.data.repositories.UserRepository
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -45,8 +51,22 @@ class LoginCadastroViewModel @Inject constructor(
     private val _startDestination = mutableStateOf<String?>(null)
     val startDestination = _startDestination
 
+    private var _fcmToken: MutableStateFlow<String?> = MutableStateFlow(null)
+    val fcmToken = _fcmToken.asStateFlow()
+
     init {
         checkAuthStatus()
+        observeSessionExpiry()
+        fetchCurrentFcmToken()
+
+    }
+
+    private fun observeSessionExpiry() {
+        viewModelScope.launch {
+            SessionManager.sessionExpired.collectLatest {
+                _uiEvent.update { LoginCadastroUiEvents.SessionExpired() }
+            }
+        }
     }
 
     private fun checkAuthStatus() {
@@ -56,6 +76,18 @@ class LoginCadastroViewModel @Inject constructor(
             } else {
                 NavigationItem.Login.route
             }
+        }
+    }
+
+    private fun fetchCurrentFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            val token = task.result
+            _fcmToken.value = token
         }
     }
 
@@ -184,7 +216,8 @@ class LoginCadastroViewModel @Inject constructor(
 
             val loginRequest = LoginRequestModel(
                 email = email,
-                senha = senha
+                senha = senha,
+                fcmToken = _fcmToken.value
             )
 
             try {

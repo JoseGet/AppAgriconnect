@@ -1,11 +1,16 @@
 package com.example.careiroapp.profile.ui.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.bag.data.models.Pedidos
 import com.example.careiroapp.bag.data.repository.BagRepository
+import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.loginCadastro.domain.usecases.GetFavoritesUseCase
@@ -25,13 +30,30 @@ class ProfileViewModel @Inject constructor(
     private val bagRepository: BagRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val userRepository: UserRepository,
-    private val pedidoRepository: PedidoRepository
+    private val pedidoRepository: PedidoRepository,
+    private val paymentRepository: PaymentRepository
 ): ViewModel() {
 
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
     var profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
+
+    val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
+
+    init {
+        viewModelScope.launch {
+            NotificationEvents.events.collect { event ->
+                when (event) {
+                    is Events.PaymentPixConfirmed -> {
+                        pixPaymentDone.value = true
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
     fun setCurrentModule(newModule: ProfileModules) {
         _profileUiState.update { it.copy(currentProfileModule = newModule) }
     }
@@ -40,7 +62,7 @@ class ProfileViewModel @Inject constructor(
         cpf: String
     ) {
         if (_profileUiState.value.isLoading) return
-        
+
         viewModelScope.launch {
             try {
                 _profileUiState.update { it.copy(isLoading = true) }
@@ -67,15 +89,16 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                _profileUiState.update { it.copy(isLoading = true) }
+                _profileUiState.update { it.copy(isLoading = true, pedidosPage = 1, hasMorePedidos = true) }
 
-                val pedidos = pedidoRepository.getPedidos()
+                val pedidos = pedidoRepository.getPedidos(page = 1, limit = PEDIDOS_PAGE_SIZE)
 
                 if (pedidos.isSuccessful) {
-                    val pedidosList = pedidos.body()
+                    val pedidosList = pedidos.body() ?: emptyList()
                     _profileUiState.update {
                         it.copy(
-                        pedidosList = pedidosList?.toList() ?: emptyList()
+                            pedidosList = pedidosList,
+                            hasMorePedidos = pedidosList.size >= PEDIDOS_PAGE_SIZE
                         )
                     }
                 }
@@ -83,6 +106,35 @@ class ProfileViewModel @Inject constructor(
                 Log.e("ProfileVM", "Error loading pedidos", e)
             } finally {
                 _profileUiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    fun loadMorePedidos() {
+        val state = _profileUiState.value
+        if (state.isLoadingMore || !state.hasMorePedidos) return
+
+        viewModelScope.launch {
+            try {
+                _profileUiState.update { it.copy(isLoadingMore = true) }
+
+                val nextPage = state.pedidosPage + 1
+                val pedidos = pedidoRepository.getPedidos(page = nextPage, limit = PEDIDOS_PAGE_SIZE)
+
+                if (pedidos.isSuccessful) {
+                    val newPedidos = pedidos.body() ?: emptyList()
+                    _profileUiState.update {
+                        it.copy(
+                            pedidosList = it.pedidosList + newPedidos,
+                            pedidosPage = nextPage,
+                            hasMorePedidos = newPedidos.size >= PEDIDOS_PAGE_SIZE
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileVM", "Error loading more pedidos", e)
+            } finally {
+                _profileUiState.update { it.copy(isLoadingMore = false) }
             }
         }
     }
@@ -103,6 +155,22 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun getPixStatus(id: String) {
+        viewModelScope.launch {
+            try {
+                _profileUiState.update { it.copy(isLoading = true) }
+                val response = paymentRepository.getPixStatus(id)
+                if (response.isSuccessful) {
+                    _profileUiState.update { it.copy(pixStatus = response.body()) }
+                }
+            } catch (e: Exception) {
+                Log.e("ProfileVM", "Error fetching pix status", e)
+            } finally {
+                _profileUiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
     fun addProductToBag(product: ProductModel, cpf: String) {
         viewModelScope.launch {
             try {
@@ -117,5 +185,9 @@ class ProfileViewModel @Inject constructor(
                 bagRepository.addToBag(bagItem, cpf)
             } catch (e: Exception) { }
         }
+    }
+
+    companion object {
+        private const val PEDIDOS_PAGE_SIZE = 10
     }
 }

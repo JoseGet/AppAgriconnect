@@ -10,6 +10,6 @@ sealed class LoginCadastroUiEvents {
     class InvalidEmail(): LoginCadastroUiEvents()
     class CpfAlreadyExist(): LoginCadastroUiEvents()
     class EmailAlreadyExist(): LoginCadastroUiEvents()
-
     class RegisterSuccess(): LoginCadastroUiEvents()
+    class SessionExpired(): LoginCadastroUiEvents()
 }

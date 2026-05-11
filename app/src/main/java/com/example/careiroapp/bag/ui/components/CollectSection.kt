@@ -72,7 +72,8 @@ fun CollectSectionRow(
         Text(
             content,
             fontFamily = montserratRegularFontFamily,
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            color = colorResource(R.color.black)
         )
     }
 }
@@ -81,6 +82,6 @@ fun CollectSectionRow(
 @Composable
 private fun CollectSectionPreview() {
     CollectSection(
-        "","",""
+        "Feira Exemplo","11h - 12h","24/08"
     )
 }

@@ -1,9 +1,14 @@
 package com.example.careiroapp.bag.ui
 
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -11,13 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
 import coil3.gif.AnimatedImageDecoder
@@ -28,6 +39,7 @@ import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutStep
 import com.example.careiroapp.navigation.NavigationItem
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CheckoutView(
     navController: NavController
@@ -60,12 +72,14 @@ fun CheckoutView(
                         }
                         CheckoutStep.TWO -> {
                             viewModel.changeCheckoutStep(CheckoutStep.ONE)
-                        }
-                        CheckoutStep.THREE -> {
-                            viewModel.changeCheckoutStep(CheckoutStep.TWO)
+                            viewModel.resetPaymentMode()
                         }
                         CheckoutStep.FINAL -> {
-                            navController.navigate(NavigationItem.Main.route)
+                            navController.navigate(NavigationItem.Main.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
                             viewModel.resetOrderState()
                         }
                     }
@@ -77,43 +91,27 @@ fun CheckoutView(
         Box(
             modifier = Modifier
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             when(bagUiState.checkoutStep) {
 
                 CheckoutStep.ONE -> {
-                    CheckoutStepOneView(
+                     CheckoutStepOneView(
                         innerPadding,
-                        payerData = orderUiState.order.payerData,
-                        onButtonClick = {email, name, telefone ->
-                            viewModel.savePayerData(
-                                email,
-                                name,
-                                telefone
-                            )
+                        onButtonClick = {date,time, local ->
+                            viewModel.saveOrderDateLocal(date, time, local = local)
                             viewModel.changeCheckoutStep(CheckoutStep.TWO)
                         }
                     )
                 }
 
                 CheckoutStep.TWO -> {
-                    CheckoutStepTwoView(
-                        innerPadding,
-                        onButtonClick = {date,time, local ->
-                            viewModel.saveOrderDateLocal(date, time, local = local)
-                            viewModel.changeCheckoutStep(CheckoutStep.THREE)
-                        }
-                    )
-                }
-
-                CheckoutStep.THREE -> {
-                    CheckoutStepThreeView(
+                    CheckoutStepTwoView (
                         innerPadding,
                         orderData = orderUiState.order,
                         productsList = bagItems,
                         totalValue = totalPrice,
                         onButtonClick = {
-
                             if (orderUiState.order.paymentType == null) {
                                 Toast.makeText(context, "Selecione uma forma de pagamento", Toast.LENGTH_SHORT).show()
                             } else {
@@ -130,12 +128,30 @@ fun CheckoutView(
                     CheckoutFinalStepView(
                         innerPadding,
                         orderData = orderUiState.order,
-                        pixPayload = orderUiState.order.pixPayload ?: ""
+                        isPaymentPixDone = viewModel.pixPaymentDone.value,
+                        onClickLeftButton = {
+                            navController.navigate(NavigationItem.Main.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                            viewModel.resetOrderState()
+                        },
+                        onClickRightButton = {
+                            viewModel.setNeedsProfileRedirect()
+                            navController.navigate(NavigationItem.Main.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                            viewModel.resetOrderState()
+                        }
                     )
                 }
             }
             if (bagUiState.isLoading) {
                 Image(
+                    modifier = Modifier.align(Alignment.Center),
                     painter = rememberAsyncImagePainter(
                         model = R.drawable.load,
                         imageLoader = imageLoader
@@ -145,4 +161,13 @@ fun CheckoutView(
             }
         }
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+@Preview
+private fun CheckoutViewPreview() {
+    CheckoutView(
+        navController = rememberNavController()
+    )
 }

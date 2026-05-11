@@ -33,14 +33,12 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.gif.GifDecoder
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
-import com.example.careiroapp.common.components.cards.CardAssinatura
-import com.example.careiroapp.common.components.cards.CardCadastroAssociacao
-import com.example.careiroapp.home.ui.components.HomeCardFeira
-import com.example.careiroapp.products.ui.components.ProductCard
 import com.example.careiroapp.home.ui.components.CategoriasModule
+import com.example.careiroapp.home.ui.components.HomeCardFeira
 import com.example.careiroapp.home.ui.components.TutorialRow
 import com.example.careiroapp.home.ui.viewmodel.HomeViewModel
 import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.products.ui.components.ProductCard
 
 @Composable
 fun HomeView(
@@ -49,12 +47,6 @@ fun HomeView(
 ) {
     val context = LocalContext.current
     val categoriesRowScrollState = rememberScrollState()
-
-    val produto1 = R.drawable.tomates
-    val uriProduto1 = "android.resource://${context.packageName}/$produto1"
-
-    val produto2 = R.drawable.peras
-    val uriProduto2 = "android.resource://${context.packageName}/$produto2"
 
     val viewModel = hiltViewModel<HomeViewModel>()
     val uiState by viewModel.uiState.collectAsState()
@@ -86,37 +78,22 @@ fun HomeView(
                 titulo = stringResource(R.string.produtos_e_associacoes_destaque),
                 subtitulo = null
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                ProductCard(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = uriProduto1,
-                    nomeProduto = "Tomates",
-                    precoProduto = 10.0f,
-                    isPromocao = true,
-                    precoPromocao = 8.00,
-                    haveButton = false,
-                    onClick = {
-
-                    }
-                )
-                ProductCard(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = uriProduto2,
-                    nomeProduto = "Peras",
-                    precoProduto = 10.0f,
-                    isPromocao = true,
-                    precoPromocao = 8.00,
-                    haveButton = false,
-                    onClick = {
-
-                    }
-                )
+                items(uiState.featuredProducts) { product ->
+                    ProductCard(
+                        modifier = Modifier.fillParentMaxWidth(0.5f),
+                        image = product.image,
+                        nomeProduto = product.nomeProduto,
+                        precoProduto = product.precoProduto,
+                        isPromocao = product.isPromocao,
+                        precoPromocao = product.precoPromocao,
+                        haveButton = false,
+                        onClick = {}
+                    )
+                }
             }
             Spacer(Modifier.height(24.dp))
             ModulesHeader(
@@ -131,11 +108,14 @@ fun HomeView(
             ) {
                 if (uiState.isLoading) {
                     Image(
-                        painter = rememberAsyncImagePainter(model = R.drawable.load, imageLoader = imageLoader),
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.load,
+                            imageLoader = imageLoader
+                        ),
                         contentDescription = null
                     )
                 }
-                LazyRow (
+                LazyRow(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -166,47 +146,40 @@ fun HomeView(
                 resetScrollFunction
             )
             Spacer(Modifier.height(24.dp))
-            ModulesHeader(
-                titulo = stringResource(R.string.assinaturas_titulo),
-                subtitulo = stringResource(R.string.assinaturas_descricao)
-            )
-            Spacer(Modifier.height(24.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                CardAssinatura(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.macas),
-                    nomeAssinatura = "Assinatura",
-                    precoAssinatura = 10.0f,
-                    haveButton = false
-                )
-                CardAssinatura(
-                    modifier = Modifier
-                        .weight(1f),
-                    image = painterResource(R.drawable.macas),
-                    nomeAssinatura = "Assinatura",
-                    precoAssinatura = 10.0f,
-                    haveButton = false
-                )
-            }
-            Spacer(Modifier.height(24.dp))
+//            ModulesHeader(
+//                titulo = stringResource(R.string.assinaturas_titulo),
+//                subtitulo = stringResource(R.string.assinaturas_descricao)
+//            )
+//            Spacer(Modifier.height(24.dp))
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                CardAssinatura(
+//                    modifier = Modifier
+//                        .weight(1f),
+//                    image = painterResource(R.drawable.macas),
+//                    nomeAssinatura = "Assinatura",
+//                    precoAssinatura = 10.0f,
+//                    haveButton = false
+//                )
+//                CardAssinatura(
+//                    modifier = Modifier
+//                        .weight(1f),
+//                    image = painterResource(R.drawable.macas),
+//                    nomeAssinatura = "Assinatura",
+//                    precoAssinatura = 10.0f,
+//                    haveButton = false
+//                )
+//            }
+//            Spacer(Modifier.height(24.dp))
             ModulesHeader(
                 titulo = stringResource(R.string.como_funciona_titulo),
                 subtitulo = stringResource(R.string.como_funciona_descricao)
             )
             Spacer(Modifier.height(24.dp))
             TutorialRow()
-            Spacer(Modifier.height(24.dp))
-            CardCadastroAssociacao(
-                {
-                    navController.navigate(NavigationItem.Associacoes.route)
-                    resetScrollFunction()
-                }
-            )
         }
     }
 }
