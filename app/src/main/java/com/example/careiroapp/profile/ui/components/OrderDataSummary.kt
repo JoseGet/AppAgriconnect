@@ -21,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.components.CollectSectionRow
-import com.example.careiroapp.common.components.buttons.OutlineAppButton
+import com.example.careiroapp.bag.ui.viewmodel.OrderState
+import com.example.careiroapp.bag.ui.viewmodel.PaymentType
+import com.example.careiroapp.common.components.buttons.AppButton
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.common.montserratRegularFontFamily
 
@@ -30,7 +32,9 @@ fun OrderDataSummary(
     local: String,
     date: String,
     time: String,
-    paymentType: String
+    paymentType: String,
+    status: String? = null,
+    onPixPaymentClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -54,9 +58,9 @@ fun OrderDataSummary(
             Spacer(modifier = Modifier.height(8.dp))
             CollectSectionRow(painter = painterResource(R.drawable.map_marker), local)
             Spacer(modifier = Modifier.height(8.dp))
-            CollectSectionRow(painter = painterResource(R.drawable.clock),time)
+            CollectSectionRow(painter = painterResource(R.drawable.clock), time)
             Spacer(modifier = Modifier.height(8.dp))
-            CollectSectionRow(painter = painterResource(R.drawable.calendar),date)
+            CollectSectionRow(painter = painterResource(R.drawable.calendar), date)
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 "Pagamento",
@@ -71,20 +75,39 @@ fun OrderDataSummary(
                 fontSize = 16.sp,
                 color = colorResource(R.color.black)
             )
-            Row(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                OutlineAppButton(
-                    text = "Cancelar pedido",
-                    modifier = Modifier,
-                    onClick = {},
-                    icon = null,
-                    isActivate = false
-                )
+            if (paymentType == PaymentType.PIX.name && status == OrderState.PENDENTE.name) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    AppButton(
+                        text = "Fazer pagamento",
+                        modifier = Modifier,
+                        onClick = {
+                            onPixPaymentClick()
+                        },
+                        icon = null,
+                        containerColor = colorResource(R.color.dark_green)
+                    )
+                }
             }
+//            Row(
+//                modifier = Modifier
+//                    .wrapContentHeight()
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                OutlineAppButton(
+//                    text = "Cancelar pedido",
+//                    modifier = Modifier,
+//                    onClick = {},
+//                    icon = null,
+//                    isActivate = false
+//                )
+//            }
         }
     }
 }
@@ -97,6 +120,7 @@ private fun OrderDataSummaryPreview() {
         local = "Local",
         date = "Data",
         time = "Hora",
-        paymentType = "Pagamento"
+        paymentType = "Pagamento",
+        onPixPaymentClick = {}
     )
 }

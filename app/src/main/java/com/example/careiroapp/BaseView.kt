@@ -13,6 +13,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -44,6 +45,14 @@ fun BaseView(
 
     val bagViewModel: BagViewModel = hiltViewModel()
     val bagItems: List<BagItem> by bagViewModel.cartItems.collectAsStateWithLifecycle()
+    val needsProfileRedirect by BagViewModel.needsProfileRedirect
+
+    LaunchedEffect(needsProfileRedirect) {
+        if (needsProfileRedirect) {
+            tabBarNavController.navigate(NavigationItem.Profile.route)
+            bagViewModel.clearNeedsProfileRedirect()
+        }
+    }
 
     val resetScroll: () -> Unit = {
         scope.launch {

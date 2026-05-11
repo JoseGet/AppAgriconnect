@@ -14,6 +14,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
@@ -24,12 +25,14 @@ import com.example.careiroapp.bag.ui.viewmodel.OrderModel
 import com.example.careiroapp.common.components.buttons.BackButton
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.profile.ui.components.OrderDataSummary
+import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun OrderView(
     navController: NavHostController,
     order: Pedidos? = null,
-    clearSelectedOrder: () -> Unit = {}
+    clearSelectedOrder: () -> Unit = {},
+    onPixPaymentClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -40,7 +43,6 @@ fun OrderView(
         BackButton(
             onClick = {
                 navController.popBackStack()
-                clearSelectedOrder()
             }
         )
         Spacer(Modifier.height(16.dp))
@@ -72,7 +74,9 @@ fun OrderView(
             local = order?.retiradaLocal ?: "",
             date = order?.retiradaData ?: "",
             time = order?.retiradaHora ?: "",
-            paymentType = order?.paymentType?.name ?: ""
+            paymentType = order?.paymentType?.name ?: "",
+            status = order?.status,
+            onPixPaymentClick = onPixPaymentClick
         )
     }
 }

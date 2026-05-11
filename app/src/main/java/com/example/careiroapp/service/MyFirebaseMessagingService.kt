@@ -3,6 +3,8 @@ package com.example.careiroapp.service
 import android.app.NotificationManager
 import androidx.core.app.NotificationCompat
 import com.example.careiroapp.R
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.consts.EventCodes
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -25,6 +27,9 @@ class MyFirebaseMessagingService(): FirebaseMessagingService() {
 
         when {
             messageData["code"] == EventCodes.PAGAMENTO_PIX_CONFIRMADO -> {
+
+                NotificationEvents.sendEvent(Events.PaymentPixConfirmed())
+
                 val notification = NotificationCompat.Builder(this, "agriconnect_notification")
                     .setSmallIcon(R.drawable.ic_agriconnect)
                     .setContentTitle("Pagamento Recebido!")

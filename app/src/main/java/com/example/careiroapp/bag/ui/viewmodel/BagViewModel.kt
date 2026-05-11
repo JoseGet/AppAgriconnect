@@ -1,11 +1,13 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
-import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.careiroapp.bag.data.models.Customer
+import com.example.careiroapp.bag.data.models.Metadata
 import com.example.careiroapp.bag.data.models.PaymentDataRequest
 import com.example.careiroapp.bag.data.models.PedidoBody
 import com.example.careiroapp.bag.data.models.PedidoProdutoModel
@@ -13,10 +15,11 @@ import com.example.careiroapp.bag.data.models.PixPaymentRequestBody
 import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,10 +50,34 @@ class BagViewModel @Inject constructor(
     private val _orderUiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
     var orderUiState: StateFlow<OrderUiState> = _orderUiState.asStateFlow()
 
-    private val _checkoutUiEvent: MutableStateFlow<CheckoutUiEvent> = MutableStateFlow(CheckoutUiEvent.None())
-    var checkoutUiEvent: StateFlow<CheckoutUiEvent> = _checkoutUiEvent.asStateFlow()
-
     val userData: Flow<UserEntity?> = userRepository.getUserData()
+
+    val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
+
+    companion object {
+        val needsProfileRedirect: MutableState<Boolean> = mutableStateOf(false)
+    }
+
+    fun setNeedsProfileRedirect() {
+        needsProfileRedirect.value = true
+    }
+
+    fun clearNeedsProfileRedirect() {
+        needsProfileRedirect.value = false
+    }
+
+    init {
+        viewModelScope.launch {
+            NotificationEvents.events.collect { event ->
+                when(event) {
+                    is Events.PaymentPixConfirmed -> {
+                        pixPaymentDone.value = true
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
     val totalPrice: LiveData<Double> = userData
         .flatMapLatest { user ->
             val cpf = user?.cpf
@@ -98,41 +125,41 @@ class BagViewModel @Inject constructor(
 
                         val currentTotal = totalPrice.value ?: 0.0
 
-                        val pixPaymentBody = PixPaymentRequestBody(
-                            method = "PIX",
-                            data = PaymentDataRequest(
-                                amount = (currentTotal * 100).toInt(), //Para a Api do AbacatePay o valor precisa estar em centavos,
-                                expiresIn = 3600,
-                                description = "Cobrança PIX no checkout transparente",
-                                customer = Customer(
-                                    name = user?.name ?: "",
-                                    email = user?.email ?: "",
-                                    taxId = user?.cpf ?: "",
-                                    cellphone = user?.telefone ?: ""
-                                ),
-                            ),
+                        val pedido = PedidoBody(
+                            valorTotal = totalPrice.value?.toFloat() ?: 0f,
+                            produtos = produtos,
+                            status = OrderState.PENDENTE.name,
+                            paymentType = orderUiState.value.order.paymentType,
+                            retiradaLocal = orderUiState.value.order.address,
+                            retiradaData = orderUiState.value.order.date,
+                            retiradaHora = orderUiState.value.order.time,
                         )
 
-                        val gson = Gson()
-                        val jsonString = gson.toJson(pixPaymentBody)
+                        val response = pedidoRepository.createPedido(pedido)
 
-                        Log.i("ZEGET", jsonString)
+                        if (response.isSuccessful) {
 
-                        val paymentResponse = paymentRepository.createPixPayment(pixPaymentBody)
-
-                        if (paymentResponse.isSuccessful) {
-                            val pedido = PedidoBody(
-                                valorTotal = totalPrice.value?.toFloat() ?: 0f,
-                                produtos = produtos,
-                                paymentType = orderUiState.value.order.paymentType,
-                                retiradaLocal = orderUiState.value.order.address,
-                                retiradaData = orderUiState.value.order.date,
-                                retiradaHora = orderUiState.value.order.time
+                            val pixPaymentBody = PixPaymentRequestBody(
+                                method = "PIX",
+                                data = PaymentDataRequest(
+                                    amount = (currentTotal * 100).toInt(), //Para a Api do AbacatePay o valor precisa estar em centavos,
+                                    expiresIn = 3600,
+                                    description = "Cobrança PIX no checkout transparente",
+                                    customer = Customer(
+                                        name = user?.name ?: "",
+                                        email = user?.email ?: "",
+                                        taxId = user?.cpf ?: "",
+                                        cellphone = user?.telefone ?: ""
+                                    ),
+                                    metadata = Metadata(
+                                        pedidoId = response.body()?.id ?: 0
+                                    )
+                                )
                             )
 
-                            val response = pedidoRepository.createPedido(pedido)
+                            val paymentResponse = paymentRepository.createPixPayment(pixPaymentBody)
 
-                            if (response.isSuccessful) {
+                            if (paymentResponse.isSuccessful) {
                                 _uiState.update { it.copy(isLoading = false) }
                                 _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
                                     totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
@@ -145,6 +172,8 @@ class BagViewModel @Inject constructor(
                                 }
 
                                 changeCheckoutStep(CheckoutStep.FINAL)
+                            } else {
+                                _uiState.update { it.copy(isLoading = false) }
                             }
                         } else {
                             _uiState.update { it.copy(isLoading = false) }
@@ -155,6 +184,7 @@ class BagViewModel @Inject constructor(
                         val pedido = PedidoBody(
                             valorTotal = totalPrice.value?.toFloat() ?: 0f,
                             produtos = produtos,
+                            status = OrderState.CONFIRMADO.name,
                             paymentType = orderUiState.value.order.paymentType,
                             retiradaLocal = orderUiState.value.order.address,
                             retiradaData = orderUiState.value.order.date,
@@ -261,8 +291,9 @@ class BagViewModel @Inject constructor(
 
     fun resetOrderState() {
         _orderUiState.update { it.copy(
-            order = OrderModel()
+            order = OrderModel(),
         ) }
+        pixPaymentDone.value = false
     }
 
 }

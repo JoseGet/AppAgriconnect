@@ -16,6 +16,9 @@ data class PedidoBody(
     @SerializedName("payment_type")
     val paymentType: PaymentType?,
 
+    @SerializedName("status")
+    val status: String,
+
     @SerializedName("retirada_local")
     val retiradaLocal: String,
 
