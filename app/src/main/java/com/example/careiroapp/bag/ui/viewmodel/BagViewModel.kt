@@ -1,6 +1,5 @@
 package com.example.careiroapp.bag.ui.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
@@ -18,11 +17,9 @@ import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.common.events.Events
 import com.example.careiroapp.common.events.NotificationEvents
-import com.example.careiroapp.consts.EventCodes
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +33,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.internal.notify
 import java.util.UUID
 import javax.inject.Inject
 
@@ -53,9 +49,6 @@ class BagViewModel @Inject constructor(
 
     private val _orderUiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
     var orderUiState: StateFlow<OrderUiState> = _orderUiState.asStateFlow()
-
-    private val _checkoutUiEvent: MutableStateFlow<CheckoutUiEvent> = MutableStateFlow(CheckoutUiEvent.None())
-    var checkoutUiEvent: StateFlow<CheckoutUiEvent> = _checkoutUiEvent.asStateFlow()
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
 

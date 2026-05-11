@@ -21,7 +21,9 @@ import com.example.careiroapp.loginCadastro.ui.viewmodel.LoginCadastroViewModel
 import com.example.careiroapp.navigation.NavigationItem.Checkout
 import com.example.careiroapp.navigation.NavigationItem.Login
 import com.example.careiroapp.navigation.NavigationItem.Main
+import com.example.careiroapp.navigation.NavigationItem.Profile
 import com.example.careiroapp.navigation.NavigationItem.Sacola
+import com.example.careiroapp.profile.ui.ProfileView
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
