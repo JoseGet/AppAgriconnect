@@ -173,7 +173,7 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun abacatePayApiSetupProvider(@PublicClient okHttpClient: OkHttpClient): AbacatePayApiService {
+    fun abacatePayApiSetupProvider(@AuthenticatedClient okHttpClient: OkHttpClient): AbacatePayApiService {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())

@@ -138,14 +138,12 @@ fun CheckoutView(
                             viewModel.resetOrderState()
                         },
                         onClickRightButton = {
+                            viewModel.setNeedsProfileRedirect()
                             navController.navigate(NavigationItem.Main.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
                                 }
                             }
-
-                            navController.navigate(NavigationItem.Profile.route)
-
                             viewModel.resetOrderState()
                         }
                     )

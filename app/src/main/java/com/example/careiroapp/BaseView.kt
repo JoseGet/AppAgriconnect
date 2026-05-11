@@ -45,6 +45,14 @@ fun BaseView(
 
     val bagViewModel: BagViewModel = hiltViewModel()
     val bagItems: List<BagItem> by bagViewModel.cartItems.collectAsStateWithLifecycle()
+    val needsProfileRedirect by BagViewModel.needsProfileRedirect
+
+    LaunchedEffect(needsProfileRedirect) {
+        if (needsProfileRedirect) {
+            tabBarNavController.navigate(NavigationItem.Profile.route)
+            bagViewModel.clearNeedsProfileRedirect()
+        }
+    }
 
     val resetScroll: () -> Unit = {
         scope.launch {

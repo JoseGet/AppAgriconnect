@@ -54,6 +54,18 @@ class BagViewModel @Inject constructor(
 
     val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
 
+    companion object {
+        val needsProfileRedirect: MutableState<Boolean> = mutableStateOf(false)
+    }
+
+    fun setNeedsProfileRedirect() {
+        needsProfileRedirect.value = true
+    }
+
+    fun clearNeedsProfileRedirect() {
+        needsProfileRedirect.value = false
+    }
+
     init {
         viewModelScope.launch {
             NotificationEvents.events.collect { event ->
@@ -160,6 +172,8 @@ class BagViewModel @Inject constructor(
                                 }
 
                                 changeCheckoutStep(CheckoutStep.FINAL)
+                            } else {
+                                _uiState.update { it.copy(isLoading = false) }
                             }
                         } else {
                             _uiState.update { it.copy(isLoading = false) }
