@@ -1,10 +1,10 @@
 package com.example.careiroapp.loginCadastro.ui
 
 import android.app.Activity
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -38,10 +39,10 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.loginCadastro.ui.components.CadastroCard
 import com.example.careiroapp.loginCadastro.ui.components.LoginCard
@@ -71,15 +72,7 @@ fun LoginView(
         }
     }
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Box(
         modifier = Modifier
@@ -165,13 +158,15 @@ fun LoginView(
             }
         }
         if (uiState.isLoading) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.load,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = null
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .zIndex(1f)
+                    .pointerInput(Unit){}
+            ) {
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
+            }
         }
     }
 }

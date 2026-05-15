@@ -1,7 +1,5 @@
 package com.example.careiroapp.products.ui
 
-import android.os.Build.VERSION.SDK_INT
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,15 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.common.montserratBoldFontFamily
-import com.example.careiroapp.navigation.NavigationItem
-import com.example.careiroapp.products.ui.components.FeaturedProducts
+import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.FilterRow
 import com.example.careiroapp.products.ui.components.ProductsGrid
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
@@ -64,15 +61,7 @@ fun ProductsView(
         }
     }
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     LaunchedEffect(productViewUiState.filterNameActivate) {
         if (productViewUiState.filterNameActivate == null) {
@@ -112,10 +101,7 @@ fun ProductsView(
             contentAlignment = Alignment.Center
         ) {
             if (productViewUiState.isLoading) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = R.drawable.load, imageLoader = imageLoader),
-                    contentDescription = null
-                )
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
             Column(
                 modifier = Modifier
@@ -141,11 +127,7 @@ fun ProductsView(
                     gridListState = gridListState,
                     list = productViewUiState.productsCardList,
                     onItemClicker = { id ->
-                        productViewModel.getProductById(
-                            userData?.cpf ?: "",
-                            id
-                        )
-                        navController.navigate(NavigationItem.ProdutoUnico.route)
+                        navController.navigate("${Screen.PRODUTO_UNICO.name}/$id")
                         resetScrollFunction()
                     },
                     loadMore = {
