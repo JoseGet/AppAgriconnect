@@ -5,5 +5,4 @@ import com.example.careiroapp.feiras.data.models.FeiraModel
 data class FeiraUiState(
     val isLoading: Boolean = false,
     val feirasCardList: List<FeiraModel> = listOf(),
-    val selectedFeira: FeiraModel? = null
 )

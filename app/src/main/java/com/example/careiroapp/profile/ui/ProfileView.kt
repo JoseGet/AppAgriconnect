@@ -1,7 +1,5 @@
 package com.example.careiroapp.profile.ui
 
-import android.os.Build.VERSION.SDK_INT
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,14 +31,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
-import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.ProductCard
 import com.example.careiroapp.profile.ui.components.OrderCard
 import com.example.careiroapp.profile.ui.components.ProfileDataWidget
@@ -61,16 +60,8 @@ fun ProfileView(
     val context = LocalContext.current
     val uriImage = "android.resource://${context.packageName}/$noProfileImage"
     val gridListState = rememberLazyGridState()
-
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
     Column(
         modifier = Modifier
@@ -106,17 +97,6 @@ fun ProfileView(
                 }
 
                 val pedidosListState = rememberLazyListState()
-                val shouldLoadMore = remember {
-                    derivedStateOf {
-                        val lastVisible = pedidosListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-                        val total = pedidosListState.layoutInfo.totalItemsCount
-                        total > 0 && lastVisible >= total - 2
-                    }
-                }
-
-                LaunchedEffect(shouldLoadMore.value) {
-                    if (shouldLoadMore.value) viewModel.loadMorePedidos()
-                }
 
                 Box(
                     modifier = Modifier
@@ -125,13 +105,7 @@ fun ProfileView(
                     contentAlignment = Alignment.Center
                 ) {
                     if (profileUiState.isLoading) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.load,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null
-                        )
+                        LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                     }
                     LazyColumn(
                         state = pedidosListState,
@@ -146,23 +120,10 @@ fun ProfileView(
                                 orderTotalValue = pedido.valorTotal.toFloat(),
                                 orderStatus = pedido.status ?: "",
                                 onClick = {
-                                    viewModel.updateSelectedPedido(pedido)
-                                    navController.navigate(NavigationItem.Pedido.route)
+                                    navController.navigate("${Screen.PEDIDO.name}/${pedido.id}")
                                     resetScrollFunction()
                                 }
                             )
-                        }
-                        if (profileUiState.isLoadingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
                         }
                     }
                 }
@@ -170,8 +131,8 @@ fun ProfileView(
 
             ProfileModules.FAVORITOS -> {
 
-                LaunchedEffect(userData?.cpf) {
-                    if (profileUiState.favoriteItensList.isEmpty()) {
+                LaunchedEffect(userData?.cpf, currentBackStackEntry) {
+                    if (currentBackStackEntry?.destination?.route == Screen.PROFILE.name) {
                         userData?.cpf?.let { cpf ->
                             viewModel.getFavoritesProducts(cpf)
                         }
@@ -184,15 +145,6 @@ fun ProfileView(
                         .height(500.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (profileUiState.isLoading) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.load,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null
-                        )
-                    }
                     LazyVerticalGrid(
                         state = gridListState,
                         columns = GridCells.Fixed(2),
@@ -210,12 +162,18 @@ fun ProfileView(
                                 isPromocao = item.isPromocao,
                                 precoPromocao = item.precoPromocao,
                                 haveButton = true,
-                                onClick = {},
+                                onClick = {
+                                    navController.navigate("${Screen.PRODUTO_UNICO.name}/${item.id}")
+                                    resetScrollFunction()
+                                },
                                 onButtonClick = {
                                     viewModel.addProductToBag(item, userData?.cpf ?: "")
                                 }
                             )
                         }
+                    }
+                    if (profileUiState.isLoading) {
+                        LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                     }
                 }
             }

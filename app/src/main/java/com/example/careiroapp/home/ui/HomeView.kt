@@ -1,11 +1,9 @@
 package com.example.careiroapp.home.ui
 
-import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,10 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.home.ui.components.CategoriasModule
@@ -38,6 +36,7 @@ import com.example.careiroapp.home.ui.components.HomeCardFeira
 import com.example.careiroapp.home.ui.components.TutorialRow
 import com.example.careiroapp.home.ui.viewmodel.HomeViewModel
 import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.ProductCard
 
 @Composable
@@ -51,15 +50,7 @@ fun HomeView(
     val viewModel = hiltViewModel<HomeViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Column() {
         Image(
@@ -78,21 +69,33 @@ fun HomeView(
                 titulo = stringResource(R.string.produtos_e_associacoes_destaque),
                 subtitulo = null
             )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(),
+                contentAlignment = Alignment.Center
             ) {
-                items(uiState.featuredProducts) { product ->
-                    ProductCard(
-                        modifier = Modifier.fillParentMaxWidth(0.5f),
-                        image = product.image,
-                        nomeProduto = product.nomeProduto,
-                        precoProduto = product.precoProduto,
-                        isPromocao = product.isPromocao,
-                        precoPromocao = product.precoPromocao,
-                        haveButton = false,
-                        onClick = {}
-                    )
+                if (uiState.isFeaturedProductsLoading) {
+                    LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
+                }
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.featuredProducts) { product ->
+                        ProductCard(
+                            modifier = Modifier.fillParentMaxWidth(0.5f),
+                            image = product.image,
+                            nomeProduto = product.nomeProduto,
+                            precoProduto = product.precoProduto,
+                            isPromocao = product.isPromocao,
+                            precoPromocao = product.precoPromocao,
+                            haveButton = false,
+                            onClick = {
+                                navController.navigate("${Screen.PRODUTO_UNICO.name}/${product.id}")
+                                resetScrollFunction()
+                            }
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -106,14 +109,8 @@ fun HomeView(
                     .wrapContentSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (uiState.isLoading) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.load,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = null
-                    )
+                if (uiState.isFairsLoading) {
+                    LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                 }
                 LazyRow(
                     modifier = Modifier

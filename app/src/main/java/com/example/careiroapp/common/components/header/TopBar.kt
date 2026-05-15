@@ -78,7 +78,16 @@ fun TopBar(
                 if (bagItemsCount > 0) {
                     Badge(
                         containerColor = colorResource(R.color.dark_green)
-                    )
+                    ) {
+                        Text(
+                            text = bagItemsCount.toString(),
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        )
+                    }
                 }
             }
         ) {

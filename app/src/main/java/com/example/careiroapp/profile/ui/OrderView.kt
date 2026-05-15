@@ -1,6 +1,8 @@
 package com.example.careiroapp.profile.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,75 +11,95 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
-import com.example.careiroapp.bag.data.models.Pedidos
 import com.example.careiroapp.bag.ui.components.SummaryProductCard
 import com.example.careiroapp.bag.ui.components.SummaryProductsHeader
-import com.example.careiroapp.bag.ui.viewmodel.OrderModel
 import com.example.careiroapp.common.components.buttons.BackButton
 import com.example.careiroapp.common.montserratBoldFontFamily
 import com.example.careiroapp.profile.ui.components.OrderDataSummary
-import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
+import com.example.careiroapp.profile.ui.viewmodel.SingleOrderUiState
+import com.example.careiroapp.profile.ui.viewmodel.SingleOrderViewModel
 
 @Composable
 fun OrderView(
     navController: NavHostController,
-    order: Pedidos? = null,
-    clearSelectedOrder: () -> Unit = {},
+    viewModel: SingleOrderViewModel,
     onPixPaymentClick: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp, vertical = 24.dp)
-    ) {
-        BackButton(
-            onClick = {
-                navController.popBackStack()
+    val uiState by viewModel.singleOrderUiState.collectAsState()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
+
+    BackHandler {
+        navController.popBackStack()
+    }
+
+    Box {
+        when (val state = uiState) {
+            is SingleOrderUiState.Loading -> {
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            "Pedido #${order?.id}",
-            fontFamily = montserratBoldFontFamily,
-            fontSize = 18.sp,
-            color = colorResource(R.color.dark_green)
-        )
-        Spacer(Modifier.height(4.dp))
-        SummaryProductsHeader()
-        Spacer(modifier = Modifier.height(16.dp))
-        Column (
-            modifier = Modifier
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            for (product in order?.itens ?: emptyList()) {
-                SummaryProductCard(
-                    image = product.produto?.image ?: "",
-                    name = product.produto?.nome ?: "",
-                    qntd = product.quantidade ?: 0,
-                    price = product.produto?.preco?.toFloat() ?: 0f
-                )
+
+            is SingleOrderUiState.Success -> {
+                val order = state.pedido
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                ) {
+                    BackButton(
+                        onClick = { navController.popBackStack() }
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Pedido #${order.id}",
+                        fontFamily = montserratBoldFontFamily,
+                        fontSize = 18.sp,
+                        color = colorResource(R.color.dark_green)
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    SummaryProductsHeader()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier.wrapContentHeight(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        for (product in order.itens) {
+                            SummaryProductCard(
+                                image = product.produto?.image ?: "",
+                                name = product.produto?.nome ?: "",
+                                qntd = product.quantidade ?: 0,
+                                price = product.produto?.preco?.toFloat() ?: 0f
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    OrderDataSummary(
+                        local = order.retiradaLocal,
+                        date = order.retiradaData,
+                        time = order.retiradaHora,
+                        paymentType = order.paymentType?.name ?: "",
+                        status = order.status,
+                        onPixPaymentClick = onPixPaymentClick
+                    )
+                }
             }
+
+            is SingleOrderUiState.None -> {}
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        OrderDataSummary(
-            local = order?.retiradaLocal ?: "",
-            date = order?.retiradaData ?: "",
-            time = order?.retiradaHora ?: "",
-            paymentType = order?.paymentType?.name ?: "",
-            status = order?.status,
-            onPixPaymentClick = onPixPaymentClick
-        )
     }
 }
 
@@ -86,5 +108,6 @@ fun OrderView(
 private fun OrderViewPreview() {
     OrderView(
         navController = rememberNavController(),
+        viewModel = TODO()
     )
 }
