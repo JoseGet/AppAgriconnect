@@ -9,6 +9,8 @@ import com.example.careiroapp.associacoes.domain.usecases.GetAssociacoesUseCase
 import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.products.domain.usecases.GetProductsByAssociacao
 import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -118,6 +120,7 @@ class AssociacaoViewModel @Inject constructor(
                     userId = cpf
                 )
                 bagRepository.addToBag(bagItem, cpf)
+                NotificationEvents.sendEvent(Events.ProductAddedToBag())
             } catch (e: Exception) { }
         }
     }

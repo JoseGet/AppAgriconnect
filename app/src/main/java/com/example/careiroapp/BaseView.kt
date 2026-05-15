@@ -1,5 +1,6 @@
 package com.example.careiroapp
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +19,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -46,6 +50,15 @@ fun BaseView(
     val bagViewModel: BagViewModel = hiltViewModel()
     val bagItems: List<BagItem> by bagViewModel.cartItems.collectAsStateWithLifecycle()
     val needsProfileRedirect by BagViewModel.needsProfileRedirect
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        NotificationEvents.events.collect { event ->
+            if (event is Events.ProductAddedToBag) {
+                Toast.makeText(context, "Produto adicionado à sacola", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(needsProfileRedirect) {
         if (needsProfileRedirect) {
@@ -88,7 +101,7 @@ fun BaseView(
                     },
                     navController,
                     tabBarNavController = tabBarNavController,
-                    bagItemsCount = bagItems.size,
+                    bagItemsCount = bagItems.sumOf { it.quantity },
                     resetScroll
                 )
             },

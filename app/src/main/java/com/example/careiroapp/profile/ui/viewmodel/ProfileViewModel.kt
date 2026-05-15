@@ -183,6 +183,7 @@ class ProfileViewModel @Inject constructor(
                     quantity = 1,
                 )
                 bagRepository.addToBag(bagItem, cpf)
+                NotificationEvents.sendEvent(Events.ProductAddedToBag())
             } catch (e: Exception) { }
         }
     }

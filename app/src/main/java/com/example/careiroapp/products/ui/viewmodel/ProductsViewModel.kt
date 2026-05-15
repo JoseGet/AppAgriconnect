@@ -17,6 +17,8 @@ import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaCou
 import com.example.careiroapp.products.domain.usecases.GetProductsByCategoriaUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsCountUseCase
 import com.example.careiroapp.products.domain.usecases.GetProductsUseCase
+import com.example.careiroapp.common.events.Events
+import com.example.careiroapp.common.events.NotificationEvents
 import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -299,6 +301,7 @@ class ProductsViewModel @Inject constructor(
                     quantity = 1,
                 )
                 bagRepository.addToBag(bagItem, cpf)
+                NotificationEvents.sendEvent(Events.ProductAddedToBag())
             } catch (e: Exception) { }
         }
     }

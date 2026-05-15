@@ -31,7 +31,7 @@ class HomeViewModel @Inject constructor(
 
     private fun getFeirasList() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isFairsLoading = true) }
             try {
                 val feirasListRequest = getFeirasUseCase.invoke()
                 if (feirasListRequest.isSuccessful) {
@@ -40,17 +40,20 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
             } finally {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(isFairsLoading = false) }
             }
         }
     }
 
     private fun getFeaturedProducts() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isFeaturedProductsLoading = true) }
             try {
                 val products = getProductsUseCase.invoke(offset = 0, limit = 2)
                 _uiState.update { it.copy(featuredProducts = (products ?: emptyList()).take(2)) }
             } catch (e: Exception) {
+            } finally {
+                _uiState.update { it.copy(isFeaturedProductsLoading = false) }
             }
         }
     }

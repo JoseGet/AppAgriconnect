@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -78,21 +77,36 @@ fun HomeView(
                 titulo = stringResource(R.string.produtos_e_associacoes_destaque),
                 subtitulo = null
             )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            Box(
+                modifier = Modifier
+                    .wrapContentSize(),
+                contentAlignment = Alignment.Center
             ) {
-                items(uiState.featuredProducts) { product ->
-                    ProductCard(
-                        modifier = Modifier.fillParentMaxWidth(0.5f),
-                        image = product.image,
-                        nomeProduto = product.nomeProduto,
-                        precoProduto = product.precoProduto,
-                        isPromocao = product.isPromocao,
-                        precoPromocao = product.precoPromocao,
-                        haveButton = false,
-                        onClick = {}
+                if (uiState.isFeaturedProductsLoading) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = R.drawable.load,
+                            imageLoader = imageLoader
+                        ),
+                        contentDescription = null
                     )
+                }
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.featuredProducts) { product ->
+                        ProductCard(
+                            modifier = Modifier.fillParentMaxWidth(0.5f),
+                            image = product.image,
+                            nomeProduto = product.nomeProduto,
+                            precoProduto = product.precoProduto,
+                            isPromocao = product.isPromocao,
+                            precoPromocao = product.precoPromocao,
+                            haveButton = false,
+                            onClick = {}
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -106,7 +120,7 @@ fun HomeView(
                     .wrapContentSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (uiState.isLoading) {
+                if (uiState.isFairsLoading) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             model = R.drawable.load,
