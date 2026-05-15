@@ -26,16 +26,11 @@ import javax.inject.Inject
 @HiltViewModel
 class AssociacaoViewModel @Inject constructor(
     private val getAssociacoesUseCase: GetAssociacoesUseCase,
-    private val getAssociacaoByIdUseCase: GetAssociacaoByIdUseCase,
-    private val getProductsByAssociacao: GetProductsByAssociacao,
-    private val bagRepository: BagRepository,
-    private val userRepository: UserRepository
 ): ViewModel() {
 
     private val _associacaoUiState = MutableStateFlow(AssociacaoUiState())
     var associacaoUiState: StateFlow<AssociacaoUiState> = _associacaoUiState.asStateFlow()
 
-    val userData: Flow<UserEntity?> = userRepository.getUserData()
 
     init {
         getAssociacoes()
@@ -68,60 +63,6 @@ class AssociacaoViewModel @Inject constructor(
                 )
             }
 
-        }
-    }
-
-    fun getAssociacaoById(id: UUID) {
-        viewModelScope.launch {
-            _associacaoUiState.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
-
-            val selectedAssociacao = getAssociacaoByIdUseCase.invoke(id)
-            val products = getProductsByAssociacao(id)
-
-            _associacaoUiState.update {
-                it.copy(
-                    isLoading = false,
-                    selectedAssociacao = selectedAssociacao,
-                    productsList = products
-                )
-            }
-
-        }
-    }
-
-    private suspend fun getProductsByAssociacao(idAssociacao: UUID): List<AssociacaoProductModel> {
-        return getProductsByAssociacao.invoke(idAssociacao) ?: emptyList()
-    }
-
-    fun clearSelectedAssociacao() {
-        viewModelScope.launch {
-            _associacaoUiState.update {
-                it.copy(
-                    selectedAssociacao = null,
-                    productsList = emptyList()
-                )
-            }
-        }
-    }
-
-    fun addProductToBag(product: AssociacaoProductModel, cpf: String) {
-        viewModelScope.launch {
-            try {
-                val bagItem = BagItem(
-                    productId = product.idProduct,
-                    name = product.nome,
-                    price = product.preco,
-                    imageUrl = product.image,
-                    quantity = 1,
-                    userId = cpf
-                )
-                bagRepository.addToBag(bagItem, cpf)
-                NotificationEvents.sendEvent(Events.ProductAddedToBag())
-            } catch (e: Exception) { }
         }
     }
 

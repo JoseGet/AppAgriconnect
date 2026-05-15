@@ -1,8 +1,6 @@
 package com.example.careiroapp.products.ui
 
-import android.os.Build.VERSION.SDK_INT
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,12 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
 import coil3.request.ImageRequest
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import coil3.request.crossfade
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.buttons.BackButton
@@ -50,15 +47,7 @@ fun SingleProductView(
     val productViewUiState by productViewModel.productUiState.collectAsState()
     val userData by productViewModel.userData.collectAsStateWithLifecycle(initialValue = null)
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     BackHandler() {
         navController.popBackStack()
@@ -83,10 +72,7 @@ fun SingleProductView(
             contentAlignment = Alignment.Center
         ) {
             if (productViewUiState.isLoading) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = R.drawable.load, imageLoader = imageLoader),
-                    contentDescription = null
-                )
+                LottieAnimation(loadingAnimation)
             }
             AsyncImage(
                 modifier = Modifier

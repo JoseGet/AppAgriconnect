@@ -1,7 +1,6 @@
 package com.example.careiroapp.loginCadastro.ui
 
 import android.app.Activity
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -38,10 +37,9 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.loginCadastro.ui.components.CadastroCard
 import com.example.careiroapp.loginCadastro.ui.components.LoginCard
@@ -71,15 +69,7 @@ fun LoginView(
         }
     }
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Box(
         modifier = Modifier
@@ -165,13 +155,7 @@ fun LoginView(
             }
         }
         if (uiState.isLoading) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = R.drawable.load,
-                    imageLoader = imageLoader
-                ),
-                contentDescription = null
-            )
+            LottieAnimation(loadingAnimation)
         }
     }
 }

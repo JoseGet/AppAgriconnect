@@ -33,7 +33,7 @@ sealed class NavigationItem(val route: String) {
     object Profile: NavigationItem(route = Screen.PROFILE.name)
     object SobreNos: NavigationItem(route = Screen.SOBRE_NOS.name)
     object FeiraUnica: NavigationItem(route = Screen.FEIRA_UNICA.name)
-    object AssociacaoUnica: NavigationItem(route = Screen.ASSOCIACAO_UNICA.name)
+    object AssociacaoUnica: NavigationItem(route = "${Screen.ASSOCIACAO_UNICA.name}/{associacaoId}")
 
     object Pedido: NavigationItem(route = Screen.PEDIDO.name)
     object PixStatus: NavigationItem(route = Screen.PIX_STATUS.name)

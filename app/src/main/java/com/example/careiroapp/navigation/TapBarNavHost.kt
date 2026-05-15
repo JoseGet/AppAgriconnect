@@ -1,5 +1,7 @@
 package com.example.careiroapp.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +17,7 @@ import com.example.careiroapp.AboutUsView
 import com.example.careiroapp.associacoes.ui.AssociacoesView
 import com.example.careiroapp.associacoes.ui.SingleAssociacaoView
 import com.example.careiroapp.associacoes.ui.viewmodel.AssociacaoViewModel
+import com.example.careiroapp.associacoes.ui.viewmodel.SingleAssociacaoViewModel
 import com.example.careiroapp.feiras.ui.FeirasView
 import com.example.careiroapp.feiras.ui.SingleFeiraView
 import com.example.careiroapp.feiras.ui.viewmodel.FeiraViewModel
@@ -78,7 +81,13 @@ fun TapBarNavHost(
         }
 
         composable(
-            NavigationItem.ProdutoUnico.route
+            NavigationItem.ProdutoUnico.route,
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    tween(1000)
+                )
+            }
         ) { backStackEntry ->
             val viewModel: ProductsViewModel =
                 if (navController.previousBackStackEntry != null) hiltViewModel(
@@ -126,17 +135,11 @@ fun TapBarNavHost(
         }
 
         composable(
-            NavigationItem.AssociacaoUnica.route
+            NavigationItem.AssociacaoUnica.route,
+            arguments = listOf(navArgument("associacaoId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val viewModel: AssociacaoViewModel =
-                if (navController.previousBackStackEntry != null) hiltViewModel(
-                    navController.previousBackStackEntry!!
-                ) else hiltViewModel()
-            SingleAssociacaoView(
-                navController,
-                viewModel,
-                resetScrollFunction
-            )
+            val viewModel: SingleAssociacaoViewModel = hiltViewModel(backStackEntry)
+            SingleAssociacaoView(navController, viewModel, resetScrollFunction)
         }
 
         composable(

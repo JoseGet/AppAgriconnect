@@ -89,7 +89,7 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                _profileUiState.update { it.copy(isLoading = true, pedidosPage = 1, hasMorePedidos = true) }
+                _profileUiState.update { it.copy(isLoading = true) }
 
                 val pedidos = pedidoRepository.getPedidos(page = 1, limit = PEDIDOS_PAGE_SIZE)
 
@@ -98,7 +98,6 @@ class ProfileViewModel @Inject constructor(
                     _profileUiState.update {
                         it.copy(
                             pedidosList = pedidosList,
-                            hasMorePedidos = pedidosList.size >= PEDIDOS_PAGE_SIZE
                         )
                     }
                 }
@@ -106,35 +105,6 @@ class ProfileViewModel @Inject constructor(
                 Log.e("ProfileVM", "Error loading pedidos", e)
             } finally {
                 _profileUiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
-    fun loadMorePedidos() {
-        val state = _profileUiState.value
-        if (state.isLoadingMore || !state.hasMorePedidos) return
-
-        viewModelScope.launch {
-            try {
-                _profileUiState.update { it.copy(isLoadingMore = true) }
-
-                val nextPage = state.pedidosPage + 1
-                val pedidos = pedidoRepository.getPedidos(page = nextPage, limit = PEDIDOS_PAGE_SIZE)
-
-                if (pedidos.isSuccessful) {
-                    val newPedidos = pedidos.body() ?: emptyList()
-                    _profileUiState.update {
-                        it.copy(
-                            pedidosList = it.pedidosList + newPedidos,
-                            pedidosPage = nextPage,
-                            hasMorePedidos = newPedidos.size >= PEDIDOS_PAGE_SIZE
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("ProfileVM", "Error loading more pedidos", e)
-            } finally {
-                _profileUiState.update { it.copy(isLoadingMore = false) }
             }
         }
     }

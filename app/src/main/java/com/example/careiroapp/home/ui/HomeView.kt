@@ -1,6 +1,5 @@
 package com.example.careiroapp.home.ui
 
-import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.home.ui.components.CategoriasModule
@@ -50,15 +48,7 @@ fun HomeView(
     val viewModel = hiltViewModel<HomeViewModel>()
     val uiState by viewModel.uiState.collectAsState()
 
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Column() {
         Image(
@@ -83,13 +73,7 @@ fun HomeView(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isFeaturedProductsLoading) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.load,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = null
-                    )
+                    LottieAnimation(loadingAnimation)
                 }
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -121,13 +105,7 @@ fun HomeView(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isFairsLoading) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            model = R.drawable.load,
-                            imageLoader = imageLoader
-                        ),
-                        contentDescription = null
-                    )
+                    LottieAnimation(loadingAnimation)
                 }
                 LazyRow(
                     modifier = Modifier

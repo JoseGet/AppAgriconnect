@@ -1,11 +1,9 @@
 package com.example.careiroapp.bag.ui
 
 import android.os.Build
-import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,10 +27,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
@@ -52,15 +49,7 @@ fun CheckoutView(
     val totalPrice by viewModel.totalPrice.observeAsState(0.0)
     val bagItems by viewModel.cartItems.collectAsStateWithLifecycle()
 
-    val imageLoader = ImageLoader.Builder(LocalContext.current)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Scaffold(
         topBar = {
@@ -150,13 +139,9 @@ fun CheckoutView(
                 }
             }
             if (bagUiState.isLoading) {
-                Image(
-                    modifier = Modifier.align(Alignment.Center),
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.load,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = null
+                LottieAnimation(
+                    loadingAnimation,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }

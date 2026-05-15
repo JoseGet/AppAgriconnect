@@ -1,7 +1,5 @@
 package com.example.careiroapp.profile.ui
 
-import android.os.Build.VERSION.SDK_INT
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,10 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.navigation.NavigationItem
@@ -61,16 +58,7 @@ fun ProfileView(
     val context = LocalContext.current
     val uriImage = "android.resource://${context.packageName}/$noProfileImage"
     val gridListState = rememberLazyGridState()
-
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     Column(
         modifier = Modifier
@@ -106,17 +94,6 @@ fun ProfileView(
                 }
 
                 val pedidosListState = rememberLazyListState()
-                val shouldLoadMore = remember {
-                    derivedStateOf {
-                        val lastVisible = pedidosListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
-                        val total = pedidosListState.layoutInfo.totalItemsCount
-                        total > 0 && lastVisible >= total - 2
-                    }
-                }
-
-                LaunchedEffect(shouldLoadMore.value) {
-                    if (shouldLoadMore.value) viewModel.loadMorePedidos()
-                }
 
                 Box(
                     modifier = Modifier
@@ -125,13 +102,7 @@ fun ProfileView(
                     contentAlignment = Alignment.Center
                 ) {
                     if (profileUiState.isLoading) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.load,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null
-                        )
+                        LottieAnimation(loadingAnimation)
                     }
                     LazyColumn(
                         state = pedidosListState,
@@ -151,18 +122,6 @@ fun ProfileView(
                                     resetScrollFunction()
                                 }
                             )
-                        }
-                        if (profileUiState.isLoadingMore) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
                         }
                     }
                 }
@@ -185,13 +144,7 @@ fun ProfileView(
                     contentAlignment = Alignment.Center
                 ) {
                     if (profileUiState.isLoading) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = R.drawable.load,
-                                imageLoader = imageLoader
-                            ),
-                            contentDescription = null
-                        )
+                        LottieAnimation(loadingAnimation)
                     }
                     LazyVerticalGrid(
                         state = gridListState,

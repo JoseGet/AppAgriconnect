@@ -1,9 +1,8 @@
+
 package com.example.careiroapp.feiras.ui
 
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +18,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil3.ImageLoader
-import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.SingleImage
 import com.example.careiroapp.common.components.buttons.BackButton
@@ -40,16 +38,7 @@ fun SingleFeiraView(
 
     val context: Context = LocalContext.current
     val uiState by feiraViewModel.feiraUiState.collectAsState()
-
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            if (SDK_INT >= 28) {
-                add(AnimatedImageDecoder.Factory())
-            } else {
-                add(GifDecoder.Factory())
-            }
-        }
-        .build()
+    val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
     BackHandler() {
         navController.popBackStack()
@@ -74,13 +63,7 @@ fun SingleFeiraView(
             contentAlignment = Alignment.Center
         ) {
             if (uiState.isLoading) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = R.drawable.load,
-                        imageLoader = imageLoader
-                    ),
-                    contentDescription = null
-                )
+                LottieAnimation(loadingAnimation)
             }
             SingleImage(uiState.selectedFeira?.image)
         }
