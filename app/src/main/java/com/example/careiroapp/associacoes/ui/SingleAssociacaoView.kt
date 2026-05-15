@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.associacoes.data.models.AssociacaoModel
@@ -57,7 +58,7 @@ fun SingleAssociacaoView(
     Box() {
         when (val state = uiState) {
             is SingleAssociacaoUiState.Loading -> {
-                LottieAnimation(loadingAnimation)
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
 
             is SingleAssociacaoUiState.Success -> {

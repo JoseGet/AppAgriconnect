@@ -59,11 +59,7 @@ fun PixStatusView(
             if (!isPixPaymentDone) {
                 navController.popBackStack()
             } else {
-                navController.navigate(NavigationItem.Profile.route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
-                    }
-                }
+                navController.popBackStack(NavigationItem.Profile.route, false)
             }
         })
         Spacer(Modifier.height(16.dp))

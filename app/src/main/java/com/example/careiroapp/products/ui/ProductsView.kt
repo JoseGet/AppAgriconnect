@@ -31,12 +31,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.common.montserratBoldFontFamily
-import com.example.careiroapp.navigation.NavigationItem
-import com.example.careiroapp.products.ui.components.FeaturedProducts
+import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.FilterRow
 import com.example.careiroapp.products.ui.components.ProductsGrid
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
@@ -101,7 +101,7 @@ fun ProductsView(
             contentAlignment = Alignment.Center
         ) {
             if (productViewUiState.isLoading) {
-                LottieAnimation(loadingAnimation)
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
             Column(
                 modifier = Modifier
@@ -127,11 +127,7 @@ fun ProductsView(
                     gridListState = gridListState,
                     list = productViewUiState.productsCardList,
                     onItemClicker = { id ->
-                        productViewModel.getProductById(
-                            userData?.cpf ?: "",
-                            id
-                        )
-                        navController.navigate(NavigationItem.ProdutoUnico.route)
+                        navController.navigate("${Screen.PRODUTO_UNICO.name}/$id")
                         resetScrollFunction()
                     },
                     loadMore = {

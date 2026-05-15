@@ -2,31 +2,28 @@ package com.example.careiroapp.feiras.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowColumn
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
 import com.example.careiroapp.feiras.ui.components.FeirasGrid
 import com.example.careiroapp.feiras.ui.viewmodel.FeiraViewModel
-import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.navigation.Screen
 
 @Composable
 fun FeirasView(
@@ -54,7 +51,7 @@ fun FeirasView(
         ) {
 
             if (uiState.isLoading) {
-                LottieAnimation(loadingAnimation)
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
 
             Column(
@@ -64,8 +61,7 @@ fun FeirasView(
                 FeirasGrid(
                     list = uiState.feirasCardList,
                     onClickCard = { id ->
-                        feiraViewModel.getFeiraById(id)
-                        navController.navigate(NavigationItem.FeiraUnica.route)
+                        navController.navigate("${Screen.FEIRA_UNICA.name}/$id")
                     }
                 )
             }

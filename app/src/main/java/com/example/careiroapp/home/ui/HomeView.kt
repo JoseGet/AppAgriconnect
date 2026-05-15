@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
@@ -35,6 +36,7 @@ import com.example.careiroapp.home.ui.components.HomeCardFeira
 import com.example.careiroapp.home.ui.components.TutorialRow
 import com.example.careiroapp.home.ui.viewmodel.HomeViewModel
 import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.ProductCard
 
 @Composable
@@ -73,7 +75,7 @@ fun HomeView(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isFeaturedProductsLoading) {
-                    LottieAnimation(loadingAnimation)
+                    LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                 }
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -88,7 +90,10 @@ fun HomeView(
                             isPromocao = product.isPromocao,
                             precoPromocao = product.precoPromocao,
                             haveButton = false,
-                            onClick = {}
+                            onClick = {
+                                navController.navigate("${Screen.PRODUTO_UNICO.name}/${product.id}")
+                                resetScrollFunction()
+                            }
                         )
                     }
                 }
@@ -105,7 +110,7 @@ fun HomeView(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isFairsLoading) {
-                    LottieAnimation(loadingAnimation)
+                    LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                 }
                 LazyRow(
                     modifier = Modifier

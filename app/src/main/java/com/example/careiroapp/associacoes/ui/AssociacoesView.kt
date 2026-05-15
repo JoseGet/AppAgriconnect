@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.associacoes.ui.components.AssociacoesGrid
@@ -51,7 +52,7 @@ fun AssociacoesView(
             contentAlignment = Alignment.Center
         ) {
             if (uiState.isLoading) {
-                LottieAnimation(loadingAnimation)
+                LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
             }
 
             Column(

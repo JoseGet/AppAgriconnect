@@ -21,14 +21,18 @@ import com.example.careiroapp.associacoes.ui.viewmodel.SingleAssociacaoViewModel
 import com.example.careiroapp.feiras.ui.FeirasView
 import com.example.careiroapp.feiras.ui.SingleFeiraView
 import com.example.careiroapp.feiras.ui.viewmodel.FeiraViewModel
+import com.example.careiroapp.feiras.ui.viewmodel.SingleFeiraViewModel
 import com.example.careiroapp.home.ui.HomeView
 import com.example.careiroapp.products.ui.ProductsView
 import com.example.careiroapp.products.ui.SingleProductView
 import com.example.careiroapp.products.ui.viewmodel.ProductsViewModel
+import com.example.careiroapp.products.ui.viewmodel.SingleProductViewModel
 import com.example.careiroapp.profile.ui.OrderView
 import com.example.careiroapp.profile.ui.PixStatusView
 import com.example.careiroapp.profile.ui.ProfileView
 import com.example.careiroapp.profile.ui.viewmodel.ProfileViewModel
+import com.example.careiroapp.profile.ui.viewmodel.SingleOrderUiState
+import com.example.careiroapp.profile.ui.viewmodel.SingleOrderViewModel
 
 @Composable
 fun TapBarNavHost(
@@ -82,20 +86,12 @@ fun TapBarNavHost(
 
         composable(
             NavigationItem.ProdutoUnico.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Left,
-                    tween(1000)
-                )
-            }
+            arguments = listOf(navArgument("productId") { type = NavType.StringType }),
         ) { backStackEntry ->
-            val viewModel: ProductsViewModel =
-                if (navController.previousBackStackEntry != null) hiltViewModel(
-                    navController.previousBackStackEntry!!
-                ) else hiltViewModel()
+            val viewModel: SingleProductViewModel = hiltViewModel(backStackEntry)
             SingleProductView(
                 navController,
-                productViewModel = viewModel,
+                viewModel,
                 resetScrollFunction
             )
         }
@@ -111,12 +107,10 @@ fun TapBarNavHost(
         }
 
         composable(
-            NavigationItem.FeiraUnica.route
+            NavigationItem.FeiraUnica.route,
+            arguments = listOf(navArgument("feiraId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val viewModel: FeiraViewModel =
-                if (navController.previousBackStackEntry != null) hiltViewModel(
-                    navController.previousBackStackEntry!!
-                ) else hiltViewModel()
+            val viewModel: SingleFeiraViewModel = hiltViewModel(backStackEntry)
             SingleFeiraView(
                 navController,
                 viewModel,
@@ -152,18 +146,13 @@ fun TapBarNavHost(
         }
 
         composable(
-            NavigationItem.Pedido.route
-        ) {
-            val viewModel: ProfileViewModel =
-                if (navController.previousBackStackEntry != null) hiltViewModel(
-                    navController.previousBackStackEntry!!
-                ) else hiltViewModel()
+            NavigationItem.Pedido.route,
+            arguments = listOf(navArgument("pedidoId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val viewModel: SingleOrderViewModel = hiltViewModel(backStackEntry)
             OrderView(
                 navController,
-                viewModel.profileUiState.value.selectedPedido,
-                clearSelectedOrder = {
-                    viewModel.clearSelectedOrder()
-                },
+                viewModel,
                 onPixPaymentClick = {
                     navController.navigate(NavigationItem.PixStatus.route)
                 }
@@ -173,16 +162,23 @@ fun TapBarNavHost(
         composable(
             NavigationItem.PixStatus.route
         ) {
-            val viewModel: ProfileViewModel = hiltViewModel(
-                navController.getBackStackEntry(NavigationItem.Profile.route)
-            )
-            val uiState by viewModel.profileUiState.collectAsStateWithLifecycle()
-            LaunchedEffect(Unit) {
-                viewModel.getPixStatus(uiState.selectedPedido?.pixPaymentId ?: "")
+            val pedidoEntry = try {
+                navController.getBackStackEntry(NavigationItem.Pedido.route)
+            } catch (e: IllegalArgumentException) {
+                return@composable
+            }
+            val viewModel: SingleOrderViewModel = hiltViewModel(pedidoEntry)
+            val pixStatus by viewModel.pixStatus.collectAsStateWithLifecycle()
+            val uiState by viewModel.singleOrderUiState.collectAsStateWithLifecycle()
+            LaunchedEffect(uiState) {
+                val pixPaymentId = (uiState as? SingleOrderUiState.Success)?.pedido?.pixPaymentId
+                if (!pixPaymentId.isNullOrBlank()) {
+                    viewModel.getPixStatus(pixPaymentId)
+                }
             }
             PixStatusView(
                 navController = navController,
-                pixStatus = uiState.pixStatus,
+                pixStatus = pixStatus,
                 isPixPaymentDone = viewModel.pixPaymentDone.value
             )
         }

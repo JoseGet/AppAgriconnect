@@ -23,6 +23,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -72,7 +73,8 @@ fun CheckoutView(
                             viewModel.resetOrderState()
                         }
                     }
-                }
+                },
+                isLoading = bagUiState.isLoading
             )
         },
         containerColor = colorResource(R.color.light_background)
@@ -139,10 +141,18 @@ fun CheckoutView(
                 }
             }
             if (bagUiState.isLoading) {
-                LottieAnimation(
-                    loadingAnimation,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .zIndex(1f)
+                        .pointerInput(Unit){}
+                ) {
+                    LottieAnimation(
+                        loadingAnimation,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
     }

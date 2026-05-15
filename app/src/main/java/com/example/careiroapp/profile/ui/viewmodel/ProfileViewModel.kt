@@ -1,13 +1,9 @@
 package com.example.careiroapp.profile.ui.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.careiroapp.bag.data.models.Pedidos
 import com.example.careiroapp.bag.data.repository.BagRepository
-import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.common.events.Events
 import com.example.careiroapp.common.events.NotificationEvents
@@ -31,36 +27,18 @@ class ProfileViewModel @Inject constructor(
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val userRepository: UserRepository,
     private val pedidoRepository: PedidoRepository,
-    private val paymentRepository: PaymentRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _profileUiState: MutableStateFlow<ProfileUiState> = MutableStateFlow(ProfileUiState())
     var profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
 
-    val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
-
-    init {
-        viewModelScope.launch {
-            NotificationEvents.events.collect { event ->
-                when (event) {
-                    is Events.PaymentPixConfirmed -> {
-                        pixPaymentDone.value = true
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
-
     fun setCurrentModule(newModule: ProfileModules) {
         _profileUiState.update { it.copy(currentProfileModule = newModule) }
     }
 
-    fun getFavoritesProducts(
-        cpf: String
-    ) {
+    fun getFavoritesProducts(cpf: String) {
         if (_profileUiState.value.isLoading) return
 
         viewModelScope.launch {
@@ -71,13 +49,12 @@ class ProfileViewModel @Inject constructor(
 
                 if (favoriteRes.isSuccessful) {
                     val favoriteList = favoriteRes.body()
-                    _profileUiState.update { it.copy(
-                        favoriteItensList = favoriteList?.toList() ?: emptyList()
-                    ) }
+                    _profileUiState.update {
+                        it.copy(favoriteItensList = favoriteList?.toList() ?: emptyList())
+                    }
                 }
-
             } catch (e: Exception) {
-                Log.e("ProfileVM", "Error loading favorites", e)
+                Log.e(TAG, "Error loading favorites", e)
             } finally {
                 _profileUiState.update { it.copy(isLoading = false) }
             }
@@ -95,46 +72,10 @@ class ProfileViewModel @Inject constructor(
 
                 if (pedidos.isSuccessful) {
                     val pedidosList = pedidos.body() ?: emptyList()
-                    _profileUiState.update {
-                        it.copy(
-                            pedidosList = pedidosList,
-                        )
-                    }
+                    _profileUiState.update { it.copy(pedidosList = pedidosList) }
                 }
             } catch (e: Exception) {
-                Log.e("ProfileVM", "Error loading pedidos", e)
-            } finally {
-                _profileUiState.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
-    fun updateSelectedPedido(pedido: Pedidos) {
-        _profileUiState.update {
-            it.copy(
-                selectedPedido = pedido
-            )
-        }
-    }
-
-    fun clearSelectedOrder() {
-        _profileUiState.update {
-            it.copy(
-                selectedPedido = null
-            )
-        }
-    }
-
-    fun getPixStatus(id: String) {
-        viewModelScope.launch {
-            try {
-                _profileUiState.update { it.copy(isLoading = true) }
-                val response = paymentRepository.getPixStatus(id)
-                if (response.isSuccessful) {
-                    _profileUiState.update { it.copy(pixStatus = response.body()) }
-                }
-            } catch (e: Exception) {
-                Log.e("ProfileVM", "Error fetching pix status", e)
+                Log.e(TAG, "Error loading pedidos", e)
             } finally {
                 _profileUiState.update { it.copy(isLoading = false) }
             }
@@ -159,6 +100,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     companion object {
+        private const val TAG = "ProfileViewModel"
         private const val PEDIDOS_PAGE_SIZE = 10
     }
 }
