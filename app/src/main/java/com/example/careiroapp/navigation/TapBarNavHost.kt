@@ -6,8 +6,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -172,10 +175,16 @@ fun TapBarNavHost(
             val viewModel: SingleOrderViewModel = hiltViewModel(pedidoEntry)
             val pixStatus by viewModel.pixStatus.collectAsStateWithLifecycle()
             val uiState by viewModel.singleOrderUiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
             LaunchedEffect(uiState) {
                 val pixPaymentId = (uiState as? SingleOrderUiState.Success)?.pedido?.pixPaymentId
                 if (!pixPaymentId.isNullOrBlank()) {
                     viewModel.getPixStatus(pixPaymentId)
+                }
+            }
+            LaunchedEffect(lifecycleOwner) {
+                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.checkPixStatusNow()
                 }
             }
             PixStatusView(

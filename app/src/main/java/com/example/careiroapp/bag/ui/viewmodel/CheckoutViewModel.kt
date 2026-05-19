@@ -32,6 +32,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,6 +50,9 @@ class CheckoutViewModel @Inject constructor(
     val checkoutUiState: StateFlow<CheckoutUiState> = _checkoutUiState.asStateFlow()
     private val _currentOrder = MutableStateFlow(OrderModel())
     val currentOrder: StateFlow<OrderModel> = _currentOrder.asStateFlow()
+
+    private var pixPaymentId: String? = null
+    private var pixPollingJob: Job? = null
 
     val userData: Flow<UserEntity?> = userRepository.getUserData()
 
@@ -140,6 +146,7 @@ class CheckoutViewModel @Inject constructor(
                             val paymentResponse = paymentRepository.createPixPayment(pixPaymentBody)
 
                             if (paymentResponse.isSuccessful) {
+                                val paymentId = paymentResponse.body()?.data?.id
                                 _currentOrder.update {
                                     it.copy(
                                         totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
@@ -149,6 +156,10 @@ class CheckoutViewModel @Inject constructor(
                                 }
                                 userData.firstOrNull()?.cpf?.let { cpf -> repository.clearBag(cpf) }
                                 _checkoutUiState.value = CheckoutUiState.Success(isOrderComplete = true)
+                                if (paymentId != null) {
+                                    pixPaymentId = paymentId
+                                    startPixPolling()
+                                }
                             } else {
                                 _checkoutUiState.value = CheckoutUiState.None(
                                     order = _currentOrder.value,
@@ -241,5 +252,37 @@ class CheckoutViewModel @Inject constructor(
         if (current is CheckoutUiState.None) {
             _checkoutUiState.value = current.copy(order = _currentOrder.value)
         }
+    }
+
+    fun checkPixStatusNow() {
+        val id = pixPaymentId ?: return
+        val current = _checkoutUiState.value
+        if (current !is CheckoutUiState.Success || current.isPaymentPixDone) return
+        viewModelScope.launch { handlePixStatusCheck(id) }
+    }
+
+    private fun startPixPolling() {
+        pixPollingJob?.cancel()
+        val id = pixPaymentId ?: return
+        pixPollingJob = viewModelScope.launch {
+            while (isActive) {
+                delay(5_000)
+                handlePixStatusCheck(id)
+                if ((_checkoutUiState.value as? CheckoutUiState.Success)?.isPaymentPixDone == true) break
+            }
+        }
+    }
+
+    private suspend fun handlePixStatusCheck(id: String) {
+        try {
+            val response = paymentRepository.getPixStatus(id)
+            if (response.isSuccessful && response.body()?.success == true) {
+                val current = _checkoutUiState.value
+                if (current is CheckoutUiState.Success && !current.isPaymentPixDone) {
+                    _checkoutUiState.value = current.copy(isPaymentPixDone = true)
+                    pixPollingJob?.cancel()
+                }
+            }
+        } catch (e: Exception) { }
     }
 }
