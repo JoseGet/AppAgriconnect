@@ -18,7 +18,7 @@ enum class PaymentType{
     DINHEIRO
 }
 
-enum class OrderState{
+enum class OrderState {
     PENDENTE,
     CONFIRMADO,
     EXPIRADO
@@ -26,16 +26,14 @@ enum class OrderState{
 
 enum class CheckoutStep {
     ONE,
-    TWO,
-    FINAL
+    TWO
 }
 
-data class OrderModel (
+data class OrderModel(
     val date: String = "",
     val time: String = "",
     val address: String = "",
     val paymentType: PaymentType? = null,
-    val items: List<ProductModel> = emptyList(),
     val totalValue: Float = 0f,
     val pixPayload: String? = null,
     val pixQrCode: String? = null

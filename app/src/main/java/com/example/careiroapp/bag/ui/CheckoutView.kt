@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -28,6 +28,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.components.BagTopBar
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutStep
+import com.example.careiroapp.bag.ui.viewmodel.CheckoutUiState
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutViewModel
 import com.example.careiroapp.navigation.NavigationItem
 
@@ -36,90 +37,98 @@ import com.example.careiroapp.navigation.NavigationItem
 fun CheckoutView(
     navController: NavController
 ) {
-
     val viewModel: CheckoutViewModel = hiltViewModel()
     val uiState by viewModel.checkoutUiState.collectAsStateWithLifecycle()
+    val orderData by viewModel.currentOrder.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val totalPrice by viewModel.totalPrice.observeAsState(0.0)
     val bagItems by viewModel.cartItems.collectAsStateWithLifecycle()
 
     val loadingAnimation by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading_animation))
 
+    val isLoading = uiState is CheckoutUiState.Loading
+
     Scaffold(
         topBar = {
             BagTopBar(
                 onBackClick = {
-                    when (uiState.checkoutStep) {
-                        CheckoutStep.ONE -> {
+                    when (uiState) {
+                        is CheckoutUiState.None if (uiState as CheckoutUiState.None).checkoutStep == CheckoutStep.ONE -> {
                             navController.popBackStack()
                         }
-                        CheckoutStep.TWO -> {
+
+                        is CheckoutUiState.None if (uiState as CheckoutUiState.None).checkoutStep == CheckoutStep.TWO -> {
                             viewModel.changeCheckoutStep(CheckoutStep.ONE)
                             viewModel.resetPaymentMode()
                         }
-                        CheckoutStep.FINAL -> {
+
+                        is CheckoutUiState.Success -> {
                             navController.navigate(NavigationItem.Main.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
                                 }
                             }
-                            viewModel.resetOrderState()
                         }
+
+                        else -> {}
                     }
                 },
-                isLoading = uiState.isLoading
+                isLoading = isLoading
             )
         },
         containerColor = colorResource(R.color.light_background)
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopStart
         ) {
-            when(uiState.checkoutStep) {
-
-                CheckoutStep.ONE -> {
-                     CheckoutStepOneView(
-                        innerPadding,
-                        onButtonClick = {date,time, local ->
-                            viewModel.saveOrderDateLocal(date, time, local = local)
-                            viewModel.changeCheckoutStep(CheckoutStep.TWO)
+            when (val state = uiState) {
+                is CheckoutUiState.None -> {
+                    when (state.checkoutStep) {
+                        CheckoutStep.ONE -> {
+                            CheckoutStepOneView(
+                                innerPadding,
+                                onButtonClick = { date, time, local ->
+                                    viewModel.saveOrderDateLocal(date, time, local = local)
+                                    viewModel.changeCheckoutStep(CheckoutStep.TWO)
+                                }
+                            )
                         }
-                    )
-                }
-
-                CheckoutStep.TWO -> {
-                    CheckoutStepTwoView (
-                        innerPadding,
-                        orderData = uiState.order,
-                        productsList = bagItems,
-                        totalValue = totalPrice,
-                        onButtonClick = {
-                            if (uiState.order.paymentType == null) {
-                                Toast.makeText(context, "Selecione uma forma de pagamento", Toast.LENGTH_SHORT).show()
-                            } else {
-                                viewModel.createPedido()
-                            }
-                        },
-                        updatePaymentType = { paymentType ->
-                            viewModel.updatePaymentType(paymentType)
+                        CheckoutStep.TWO -> {
+                            CheckoutStepTwoView(
+                                innerPadding,
+                                orderData = orderData,
+                                productsList = bagItems,
+                                totalValue = totalPrice,
+                                onButtonClick = {
+                                    if (orderData.paymentType == null) {
+                                        Toast.makeText(
+                                            context,
+                                            "Selecione uma forma de pagamento",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        viewModel.createPedido()
+                                    }
+                                },
+                                updatePaymentType = { paymentType ->
+                                    viewModel.updatePaymentType(paymentType)
+                                }
+                            )
                         }
-                    )
+                    }
                 }
-
-                CheckoutStep.FINAL -> {
+                is CheckoutUiState.Success -> {
                     CheckoutFinalStepView(
                         innerPadding,
-                        orderData = uiState.order,
-                        isPaymentPixDone = uiState.isPaymentPixDone,
+                        orderData = orderData,
+                        isPaymentPixDone = state.isPaymentPixDone,
                         onClickLeftButton = {
                             navController.navigate(NavigationItem.Main.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
                                 }
                             }
-                            viewModel.resetOrderState()
                         },
                         onClickRightButton = {
                             viewModel.setNeedsProfileRedirect()
@@ -128,18 +137,19 @@ fun CheckoutView(
                                     inclusive = true
                                 }
                             }
-                            viewModel.resetOrderState()
                         }
                     )
                 }
+                is CheckoutUiState.Loading -> {}
             }
-            if (uiState.isLoading) {
+
+            if (isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black.copy(alpha = 0.5f))
                         .zIndex(1f)
-                        .pointerInput(Unit){}
+                        .pointerInput(Unit) {}
                 ) {
                     LottieAnimation(
                         loadingAnimation,
