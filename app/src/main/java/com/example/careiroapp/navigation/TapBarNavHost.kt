@@ -15,6 +15,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.careiroapp.AboutUsView
 import com.example.careiroapp.associacoes.ui.AssociacoesView
+import com.example.careiroapp.search.ui.SearchResultView
+import com.example.careiroapp.search.ui.viewmodel.SearchViewModel
 import com.example.careiroapp.associacoes.ui.SingleAssociacaoView
 import com.example.careiroapp.associacoes.ui.viewmodel.AssociacaoViewModel
 import com.example.careiroapp.associacoes.ui.viewmodel.SingleAssociacaoViewModel
@@ -180,6 +182,17 @@ fun TapBarNavHost(
                 navController = navController,
                 pixStatus = pixStatus,
                 isPixPaymentDone = viewModel.pixPaymentDone.value
+            )
+        }
+
+        composable(
+            NavigationItem.Busca.route,
+            arguments = listOf(navArgument("query") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val viewModel: SearchViewModel = hiltViewModel(backStackEntry)
+            SearchResultView(
+                navController = navController,
+                viewModel = viewModel
             )
         }
 

@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.R
 import com.example.careiroapp.navigation.NavigationItem
+import com.example.careiroapp.navigation.Screen
 
 @Composable
 fun AppHeader(
@@ -37,7 +38,11 @@ fun AppHeader(
             rightIconAction = { appNavController.navigate(NavigationItem.Sacola.route) },
             bagItemsCount = bagItemsCount
         )
-        AppSearchBar()
+        AppSearchBar(
+            onSearch = { query ->
+                tabBarNavController.navigate("${Screen.BUSCA.name}/$query")
+            }
+        )
         Spacer(Modifier.height(16.dp))
         ModulesBar(
             navController = tabBarNavController,

@@ -2,10 +2,17 @@ package com.example.careiroapp.bag.ui.viewmodel
 
 import com.example.careiroapp.products.data.models.ProductModel
 
-data class OrderUiState(
-    val isLoading: Boolean = false,
-    val order: OrderModel = OrderModel(),
-)
+sealed class CheckoutUiState {
+    object Loading: CheckoutUiState()
+    data class None(
+        val order: OrderModel = OrderModel(),
+        val checkoutStep: CheckoutStep = CheckoutStep.ONE,
+    ): CheckoutUiState()
+    data class Success(
+        val isOrderComplete: Boolean,
+        val isPaymentPixDone: Boolean = false
+    ): CheckoutUiState()
+}
 enum class PaymentType{
     PIX,
     DINHEIRO
@@ -15,6 +22,12 @@ enum class OrderState{
     PENDENTE,
     CONFIRMADO,
     EXPIRADO
+}
+
+enum class CheckoutStep {
+    ONE,
+    TWO,
+    FINAL
 }
 
 data class OrderModel (

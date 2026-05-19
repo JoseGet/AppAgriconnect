@@ -150,4 +150,6 @@ dependencies {
     //Firebase Messaging
     implementation("com.google.firebase:firebase-messaging")
 
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
+
 }

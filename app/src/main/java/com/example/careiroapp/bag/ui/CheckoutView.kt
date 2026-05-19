@@ -1,24 +1,18 @@
 package com.example.careiroapp.bag.ui
 
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -33,8 +27,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.bag.ui.components.BagTopBar
-import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
 import com.example.careiroapp.bag.ui.viewmodel.CheckoutStep
+import com.example.careiroapp.bag.ui.viewmodel.CheckoutViewModel
 import com.example.careiroapp.navigation.NavigationItem
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -43,9 +37,8 @@ fun CheckoutView(
     navController: NavController
 ) {
 
-    val viewModel: BagViewModel = hiltViewModel()
-    val bagUiState by viewModel.uiState.collectAsState()
-    val orderUiState by viewModel.orderUiState.collectAsState()
+    val viewModel: CheckoutViewModel = hiltViewModel()
+    val uiState by viewModel.checkoutUiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val totalPrice by viewModel.totalPrice.observeAsState(0.0)
     val bagItems by viewModel.cartItems.collectAsStateWithLifecycle()
@@ -56,7 +49,7 @@ fun CheckoutView(
         topBar = {
             BagTopBar(
                 onBackClick = {
-                    when (bagUiState.checkoutStep) {
+                    when (uiState.checkoutStep) {
                         CheckoutStep.ONE -> {
                             navController.popBackStack()
                         }
@@ -74,7 +67,7 @@ fun CheckoutView(
                         }
                     }
                 },
-                isLoading = bagUiState.isLoading
+                isLoading = uiState.isLoading
             )
         },
         containerColor = colorResource(R.color.light_background)
@@ -84,7 +77,7 @@ fun CheckoutView(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopStart
         ) {
-            when(bagUiState.checkoutStep) {
+            when(uiState.checkoutStep) {
 
                 CheckoutStep.ONE -> {
                      CheckoutStepOneView(
@@ -99,11 +92,11 @@ fun CheckoutView(
                 CheckoutStep.TWO -> {
                     CheckoutStepTwoView (
                         innerPadding,
-                        orderData = orderUiState.order,
+                        orderData = uiState.order,
                         productsList = bagItems,
                         totalValue = totalPrice,
                         onButtonClick = {
-                            if (orderUiState.order.paymentType == null) {
+                            if (uiState.order.paymentType == null) {
                                 Toast.makeText(context, "Selecione uma forma de pagamento", Toast.LENGTH_SHORT).show()
                             } else {
                                 viewModel.createPedido()
@@ -118,8 +111,8 @@ fun CheckoutView(
                 CheckoutStep.FINAL -> {
                     CheckoutFinalStepView(
                         innerPadding,
-                        orderData = orderUiState.order,
-                        isPaymentPixDone = viewModel.pixPaymentDone.value,
+                        orderData = uiState.order,
+                        isPaymentPixDone = uiState.isPaymentPixDone,
                         onClickLeftButton = {
                             navController.navigate(NavigationItem.Main.route) {
                                 popUpTo(navController.graph.startDestinationId) {
@@ -140,7 +133,7 @@ fun CheckoutView(
                     )
                 }
             }
-            if (bagUiState.isLoading) {
+            if (uiState.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
