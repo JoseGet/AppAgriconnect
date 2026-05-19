@@ -71,14 +71,14 @@ fun PersonalDataWidget(
                 stringResource(R.string.telefone_perfil),
                 telefonePerfil
             )
-            Spacer(Modifier.height(16.dp))
-            OutlineAppButton(
-                text = stringResource(R.string.alterar_dados),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                onClick = {},
-                icon = painterResource(R.drawable.pencil),
-            )
+//            Spacer(Modifier.height(16.dp))
+//            OutlineAppButton(
+//                text = stringResource(R.string.alterar_dados),
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                onClick = {},
+//                icon = painterResource(R.drawable.pencil),
+//            )
         }
     }
 }

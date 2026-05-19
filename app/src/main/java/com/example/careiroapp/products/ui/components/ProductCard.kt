@@ -47,7 +47,8 @@ fun ProductCard(
     precoPromocao: Double?,
     haveButton: Boolean,
     onClick: () -> Unit,
-    onButtonClick: () -> Unit = {}
+    onButtonClick: () -> Unit = {},
+    nomeVendedor: String? = null
 ) {
 
     val modifiedPrecoProduto = String.format("%.2f", precoProduto).replace('.', ',');
@@ -116,6 +117,17 @@ fun ProductCard(
                         ),
                     )
                 }
+            }
+            if (nomeVendedor != null) {
+                Text(
+                    nomeVendedor,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 12.sp,
+                        fontFamily = montserratMediumFontFamily,
+                    )
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
             if (haveButton) {

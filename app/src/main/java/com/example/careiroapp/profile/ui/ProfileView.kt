@@ -68,119 +68,125 @@ fun ProfileView(
             .fillMaxSize()
             .background(color = Color.White)
             .padding(vertical = 24.dp, horizontal = 16.dp),
+
     ) {
         ModulesHeader(
             titulo = "Meu Perfil",
             subtitulo = null
         )
         Spacer(Modifier.height(24.dp))
-        ProfileDataWidget(
-            nomePerfil = userData?.name ?: "",
-            emailPerfil = userData?.email ?: "",
-            telefonePerfil = userData?.telefone ?: "",
-            fotoPerfil = userData?.fotoPerfil?.takeIf { it.isNotBlank() } ?: uriImage
-        )
-        Spacer(Modifier.height(24.dp))
-        ProfileModulesBar(
-            profileUiState.currentProfileModule,
-            onCLick = { profileModule ->
-                viewModel.setCurrentModule(profileModule)
-            }
-        )
-        Spacer(Modifier.height(24.dp))
-        when (profileUiState.currentProfileModule) {
-
-            ProfileModules.PEDIDOS -> {
-
-                LaunchedEffect(Unit) {
-                    if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ProfileDataWidget(
+                nomePerfil = userData?.name ?: "",
+                emailPerfil = userData?.email ?: "",
+                telefonePerfil = userData?.telefone ?: "",
+                fotoPerfil = userData?.fotoPerfil?.takeIf { it.isNotBlank() } ?: uriImage
+            )
+            Spacer(Modifier.height(24.dp))
+            ProfileModulesBar(
+                profileUiState.currentProfileModule,
+                onCLick = { profileModule ->
+                    viewModel.setCurrentModule(profileModule)
                 }
+            )
+            Spacer(Modifier.height(24.dp))
+            when (profileUiState.currentProfileModule) {
 
-                val pedidosListState = rememberLazyListState()
+                ProfileModules.PEDIDOS -> {
 
-                Box(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .height(500.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (profileUiState.isLoading) {
-                        LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
+                    LaunchedEffect(Unit) {
+                        if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
                     }
-                    LazyColumn(
-                        state = pedidosListState,
+
+                    val pedidosListState = rememberLazyListState()
+
+                    Box(
                         modifier = Modifier
-                            .padding(vertical = 10.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                            .wrapContentWidth()
+                            .height(500.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        items(profileUiState.pedidosList) { pedido ->
-                            OrderCard(
-                                orderId = pedido.id,
-                                orderTotalValue = pedido.valorTotal.toFloat(),
-                                orderStatus = pedido.status ?: "",
-                                onClick = {
-                                    navController.navigate("${Screen.PEDIDO.name}/${pedido.id}")
-                                    resetScrollFunction()
-                                }
-                            )
+                        if (profileUiState.isLoading) {
+                            LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
+                        }
+                        LazyColumn(
+                            state = pedidosListState,
+                            modifier = Modifier
+                                .padding(vertical = 10.dp)
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            items(profileUiState.pedidosList) { pedido ->
+                                OrderCard(
+                                    orderId = pedido.id,
+                                    orderTotalValue = pedido.valorTotal.toFloat(),
+                                    orderStatus = pedido.status ?: "",
+                                    onClick = {
+                                        navController.navigate("${Screen.PEDIDO.name}/${pedido.id}")
+                                        resetScrollFunction()
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            ProfileModules.FAVORITOS -> {
+                ProfileModules.FAVORITOS -> {
 
-                LaunchedEffect(userData?.cpf, currentBackStackEntry) {
-                    if (currentBackStackEntry?.destination?.route == Screen.PROFILE.name) {
-                        userData?.cpf?.let { cpf ->
-                            viewModel.getFavoritesProducts(cpf)
+                    LaunchedEffect(userData?.cpf, currentBackStackEntry) {
+                        if (currentBackStackEntry?.destination?.route == Screen.PROFILE.name) {
+                            userData?.cpf?.let { cpf ->
+                                viewModel.getFavoritesProducts(cpf)
+                            }
                         }
                     }
-                }
 
-                Box(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .height(500.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LazyVerticalGrid(
-                        state = gridListState,
-                        columns = GridCells.Fixed(2),
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            .wrapContentWidth()
+                            .height(500.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        items(profileUiState.favoriteItensList) { item ->
-                            ProductCard(
-                                modifier = Modifier
-                                    .padding(bottom = 16.dp),
-                                image = item.image,
-                                nomeProduto = item.nomeProduto,
-                                precoProduto = item.precoProduto,
-                                isPromocao = item.isPromocao,
-                                precoPromocao = item.precoPromocao,
-                                haveButton = true,
-                                onClick = {
-                                    navController.navigate("${Screen.PRODUTO_UNICO.name}/${item.id}")
-                                    resetScrollFunction()
-                                },
-                                onButtonClick = {
-                                    viewModel.addProductToBag(item, userData?.cpf ?: "")
-                                }
-                            )
+                        LazyVerticalGrid(
+                            state = gridListState,
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(profileUiState.favoriteItensList) { item ->
+                                ProductCard(
+                                    modifier = Modifier
+                                        .padding(bottom = 16.dp),
+                                    image = item.image,
+                                    nomeProduto = item.nomeProduto,
+                                    precoProduto = item.precoProduto,
+                                    isPromocao = item.isPromocao,
+                                    precoPromocao = item.precoPromocao,
+                                    haveButton = true,
+                                    onClick = {
+                                        navController.navigate("${Screen.PRODUTO_UNICO.name}/${item.id}")
+                                        resetScrollFunction()
+                                    },
+                                    onButtonClick = {
+                                        viewModel.addProductToBag(item, userData?.cpf ?: "")
+                                    }
+                                )
+                            }
+                        }
+                        if (profileUiState.isLoading) {
+                            LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                         }
                     }
-                    if (profileUiState.isLoading) {
-                        LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
-                    }
                 }
-            }
 
 //            ProfileModules.ASSINATURAS -> {
 //
 //            }
+            }
         }
     }
 }

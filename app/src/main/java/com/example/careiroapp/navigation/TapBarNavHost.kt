@@ -6,8 +6,11 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,6 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.careiroapp.AboutUsView
 import com.example.careiroapp.associacoes.ui.AssociacoesView
+import com.example.careiroapp.search.ui.SearchResultView
+import com.example.careiroapp.search.ui.viewmodel.SearchViewModel
 import com.example.careiroapp.associacoes.ui.SingleAssociacaoView
 import com.example.careiroapp.associacoes.ui.viewmodel.AssociacaoViewModel
 import com.example.careiroapp.associacoes.ui.viewmodel.SingleAssociacaoViewModel
@@ -170,16 +175,33 @@ fun TapBarNavHost(
             val viewModel: SingleOrderViewModel = hiltViewModel(pedidoEntry)
             val pixStatus by viewModel.pixStatus.collectAsStateWithLifecycle()
             val uiState by viewModel.singleOrderUiState.collectAsStateWithLifecycle()
+            val lifecycleOwner = LocalLifecycleOwner.current
             LaunchedEffect(uiState) {
                 val pixPaymentId = (uiState as? SingleOrderUiState.Success)?.pedido?.pixPaymentId
                 if (!pixPaymentId.isNullOrBlank()) {
                     viewModel.getPixStatus(pixPaymentId)
                 }
             }
+            LaunchedEffect(lifecycleOwner) {
+                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.checkPixStatusNow()
+                }
+            }
             PixStatusView(
                 navController = navController,
                 pixStatus = pixStatus,
                 isPixPaymentDone = viewModel.pixPaymentDone.value
+            )
+        }
+
+        composable(
+            NavigationItem.Busca.route,
+            arguments = listOf(navArgument("query") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val viewModel: SearchViewModel = hiltViewModel(backStackEntry)
+            SearchResultView(
+                navController = navController,
+                viewModel = viewModel
             )
         }
 

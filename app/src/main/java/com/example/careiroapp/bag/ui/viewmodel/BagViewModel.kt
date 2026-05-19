@@ -39,45 +39,13 @@ import javax.inject.Inject
 @HiltViewModel
 class BagViewModel @Inject constructor(
     private val repository: BagRepository,
-    private val userRepository: UserRepository,
-    private val pedidoRepository: PedidoRepository,
-    private val paymentRepository: PaymentRepository
+    private val userRepository: UserRepository
 ): ViewModel() {
 
     private val _uiState: MutableStateFlow<BagUiState> = MutableStateFlow(BagUiState())
     var uiState: StateFlow<BagUiState> = _uiState.asStateFlow()
 
-    private val _orderUiState: MutableStateFlow<OrderUiState> = MutableStateFlow(OrderUiState())
-    var orderUiState: StateFlow<OrderUiState> = _orderUiState.asStateFlow()
-
     val userData: Flow<UserEntity?> = userRepository.getUserData()
-
-    val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
-
-    companion object {
-        val needsProfileRedirect: MutableState<Boolean> = mutableStateOf(false)
-    }
-
-    fun setNeedsProfileRedirect() {
-        needsProfileRedirect.value = true
-    }
-
-    fun clearNeedsProfileRedirect() {
-        needsProfileRedirect.value = false
-    }
-
-    init {
-        viewModelScope.launch {
-            NotificationEvents.events.collect { event ->
-                when(event) {
-                    is Events.PaymentPixConfirmed -> {
-                        pixPaymentDone.value = true
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
     val totalPrice: LiveData<Double> = userData
         .flatMapLatest { user ->
             val cpf = user?.cpf
@@ -103,124 +71,6 @@ class BagViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun createPedido() {
-
-        val produtos = bagItemsConverter(cartItems.value)
-
-        if (_uiState.value.isLoading) return
-
-        viewModelScope.launch {
-
-            _uiState.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
-
-            try {
-                when (orderUiState.value.order.paymentType) {
-                    PaymentType.PIX -> {
-
-                        val user = userData.firstOrNull()
-
-                        val currentTotal = totalPrice.value ?: 0.0
-
-                        val pedido = PedidoBody(
-                            valorTotal = totalPrice.value?.toFloat() ?: 0f,
-                            produtos = produtos,
-                            status = OrderState.PENDENTE.name,
-                            paymentType = orderUiState.value.order.paymentType,
-                            retiradaLocal = orderUiState.value.order.address,
-                            retiradaData = orderUiState.value.order.date,
-                            retiradaHora = orderUiState.value.order.time,
-                        )
-
-                        val response = pedidoRepository.createPedido(pedido)
-
-                        if (response.isSuccessful) {
-
-                            val pixPaymentBody = PixPaymentRequestBody(
-                                method = "PIX",
-                                data = PaymentDataRequest(
-                                    amount = (currentTotal * 100).toInt(), //Para a Api do AbacatePay o valor precisa estar em centavos,
-                                    expiresIn = 3600,
-                                    description = "Cobrança PIX no checkout transparente",
-                                    customer = Customer(
-                                        name = user?.name ?: "",
-                                        email = user?.email ?: "",
-                                        taxId = user?.cpf ?: "",
-                                        cellphone = user?.telefone ?: ""
-                                    ),
-                                    metadata = Metadata(
-                                        pedidoId = response.body()?.id ?: 0
-                                    )
-                                )
-                            )
-
-                            val paymentResponse = paymentRepository.createPixPayment(pixPaymentBody)
-
-                            if (paymentResponse.isSuccessful) {
-                                _uiState.update { it.copy(isLoading = false) }
-                                _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
-                                    totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
-                                    pixPayload = paymentResponse.body()?.data?.brCode,
-                                    pixQrCode = paymentResponse.body()?.data?.brCodeBase64
-                                ))}
-
-                                userData.firstOrNull()?.cpf?.let { cpf ->
-                                    repository.clearBag(cpf)
-                                }
-
-                                changeCheckoutStep(CheckoutStep.FINAL)
-                            } else {
-                                _uiState.update { it.copy(isLoading = false) }
-                            }
-                        } else {
-                            _uiState.update { it.copy(isLoading = false) }
-                        }
-
-                    }
-                    PaymentType.DINHEIRO -> {
-                        val pedido = PedidoBody(
-                            valorTotal = totalPrice.value?.toFloat() ?: 0f,
-                            produtos = produtos,
-                            status = OrderState.CONFIRMADO.name,
-                            paymentType = orderUiState.value.order.paymentType,
-                            retiradaLocal = orderUiState.value.order.address,
-                            retiradaData = orderUiState.value.order.date,
-                            retiradaHora = orderUiState.value.order.time
-                        )
-
-                        val response = pedidoRepository.createPedido(pedido)
-
-                        if (response.isSuccessful) {
-                            _uiState.update { it.copy(isLoading = false) }
-                            _orderUiState.update { it.copy(order = orderUiState.value.order.copy(
-                                totalValue = response.body()?.valorTotal?.toFloat() ?: 0f,
-                            ))}
-
-                            userData.firstOrNull()?.cpf?.let { cpf ->
-                                repository.clearBag(cpf)
-                            }
-
-                            changeCheckoutStep(CheckoutStep.FINAL)
-                        }
-                    }
-                    else -> {}
-                }
-            } catch (e: Exception) { }
-        }
-    }
-
-    private fun bagItemsConverter(bagItems: List<BagItem>): List<PedidoProdutoModel> {
-        return bagItems.map { item ->
-            PedidoProdutoModel(
-                idProduto = item.productId,
-                quantidade = item.quantity
-            )
-        }
-    }
-
     fun addQuantity(productId: UUID, cpf: String) {
         viewModelScope.launch {
             try {
@@ -243,57 +93,6 @@ class BagViewModel @Inject constructor(
                 repository.removeFromBag(item = bagItem)
             } catch (e: Exception) {}
         }
-    }
-
-    fun changeCheckoutStep(newStep: CheckoutStep) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(checkoutStep = newStep) }
-        }
-    }
-
-    fun updatePaymentType(
-        paymentType: PaymentType
-    ) {
-        _orderUiState.update {
-            it.copy(
-                order = it.order.copy(
-                    paymentType = paymentType
-                )
-            )
-        }
-    }
-
-    fun saveOrderDateLocal(
-        date: String,
-        time: String,
-        local: String
-    ) {
-        _orderUiState.update {
-            it.copy(
-                order = it.order.copy(
-                    date = date,
-                    time = time,
-                    address = local
-                )
-            )
-        }
-    }
-
-    fun resetPaymentMode() {
-        _orderUiState.update {
-            it.copy(
-                order = it.order.copy(
-                    paymentType = null
-                )
-            )
-        }
-    }
-
-    fun resetOrderState() {
-        _orderUiState.update { it.copy(
-            order = OrderModel(),
-        ) }
-        pixPaymentDone.value = false
     }
 
 }

@@ -17,7 +17,8 @@ enum class Screen {
 
     PEDIDO,
     PIX_STATUS,
-    LOGIN
+    LOGIN,
+    BUSCA
 }
 
 sealed class NavigationItem(val route: String) {
@@ -39,4 +40,5 @@ sealed class NavigationItem(val route: String) {
     object PixStatus: NavigationItem(route = Screen.PIX_STATUS.name)
 
     object Login: NavigationItem(route = Screen.LOGIN.name)
+    object Busca: NavigationItem(route = "${Screen.BUSCA.name}/{query}")
 }

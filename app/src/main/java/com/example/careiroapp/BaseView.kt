@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.careiroapp.bag.ui.viewmodel.BagViewModel
+import com.example.careiroapp.bag.ui.viewmodel.CheckoutViewModel
 import com.example.careiroapp.common.components.drawer.AppDrawer
 import com.example.careiroapp.common.components.footer.AppFooter
 import com.example.careiroapp.common.components.header.AppHeader
@@ -47,9 +48,9 @@ fun BaseView(
     val scope = rememberCoroutineScope()
     val tabBarNavController = rememberNavController()
 
-    val bagViewModel: BagViewModel = hiltViewModel()
-    val bagItems: List<BagItem> by bagViewModel.cartItems.collectAsStateWithLifecycle()
-    val needsProfileRedirect by BagViewModel.needsProfileRedirect
+    val checkoutViewModel: CheckoutViewModel = hiltViewModel()
+    val bagItems: List<BagItem> by checkoutViewModel.cartItems.collectAsStateWithLifecycle()
+    val needsProfileRedirect by CheckoutViewModel.needsProfileRedirect
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -63,7 +64,7 @@ fun BaseView(
     LaunchedEffect(needsProfileRedirect) {
         if (needsProfileRedirect) {
             tabBarNavController.navigate(NavigationItem.Profile.route)
-            bagViewModel.clearNeedsProfileRedirect()
+            checkoutViewModel.clearNeedsProfileRedirect()
         }
     }
 
