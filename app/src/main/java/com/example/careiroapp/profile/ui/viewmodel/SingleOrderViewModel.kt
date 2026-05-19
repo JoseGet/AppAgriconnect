@@ -12,10 +12,13 @@ import com.example.careiroapp.bag.data.repository.PedidoRepository
 import com.example.careiroapp.common.events.Events
 import com.example.careiroapp.common.events.NotificationEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +36,9 @@ class SingleOrderViewModel @Inject constructor(
     val pixStatus: StateFlow<PixStatusResponse?> = _pixStatus.asStateFlow()
 
     val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
+
+    private var pixPaymentId: String? = null
+    private var pixPollingJob: Job? = null
 
     private val pedidoId: Int = savedStateHandle.get<Int>("pedidoId")!!
 
@@ -71,15 +77,42 @@ class SingleOrderViewModel @Inject constructor(
     }
 
     fun getPixStatus(id: String) {
-        viewModelScope.launch {
-            try {
-                val response = paymentRepository.getPixStatus(id)
-                if (response.isSuccessful) {
-                    _pixStatus.update { response.body() }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error fetching pix status", e)
+        if (pixPaymentId != null) return
+        pixPaymentId = id
+        viewModelScope.launch { handlePixStatusCheck(id) }
+        startPixPolling()
+    }
+
+    fun checkPixStatusNow() {
+        val id = pixPaymentId ?: return
+        if (pixPaymentDone.value) return
+        viewModelScope.launch { handlePixStatusCheck(id) }
+    }
+
+    private fun startPixPolling() {
+        pixPollingJob?.cancel()
+        val id = pixPaymentId ?: return
+        pixPollingJob = viewModelScope.launch {
+            while (isActive) {
+                delay(5_000)
+                handlePixStatusCheck(id)
+                if (pixPaymentDone.value) break
             }
+        }
+    }
+
+    private suspend fun handlePixStatusCheck(id: String) {
+        try {
+            val response = paymentRepository.getPixStatus(id)
+            if (response.isSuccessful) {
+                _pixStatus.update { response.body() }
+                if (response.body()?.success == true && !pixPaymentDone.value) {
+                    pixPaymentDone.value = true
+                    pixPollingJob?.cancel()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching pix status", e)
         }
     }
 

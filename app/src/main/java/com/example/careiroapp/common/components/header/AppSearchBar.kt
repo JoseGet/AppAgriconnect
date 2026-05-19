@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,13 +30,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.careiroapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSearchBar() {
+fun AppSearchBar(onSearch: (String) -> Unit = {}) {
     var text by remember { mutableStateOf("") }
 
     Box(
@@ -51,39 +55,41 @@ fun AppSearchBar() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
             BasicTextField(
                 modifier = Modifier
                     .padding(start = 16.dp)
                     .weight(1f),
                 value = text,
-                onValueChange = {
-                    text = it
-                },
+                onValueChange = { text = it },
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = {
+                    if (text.isNotBlank()) onSearch(text)
+                }),
                 decorationBox = { innerTextField ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (text.isEmpty()) {
-                            Text(
-                                "O que você procura?",
-                                color = Color.Gray
-                            )
+                            Text("O que você procura?", color = Color.Gray)
                         }
                         innerTextField()
                     }
                 },
             )
 
-            Icon(
-                modifier = Modifier.padding(end = 16.dp),
-                painter = painterResource(R.drawable.lupa),
-                contentDescription = null,
-                tint = colorResource(R.color.dark_green)
-            )
+            IconButton(
+                onClick = { if (text.isNotBlank()) onSearch(text) },
+                modifier = Modifier.padding(end = 4.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.lupa),
+                    contentDescription = "Pesquisar",
+                    tint = colorResource(R.color.dark_green)
+                )
+            }
         }
     }
 }
