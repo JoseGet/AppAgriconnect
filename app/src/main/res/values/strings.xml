@@ -133,5 +133,11 @@ No Agriconnect, a tecnologia é aliada na criação de redes entre agricultores 
     <string name="payment_pix_done_title">Pedido confirmado!</string>
     <string name="payment_pix_done_description">Confira o as informações e o resumo do seu pedido em ”Meus pedidos”</string>
 
+    <string name="empty_favorites_title">Favorite produtos para ver a disponibilidade e planejar suas compras.</string>
+    <string name="empty_favorites_description">Favorite produtos para ver a disponibilidade e planejar suas compras.</string>
+
+    <string name="empty_orders_title">Abasteça sua casa com produtos locais</string>
+    <string name="empty_orders_description">Faça seu primeiro pedido no Agriconnect</string>
+
 
 </resources>

@@ -1,5 +1,6 @@
 package com.example.careiroapp.profile.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,18 +29,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil3.Image
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.careiroapp.R
 import com.example.careiroapp.common.components.ModulesHeader
+import com.example.careiroapp.common.montserratBoldFontFamily
+import com.example.careiroapp.common.montserratRegularFontFamily
 import com.example.careiroapp.navigation.Screen
 import com.example.careiroapp.products.ui.components.ProductCard
 import com.example.careiroapp.profile.ui.components.OrderCard
@@ -98,7 +109,7 @@ fun ProfileView(
                 ProfileModules.PEDIDOS -> {
 
                     LaunchedEffect(Unit) {
-                        if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
+                        //if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
                     }
 
                     val pedidosListState = rememberLazyListState()
@@ -112,22 +123,54 @@ fun ProfileView(
                         if (profileUiState.isLoading) {
                             LottieAnimation(loadingAnimation, iterations = LottieConstants.IterateForever)
                         }
-                        LazyColumn(
-                            state = pedidosListState,
-                            modifier = Modifier
-                                .padding(vertical = 10.dp)
-                                .fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(24.dp)
-                        ) {
-                            items(profileUiState.pedidosList) { pedido ->
-                                OrderCard(
-                                    orderId = pedido.id,
-                                    orderTotalValue = pedido.valorTotal.toFloat(),
-                                    orderStatus = pedido.status ?: "",
-                                    onClick = {
-                                        navController.navigate("${Screen.PEDIDO.name}/${pedido.id}")
-                                        resetScrollFunction()
-                                    }
+                        if (profileUiState.pedidosList.isNotEmpty()) {
+                            LazyColumn(
+                                state = pedidosListState,
+                                modifier = Modifier
+                                    .padding(vertical = 10.dp)
+                                    .fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                            ) {
+                                items(profileUiState.pedidosList) { pedido ->
+                                    OrderCard(
+                                        orderId = pedido.id,
+                                        orderTotalValue = pedido.valorTotal.toFloat(),
+                                        orderStatus = pedido.status ?: "",
+                                        onClick = {
+                                            navController.navigate("${Screen.PEDIDO.name}/${pedido.id}")
+                                            resetScrollFunction()
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.empty_order_icon),
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Text(
+                                    text = stringResource(R.string.empty_orders_title),
+                                    style = TextStyle(
+                                        fontFamily = montserratBoldFontFamily,
+                                        fontSize = 18.sp,
+                                        color = colorResource(R.color.black),
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.empty_orders_description),
+                                    style = TextStyle(
+                                        fontFamily = montserratRegularFontFamily,
+                                        fontSize = 16.sp,
+                                        color = colorResource(R.color.black),
+                                        textAlign = TextAlign.Center
+                                    )
                                 )
                             }
                         }
@@ -139,7 +182,7 @@ fun ProfileView(
                     LaunchedEffect(userData?.cpf, currentBackStackEntry) {
                         if (currentBackStackEntry?.destination?.route == Screen.PROFILE.name) {
                             userData?.cpf?.let { cpf ->
-                                viewModel.getFavoritesProducts(cpf)
+                                //viewModel.getFavoritesProducts(cpf)
                             }
                         }
                     }
@@ -150,30 +193,62 @@ fun ProfileView(
                             .height(500.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        LazyVerticalGrid(
-                            state = gridListState,
-                            columns = GridCells.Fixed(2),
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(profileUiState.favoriteItensList) { item ->
-                                ProductCard(
-                                    modifier = Modifier
-                                        .padding(bottom = 16.dp),
-                                    image = item.image,
-                                    nomeProduto = item.nomeProduto,
-                                    precoProduto = item.precoProduto,
-                                    isPromocao = item.isPromocao,
-                                    precoPromocao = item.precoPromocao,
-                                    haveButton = true,
-                                    onClick = {
-                                        navController.navigate("${Screen.PRODUTO_UNICO.name}/${item.id}")
-                                        resetScrollFunction()
-                                    },
-                                    onButtonClick = {
-                                        viewModel.addProductToBag(item, userData?.cpf ?: "")
-                                    }
+                        if (profileUiState.favoriteItensList.isNotEmpty()) {
+                            LazyVerticalGrid(
+                                state = gridListState,
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(profileUiState.favoriteItensList) { item ->
+                                    ProductCard(
+                                        modifier = Modifier
+                                            .padding(bottom = 16.dp),
+                                        image = item.image,
+                                        nomeProduto = item.nomeProduto,
+                                        precoProduto = item.precoProduto,
+                                        isPromocao = item.isPromocao,
+                                        precoPromocao = item.precoPromocao,
+                                        haveButton = true,
+                                        onClick = {
+                                            navController.navigate("${Screen.PRODUTO_UNICO.name}/${item.id}")
+                                            resetScrollFunction()
+                                        },
+                                        onButtonClick = {
+                                            viewModel.addProductToBag(item, userData?.cpf ?: "")
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.empty_favorites_icon),
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                                Text(
+                                    text = stringResource(R.string.empty_favorites_title),
+                                    style = TextStyle(
+                                        fontFamily = montserratBoldFontFamily,
+                                        fontSize = 18.sp,
+                                        color = colorResource(R.color.black),
+                                        textAlign = TextAlign.Center
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.empty_favorites_description),
+                                    style = TextStyle(
+                                        fontFamily = montserratRegularFontFamily,
+                                        fontSize = 16.sp,
+                                        color = colorResource(R.color.black),
+                                        textAlign = TextAlign.Center
+                                    )
                                 )
                             }
                         }

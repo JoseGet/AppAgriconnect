@@ -81,7 +81,8 @@ fun CheckoutFinalStepView(
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontFamily = montserratRegularFontFamily,
-                                color = colorResource(R.color.dark_green)
+                                color = colorResource(R.color.dark_green),
+                                textAlign = TextAlign.Center
                             )
                         )
                         Spacer(modifier = Modifier.height(19.dp))

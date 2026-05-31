@@ -16,6 +16,10 @@ data class PixStatusResponse(
 
 data class PixStatusData(
 
+    @SerializedName("status")
+    @Expose
+    val status: String,
+
     @SerializedName("brCode")
     @Expose
     val brCode: String,
