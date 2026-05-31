@@ -263,6 +263,7 @@ class CheckoutViewModel @Inject constructor(
         val id = pixPaymentId ?: return
         val current = _checkoutUiState.value
         if (current !is CheckoutUiState.Success || current.isPaymentPixDone) return
+        _checkoutUiState.value = current.copy(isPolling = true)
         viewModelScope.launch { handlePixStatusCheck(id) }
     }
 
@@ -282,13 +283,17 @@ class CheckoutViewModel @Inject constructor(
         try {
             val response = paymentRepository.getPixStatus(id)
             val status = response.body()?.data?.firstOrNull()?.status
+            val current = _checkoutUiState.value
+            if (current !is CheckoutUiState.Success) return
             if (response.isSuccessful && status == "PAID") {
-                val current = _checkoutUiState.value
-                if (current is CheckoutUiState.Success && !current.isPaymentPixDone) {
-                    _checkoutUiState.value = current.copy(isPaymentPixDone = true)
-                    pixPollingJob?.cancel()
-                }
+                _checkoutUiState.value = current.copy(isPaymentPixDone = true, isPolling = false)
+                pixPollingJob?.cancel()
             }
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            val current = _checkoutUiState.value
+            if (current is CheckoutUiState.Success) {
+                _checkoutUiState.value = current.copy(isPolling = false)
+            }
+        }
     }
 }

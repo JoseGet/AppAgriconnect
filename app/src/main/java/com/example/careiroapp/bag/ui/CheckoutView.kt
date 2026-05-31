@@ -136,6 +136,7 @@ fun CheckoutView(
                         innerPadding,
                         orderData = orderData,
                         isPaymentPixDone = state.isPaymentPixDone,
+                        isPolling = state.isPolling,
                         onClickLeftButton = {
                             navController.navigate(NavigationItem.Main.route) {
                                 popUpTo(navController.graph.startDestinationId) {

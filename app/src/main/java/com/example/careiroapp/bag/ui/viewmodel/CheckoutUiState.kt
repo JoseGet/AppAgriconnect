@@ -10,7 +10,8 @@ sealed class CheckoutUiState {
     ): CheckoutUiState()
     data class Success(
         val isOrderComplete: Boolean,
-        val isPaymentPixDone: Boolean = false
+        val isPaymentPixDone: Boolean = false,
+        val isPolling: Boolean = false
     ): CheckoutUiState()
 }
 enum class PaymentType{

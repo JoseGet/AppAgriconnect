@@ -109,7 +109,7 @@ fun ProfileView(
                 ProfileModules.PEDIDOS -> {
 
                     LaunchedEffect(Unit) {
-                        //if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
+                        if (profileUiState.pedidosList.isEmpty()) viewModel.getPedidos()
                     }
 
                     val pedidosListState = rememberLazyListState()
@@ -182,7 +182,7 @@ fun ProfileView(
                     LaunchedEffect(userData?.cpf, currentBackStackEntry) {
                         if (currentBackStackEntry?.destination?.route == Screen.PROFILE.name) {
                             userData?.cpf?.let { cpf ->
-                                //viewModel.getFavoritesProducts(cpf)
+                                viewModel.getFavoritesProducts(cpf)
                             }
                         }
                     }
