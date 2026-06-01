@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ fun CheckoutFinalStepView(
     padding: PaddingValues,
     orderData: OrderModel,
     isPaymentPixDone: Boolean,
+    isPolling: Boolean = false,
     onClickLeftButton: () -> Unit,
     onClickRightButton: () -> Unit
 ) {
@@ -81,7 +83,8 @@ fun CheckoutFinalStepView(
                             style = TextStyle(
                                 fontSize = 14.sp,
                                 fontFamily = montserratRegularFontFamily,
-                                color = colorResource(R.color.dark_green)
+                                color = colorResource(R.color.dark_green),
+                                textAlign = TextAlign.Center
                             )
                         )
                         Spacer(modifier = Modifier.height(19.dp))
@@ -90,7 +93,15 @@ fun CheckoutFinalStepView(
                             contentDescription = null,
                             modifier = Modifier.size(300.dp)
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        if (isPolling) {
+                            CircularProgressIndicator(
+                                color = colorResource(R.color.dark_green),
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                         AppButton(
                             text = "Copiar codigo PIX",
                             modifier = Modifier,

@@ -175,22 +175,18 @@ fun TapBarNavHost(
             val viewModel: SingleOrderViewModel = hiltViewModel(pedidoEntry)
             val pixStatus by viewModel.pixStatus.collectAsStateWithLifecycle()
             val uiState by viewModel.singleOrderUiState.collectAsStateWithLifecycle()
-            val lifecycleOwner = LocalLifecycleOwner.current
             LaunchedEffect(uiState) {
                 val pixPaymentId = (uiState as? SingleOrderUiState.Success)?.pedido?.pixPaymentId
                 if (!pixPaymentId.isNullOrBlank()) {
                     viewModel.getPixStatus(pixPaymentId)
                 }
             }
-            LaunchedEffect(lifecycleOwner) {
-                lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.checkPixStatusNow()
-                }
-            }
             PixStatusView(
                 navController = navController,
                 pixStatus = pixStatus,
-                isPixPaymentDone = viewModel.pixPaymentDone.value
+                isPixPaymentDone = viewModel.pixPaymentDone.value,
+                isPolling = viewModel.isPolling.value,
+                onResumed = { viewModel.checkPixStatusNow() }
             )
         }
 

@@ -12,6 +12,7 @@ import com.example.careiroapp.bag.data.models.PaymentDataRequest
 import com.example.careiroapp.bag.data.models.PedidoBody
 import com.example.careiroapp.bag.data.models.PedidoProdutoModel
 import com.example.careiroapp.bag.data.models.PixPaymentRequestBody
+import android.content.Context
 import com.example.careiroapp.bag.data.repository.BagRepository
 import com.example.careiroapp.bag.data.repository.PaymentRepository
 import com.example.careiroapp.bag.data.repository.PedidoRepository
@@ -21,6 +22,9 @@ import com.example.careiroapp.data.room.entities.BagItem
 import com.example.careiroapp.data.room.entities.UserEntity
 import com.example.careiroapp.profile.data.repositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,9 +35,10 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -258,6 +263,7 @@ class CheckoutViewModel @Inject constructor(
         val id = pixPaymentId ?: return
         val current = _checkoutUiState.value
         if (current !is CheckoutUiState.Success || current.isPaymentPixDone) return
+        _checkoutUiState.value = current.copy(isPolling = true)
         viewModelScope.launch { handlePixStatusCheck(id) }
     }
 
@@ -276,13 +282,18 @@ class CheckoutViewModel @Inject constructor(
     private suspend fun handlePixStatusCheck(id: String) {
         try {
             val response = paymentRepository.getPixStatus(id)
-            if (response.isSuccessful && response.body()?.success == true) {
-                val current = _checkoutUiState.value
-                if (current is CheckoutUiState.Success && !current.isPaymentPixDone) {
-                    _checkoutUiState.value = current.copy(isPaymentPixDone = true)
-                    pixPollingJob?.cancel()
-                }
+            val status = response.body()?.data?.firstOrNull()?.status
+            val current = _checkoutUiState.value
+            if (current !is CheckoutUiState.Success) return
+            if (response.isSuccessful && status == "PAID") {
+                _checkoutUiState.value = current.copy(isPaymentPixDone = true, isPolling = false)
+                pixPollingJob?.cancel()
             }
-        } catch (e: Exception) { }
+        } catch (e: Exception) {
+            val current = _checkoutUiState.value
+            if (current is CheckoutUiState.Success) {
+                _checkoutUiState.value = current.copy(isPolling = false)
+            }
+        }
     }
 }
