@@ -143,7 +143,7 @@ fun ProfileView(
                                     )
                                 }
                             }
-                        } else {
+                        } else if (!profileUiState.isLoading) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
@@ -221,7 +221,7 @@ fun ProfileView(
                                     )
                                 }
                             }
-                        } else {
+                        } else if (!profileUiState.isLoading) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center

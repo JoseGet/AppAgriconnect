@@ -3,6 +3,10 @@ package com.example.careiroapp.profile.ui
 import android.content.ClipData
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,8 +48,17 @@ import com.example.careiroapp.navigation.NavigationItem
 fun PixStatusView(
     navController: NavHostController,
     pixStatus: PixStatusResponse? = null,
-    isPixPaymentDone: Boolean = false
+    isPixPaymentDone: Boolean = false,
+    isPolling: Boolean = false,
+    onResumed: () -> Unit = {}
 ) {
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            onResumed()
+        }
+    }
 
     val clipboardManager = LocalClipboardManager.current
     val successPayment by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.checkmark_animation))
@@ -81,7 +95,15 @@ fun PixStatusView(
                     contentDescription = null,
                     modifier = Modifier.size(300.dp)
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+                if (isPolling) {
+                    CircularProgressIndicator(
+                        color = colorResource(R.color.dark_green),
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 AppButton(
                     text = "Copiar codigo PIX",
                     modifier = Modifier,

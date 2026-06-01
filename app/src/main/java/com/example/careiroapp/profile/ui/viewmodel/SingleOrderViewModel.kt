@@ -36,6 +36,7 @@ class SingleOrderViewModel @Inject constructor(
     val pixStatus: StateFlow<PixStatusResponse?> = _pixStatus.asStateFlow()
 
     val pixPaymentDone: MutableState<Boolean> = mutableStateOf(false)
+    val isPolling: MutableState<Boolean> = mutableStateOf(false)
 
     private var pixPaymentId: String? = null
     private var pixPollingJob: Job? = null
@@ -86,6 +87,7 @@ class SingleOrderViewModel @Inject constructor(
     fun checkPixStatusNow() {
         val id = pixPaymentId ?: return
         if (pixPaymentDone.value) return
+        isPolling.value = true
         viewModelScope.launch { handlePixStatusCheck(id) }
     }
 
@@ -106,7 +108,7 @@ class SingleOrderViewModel @Inject constructor(
             val response = paymentRepository.getPixStatus(id)
             if (response.isSuccessful) {
                 _pixStatus.update { response.body() }
-                if (response.body()?.success == true && !pixPaymentDone.value) {
+                if (response.body()?.data?.firstOrNull()?.status == "PAID" && !pixPaymentDone.value) {
                     pixPaymentDone.value = true
                     pixPollingJob?.cancel()
                 }
